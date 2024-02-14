@@ -1,9 +1,9 @@
 import './App.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import JsonFileProcessor from "./JsonFileProcessor";
 import {GlobalStateProvider} from "./GlobalStateContext";
 import JsonElementsDisplay from "./JsonElementsDisplay";
 import React from "react";
+import LottiePreview from "./LottiePreview";
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
           </div>
           <div id="splitBar"></div>
           <div id="jsonPreview">
+            <LottiePreview/>
             <div id="animationPreview"></div>
             <div id="previewControlContainer">
               <div id="progressBarContainer">
