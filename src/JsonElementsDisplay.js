@@ -3,6 +3,7 @@ import {GlobalStateContext} from './GlobalStateContext';
 import InfosDisplay from "./InfosDispaly";
 import FontsDisplay from "./FontsDisplay";
 import TextsDisplay from "./TextsDisplay";
+import ImagesDisplay from "./ImagesDisplay";
 
 
 function JsonElementsDisplay() {
@@ -65,7 +66,9 @@ function JsonElementsDisplay() {
                         <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
                     </h3>
                     <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
-                        <FontsDisplay/>
+                        <div className='image-preview'>
+                            <ImagesDisplay/>
+                        </div>
                     </div>
                 </div>
             )}

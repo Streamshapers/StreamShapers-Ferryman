@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import JsonFileProcessor from "./JsonFileProcessor";
 import {GlobalStateProvider} from "./GlobalStateContext";
 import JsonElementsDisplay from "./JsonElementsDisplay";
+import React from "react";
 
 function App() {
   return (
@@ -26,13 +27,13 @@ function App() {
               </div>
               <div id="previewControls">
                 <div id="timeDisplay" title="Time (seconds:frame)">00:00</div>
-                <FontAwesomeIcon icon="fa-solid fa-backward-step" className="previewControlButton" title="frame back (Pause)"/>
+                <i className='fa-solid fa-backward-steppreviewControlButton' title="frame back (Pause)"></i>
                 <button id="playPauseButton" className="previewControlButton" title="Play/Pause">
-                  <FontAwesomeIcon icon="fa-solid fa-pause" />
+                  <i className="fa-solid fa-pause"></i>
                 </button>
-                <FontAwesomeIcon icon="fa-solid fa-forward-step" className="previewControlButton" title="next Frame (Pause)"/>
-                <FontAwesomeIcon icon="fa-solid fa-forward-fast" className="previewControlButton" title="play next section"/>
-                <FontAwesomeIcon icon="fa -solid fa-circle-down" className="previewControlButton" title="Download current Frame"/>
+                <i className="fa-solid fa-forward-step previewControlButton" title="next Frame (Pause)"></i>
+                <i className="fa-solid fa-forward-fast previewControlButton" title="play next section"></i>
+                <i className="fa-solid fa-circle-down previewControlButton" title="Download current Frame"></i>
               </div>
             </div>
           </div>

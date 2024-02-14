@@ -2,8 +2,12 @@ import React, {useContext, useEffect, useState} from 'react';
 import {GlobalStateContext} from './GlobalStateContext';
 
 function TextsDisplay() {
-    const { jsonData, texts, originalTexts, textsLayerNames, setJsonData } = useContext(GlobalStateContext);
+    const { jsonData, texts, setTexts, originalTexts, textsLayerNames, setJsonData } = useContext(GlobalStateContext);
     const [textShowAll, setTextShowAll] = useState(false);
+
+    useEffect(() => {
+        setTexts(texts);
+    }, [setTexts, texts]);
 
     const updateLottieText = (index, newText) => {
         if (!jsonData) {
@@ -41,11 +45,20 @@ function TextsDisplay() {
             searchAndUpdateText(tempJsonData);
         }
         setJsonData(tempJsonData);
+
+        const updatedTexts = [...texts];
+        updatedTexts[index] = newText;
+        setTexts(updatedTexts);
     };
 
     const toggleTextShowAll = () => {
         setTextShowAll(!textShowAll);
     };
+
+    // Filterfunktion, die entscheidet, welche Texte basierend auf textShowAll angezeigt werden
+    const filteredTexts = texts && textsLayerNames && texts.filter((text, i) => {
+        return textShowAll || textsLayerNames[i].startsWith('_');
+    });
 
     return (
         <div>
@@ -62,19 +75,20 @@ function TextsDisplay() {
                 </div>
             </div>
             <div id="text-inputs" className="text-inputs">
-                {texts && textsLayerNames && texts.map((text, i) => {
-                        return (
-                            <div key={i} className="jsonText">
-                                <label>{textsLayerNames[i]}:</label>
-                                <input
-                                    type="text"
-                                    data-index={i}
-                                    value={text}
-                                    onChange={(e) => updateLottieText(i, e.target.value)}
-                                />
-                                <span>{originalTexts[i]}</span>
-                            </div>
-                        );
+                {filteredTexts.map((text, i) => {
+                    const index = texts.indexOf(text); // Finde den originalen Index des Textes
+                    return (
+                        <div key={i} className="jsonText">
+                            <label>{textsLayerNames[index]}:</label>
+                            <input
+                                type="text"
+                                data-index={index}
+                                value={text}
+                                onChange={(e) => updateLottieText(index, e.target.value)}
+                            />
+                            <span>{originalTexts[index]}</span>
+                        </div>
+                    );
                 })}
             </div>
         </div>
