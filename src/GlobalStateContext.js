@@ -8,7 +8,7 @@ export const GlobalStateProvider = ({children}) => {
     const [colors, setColors] = useState([]);
     const [texts, setTexts] = useState([]);
     const [originalTexts, setOriginalTexts] = useState([]);
-    const [textlayerNames, setTextlayerNames] = useState([]);
+    const [textsLayerNames, setTextsLayerNames] = useState([]);
     const [images, setImages] = useState([]);
     const [savedFrame, setSavedFrame] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -62,7 +62,7 @@ export const GlobalStateProvider = ({children}) => {
 
         setInfos(newInfos);
 
-    }, [jsonData, setInfos]);
+    }, [jsonData]);
 
     //############################## Fonts #########################################################################
     useEffect(() => {
@@ -78,7 +78,7 @@ export const GlobalStateProvider = ({children}) => {
 
         setFonts(newFonts);
 
-    }, [jsonData, setFonts]);
+    }, [jsonData]);
 
     //######################################## Texts ###############################################################
 
@@ -118,13 +118,10 @@ export const GlobalStateProvider = ({children}) => {
             const {texts, originalTexts, textsLayerNames} = searchForTexts(jsonData);
             setTexts(texts);
             setOriginalTexts(originalTexts);
-            setTextlayerNames(textsLayerNames);
-            console.log(texts)
-            console.log(originalTexts)
-            console.log(textsLayerNames)
+            setTextsLayerNames(textsLayerNames);
         }
 
-    }, [jsonData, setTexts, setOriginalTexts, setTextlayerNames]);
+    }, [jsonData]);
 
     //############################### Colors ###########################################################################
 
@@ -205,7 +202,7 @@ export const GlobalStateProvider = ({children}) => {
             const {colors} = searchForColors(jsonData);
             setColors(colors);
         }
-    }, [jsonData, setColors]);
+    }, [jsonData]);
 
     //########################################## Images ################################################################
 
@@ -235,12 +232,12 @@ export const GlobalStateProvider = ({children}) => {
             const extractedImages = searchForImages(jsonData);
             setImages(extractedImages);
         }
-    }, [jsonData, setImages]);
+    }, [jsonData]);
 
     return (
         <GlobalStateContext.Provider value={{
-            jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts,
-            textlayerNames, setTextlayerNames, images, setImages, savedFrame, setSavedFrame, isPlaying, setIsPlaying,
+            jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
+            setTextsLayerNames, images, setImages, savedFrame, setSavedFrame, isPlaying, setIsPlaying,
             currentFrame, setCurrentFrame, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts
         }}>

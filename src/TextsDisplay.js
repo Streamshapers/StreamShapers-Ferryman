@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {GlobalStateContext} from './GlobalStateContext';
 
 function TextsDisplay() {
@@ -21,7 +21,7 @@ function TextsDisplay() {
                     obj.t.d.k.forEach((item) => {
                         // Update the text only if the current index matches the provided textIndex
                         if (item.s && currentTextIndex === index) {
-                            //console.log("Updating text at index:", currentTextIndex);
+                            console.log("Updating text at index:", currentTextIndex);
                             item.s.t = newText;
                         }
                         currentTextIndex++; // Increment the counter for each text element
@@ -43,9 +43,9 @@ function TextsDisplay() {
         setJsonData(tempJsonData);
     };
 
-    /*useEffect(() => {
-
-    }, []);*/
+    const toggleTextShowAll = () => {
+        setTextShowAll(!textShowAll);
+    };
 
     return (
         <div>
@@ -57,13 +57,12 @@ function TextsDisplay() {
                         title="Show all"
                         id="textShowAll"
                         checked={textShowAll}
-                        onChange={() => setTextShowAll(!textShowAll)}
+                        onChange={toggleTextShowAll}
                     />
                 </div>
             </div>
             <div id="text-inputs" className="text-inputs">
-                {texts && texts.map((text, i) => {
-                    if ((textShowAll || textsLayerNames[i].startsWith('_')) && originalTexts[i] !== undefined) {
+                {texts && textsLayerNames && texts.map((text, i) => {
                         return (
                             <div key={i} className="jsonText">
                                 <label>{textsLayerNames[i]}:</label>
@@ -76,8 +75,6 @@ function TextsDisplay() {
                                 <span>{originalTexts[i]}</span>
                             </div>
                         );
-                    }
-                    return null;
                 })}
             </div>
         </div>

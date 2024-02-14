@@ -5,7 +5,7 @@ import jsonElementsDisplay from "./JsonElementsDisplay";
 function JsonFileProcessor() {
     const {
         jsonData, setJsonData, colors, setColors, error, setError,
-        texts, setTexts, textlayerNames, setTextlayerNames, images, setImages,
+        texts, setTexts, textsLayerNames, setTextsLayerNames, images, setImages,
         savedFrame, setSavedFrame, isPlaying, setIsPlaying, currentFrame, setCurrentFrame
     } = useContext(GlobalStateContext);
 
@@ -13,7 +13,7 @@ function JsonFileProcessor() {
         setJsonData(null);
         setColors([]);
         setTexts([]);
-        setTextlayerNames([]);
+        setTextsLayerNames([]);
         setImages([]);
         setSavedFrame(0);
         setIsPlaying(true);
@@ -49,7 +49,7 @@ function JsonFileProcessor() {
             const jsonData = JSON.parse(content);
             setJsonData(jsonData);
         } catch (error) {
-            setError("Error reading the JSON file. Please make sure it is a valid JSON file.");
+            setError(`Error reading the JSON file. Please make sure it is a valid JSON file. Error: ${error.message}`);
         }
     };
 
