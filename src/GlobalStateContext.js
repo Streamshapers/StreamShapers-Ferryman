@@ -10,12 +10,11 @@ export const GlobalStateProvider = ({children}) => {
     const [originalTexts, setOriginalTexts] = useState([]);
     const [textsLayerNames, setTextsLayerNames] = useState([]);
     const [images, setImages] = useState([]);
-    const [savedFrame, setSavedFrame] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentFrame, setCurrentFrame] = useState(0);
     const [infos, setInfos] = useState({});
     const [fonts, setFonts] = useState([]);
     const [uploadedFonts, setUploadedFonts] = useState({});
+    const [fontFaces, setFontFaces] = useState(null);
+    const [textShowAll, setTextShowAll] = useState(false);
 
     useEffect(() => {
         if (!jsonData) {
@@ -79,6 +78,37 @@ export const GlobalStateProvider = ({children}) => {
         setFonts(newFonts);
 
     }, [jsonData]);
+
+    useEffect(() => {
+        let styles = '';
+        for (const fontName in uploadedFonts) {
+            if (uploadedFonts.hasOwnProperty(fontName)) {
+                const fontBase64 = uploadedFonts[fontName];
+                styles += `
+                @font-face {
+                    font-family: '${fontName}';
+                    src: url('${fontBase64}');
+                }
+                
+            `;
+            }
+        }
+        setFontFaces(styles);
+    }, [uploadedFonts]);
+
+    useEffect(() => {
+        if(!fontFaces){
+            return;
+        }
+        const styleElement = document.createElement('style');
+        styleElement.setAttribute('type', 'text/css');
+        styleElement.innerHTML = fontFaces.toString();
+        document.head.appendChild(styleElement);
+
+        return () => {
+            document.head.removeChild(styleElement);
+        };
+    }, [fontFaces]);
 
     //######################################## Texts ###############################################################
 
@@ -237,9 +267,9 @@ export const GlobalStateProvider = ({children}) => {
     return (
         <GlobalStateContext.Provider value={{
             jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
-            setTextsLayerNames, images, setImages, savedFrame, setSavedFrame, isPlaying, setIsPlaying,
-            currentFrame, setCurrentFrame, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
-            originalTexts, setOriginalTexts
+            setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts,
+            uploadedFonts, setUploadedFonts, originalTexts, setOriginalTexts, fontFaces, setFontFaces,
+            textShowAll, setTextShowAll
         }}>
             {children}
         </GlobalStateContext.Provider>

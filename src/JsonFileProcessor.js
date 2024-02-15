@@ -4,9 +4,7 @@ import jsonElementsDisplay from "./JsonElementsDisplay";
 
 function JsonFileProcessor() {
     const {
-        jsonData, setJsonData, colors, setColors, error, setError,
-        texts, setTexts, textsLayerNames, setTextsLayerNames, images, setImages,
-        savedFrame, setSavedFrame, isPlaying, setIsPlaying, currentFrame, setCurrentFrame
+        setJsonData, setColors, error, setError, setTexts, setTextsLayerNames, setImages
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -15,9 +13,6 @@ function JsonFileProcessor() {
         setTexts([]);
         setTextsLayerNames([]);
         setImages([]);
-        setSavedFrame(0);
-        setIsPlaying(true);
-        setCurrentFrame(0);
     };
 
     const processJsonFile = (file) => {
@@ -56,11 +51,12 @@ function JsonFileProcessor() {
 
     return (
         <div>
-            <input type="file" id="jsonFile" accept=".json" onChange={(e) => processJsonFile(e.target.files[0])} />
+            <input type="file" id="jsonFile" accept=".json" onChange={(e) => processJsonFile(e.target.files[0])}/>
             {error && <div className="error-message">{error}</div>}
             {/* Weitere UI-Elemente und Logik hier */}
         </div>
     );
 
 }
+
 export default JsonFileProcessor;

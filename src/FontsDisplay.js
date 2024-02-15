@@ -1,9 +1,8 @@
 import React, {useContext} from 'react';
 import {GlobalStateContext} from "./GlobalStateContext";
 
-function InfosDisplay() {
+function FontsDisplay() {
     const {jsonData, setJsonData, fonts, uploadedFonts, setUploadedFonts} = useContext(GlobalStateContext);
-
 
     if (!fonts) {
         return <div>Loading...</div>;
@@ -37,12 +36,14 @@ function InfosDisplay() {
                 if (jsonData && jsonData.fonts && jsonData.fonts.list) {
                     const updatedFontsList = jsonData.fonts.list.map(font => {
                         if (font.fFamily === fontName) {
-                            return { ...font, fPath: "" };
+                            return {...font, fPath: ""};
                         }
                         return font;
                     });
-
-                    setJsonData({...jsonData, fonts: { ...jsonData.fonts, list: updatedFontsList }});
+                    const timer = setTimeout(() => {
+                        setJsonData({...jsonData, fonts: {...jsonData.fonts, list: updatedFontsList}});
+                    }, 100);//Timeout damit Font richtig dargestellt wird
+                    return () => clearTimeout(timer);
                 }
             } else {
                 console.error('Uploaded format is not supported.');
@@ -56,14 +57,14 @@ function InfosDisplay() {
             {fonts.map(font => {
                 const isUploaded = uploadedFonts.hasOwnProperty(font);
                 const indicatorId = `indicator_${font}`;
-                const indicatorStyle = isUploaded ? { color: 'green' } : { color: 'red' };
+                const indicatorStyle = isUploaded ? {color: 'green'} : {color: 'red'};
                 const indicator = isUploaded ? '✔' : '✖';
 
                 return (
                     <div key={font} className='font-item'>
                         <span id={indicatorId} style={indicatorStyle}>{indicator}</span>
                         {font}
-                        <input type='file' accept='.ttf' onChange={(e) => uploadFont(e.target.files, font)} />
+                        <input type='file' accept='.ttf' onChange={(e) => uploadFont(e.target.files, font)}/>
                     </div>
                 );
             })}
@@ -71,4 +72,4 @@ function InfosDisplay() {
     );
 }
 
-export default InfosDisplay;
+export default FontsDisplay;

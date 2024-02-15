@@ -250,7 +250,6 @@ input[type='file']::-webkit-file-upload-button {
 #previewControlContainer{
   width: 100%;
   box-sizing: border-box;
-  display: none;
   background: var(--secondary);
   padding: 40px 20px 20px 20px;
   border-radius: 0 0 5px 5px;

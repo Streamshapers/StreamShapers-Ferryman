@@ -2,8 +2,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import {GlobalStateContext} from './GlobalStateContext';
 
 function TextsDisplay() {
-    const { jsonData, texts, setTexts, originalTexts, textsLayerNames, setJsonData } = useContext(GlobalStateContext);
-    const [textShowAll, setTextShowAll] = useState(false);
+    const { jsonData, texts, setTexts, originalTexts, textsLayerNames, setJsonData, textShowAll, setTextShowAll } = useContext(GlobalStateContext);
+
 
     useEffect(() => {
         setTexts(texts);
