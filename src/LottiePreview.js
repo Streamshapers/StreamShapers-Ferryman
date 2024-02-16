@@ -12,7 +12,7 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 function LottiePreview() {
-    const {jsonData, fontFaces} = useContext(GlobalStateContext);
+    const {jsonData, fontFaces, texts} = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const progressBarRef = useRef(null);
     const [lottieInstance, setLottieInstance] = useState(null);
@@ -21,22 +21,19 @@ function LottiePreview() {
     const [markers, setMarkers] = useState([]);
 
     useEffect(() => {
-        if (!jsonData) {
-            return;
-        }
+        if (!jsonData) return;
 
+        // Initialisieren der Lottie-Animation
         const instance = lottie.loadAnimation({
             container: animationContainerRef.current,
             renderer: 'svg',
             loop: true,
-            autoplay: false,
+            autoplay: isPlaying,
             animationData: jsonData,
         });
 
         instance.goToAndStop(currentFrame);
-        if(isPlaying){
-            instance.play();
-        }
+        if(isPlaying) instance.play();
 
         const onEnterFrame = (e) => {
             setCurrentFrame(Math.round(e.currentTime));
@@ -47,15 +44,18 @@ function LottiePreview() {
         };
 
         instance.addEventListener('enterFrame', onEnterFrame);
-
         setLottieInstance(instance);
-        setMarkers(jsonData.markers);
+
+        console.log('preview rendered');
+
+        setMarkers(jsonData.markers || []);
 
         return () => {
             instance.removeEventListener('enterFrame', onEnterFrame);
             instance.destroy();
+            setMarkers([]);
         };
-    }, [jsonData]);
+    }, [jsonData, texts]);
 
     function formatTimeFromFrames(currentFrame, frameRate) {
         const seconds = Math.floor(currentFrame / frameRate);
@@ -67,20 +67,19 @@ function LottiePreview() {
         return `${formattedSeconds}:${formattedFrames}`;
     }
 
+    useEffect(() => {
+        if (!lottieInstance) return;
+        isPlaying ? lottieInstance.play() : lottieInstance.pause();
+    }, [isPlaying]);
 
     const togglePlayPause = () => {
-        if (!lottieInstance) return;
-        const newState = !isPlaying;
-        setIsPlaying(newState);
-
-        newState ? lottieInstance.play() : lottieInstance.pause();
+        isPlaying ? setIsPlaying(false) : setIsPlaying(true);
     };
 
     const stepFrame = (direction) => {
         if (!lottieInstance) return;
         if (isPlaying) {
-            lottieInstance.pause();
-            setIsPlaying(false);
+            togglePlayPause();
         }
         const newFrame = Math.max(0, Math.min(currentFrame + direction, jsonData.op - 1));
         lottieInstance.goToAndStop(newFrame, true);
@@ -91,13 +90,11 @@ function LottiePreview() {
         const nextMarker = markers.find(marker => marker.tm > currentFrame);
         if (nextMarker) {
             setIsPlaying(true);
-            lottieInstance.play();
 
             const checkInterval = setInterval(() => {
                 const currentFrame = Math.round(lottieInstance.currentFrame);
                 if (currentFrame >= nextMarker.tm) {
                     clearInterval(checkInterval);
-                    lottieInstance.pause();
                     setIsPlaying(false);
                     setCurrentFrame(nextMarker.tm);
                 }
@@ -105,7 +102,6 @@ function LottiePreview() {
         } else {
             if (!isPlaying) {
                 setIsPlaying(true);
-                lottieInstance.play();
 
                 const checkInterval = setInterval(() => {
                     const currentFrame = Math.round(lottieInstance.currentFrame);
@@ -128,9 +124,8 @@ function LottiePreview() {
                         key={index}
                         className="progress-bar-marker"
                         style={{ left: `${(marker.tm / totalFrames) * 100}%` }}
-                        onClick={() => goToMarker(marker.tm)}
                     >
-                        <span className="marker-tooltip">{marker.cm}</span>
+                        <span className="marker-tooltip" onClick={() => goToMarker(marker.tm)}>{marker.cm}</span>
                     </div>
                 ))}
             </>
@@ -138,8 +133,9 @@ function LottiePreview() {
     };
 
     const goToMarker = (markerFrame) => {
+        console.log(isPlaying)
         if (lottieInstance) {
-            togglePlayPause();
+            setIsPlaying(false);
             console.log(isPlaying)
             lottieInstance.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
