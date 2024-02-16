@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {GlobalStateContext} from "./GlobalStateContext";
 import lottie from 'lottie-web';
 import {
@@ -19,6 +19,8 @@ function LottiePreview() {
     const [isPlaying, setIsPlaying] = useState(true);
     const [currentFrame, setCurrentFrame] = useState(0);
     const [markers, setMarkers] = useState([]);
+    const [markersSet, setMarkersSet] = useState(false);
+    const progressBarWidth = useRef('0%');
 
     useEffect(() => {
         if (!jsonData) return;
@@ -33,13 +35,14 @@ function LottiePreview() {
         });
 
         instance.goToAndStop(currentFrame);
-        if(isPlaying) instance.play();
+        if (isPlaying) instance.play();
 
         const onEnterFrame = (e) => {
             setCurrentFrame(Math.round(e.currentTime));
             const progress = e.currentTime / (jsonData.op - jsonData.ip);
+            progressBarWidth.current = `${progress * 100}%`;
             if (progressBarRef.current) {
-                progressBarRef.current.style.width = `${progress * 100}%`;
+                progressBarRef.current.style.width = progressBarWidth.current;
             }
         };
 
@@ -48,14 +51,28 @@ function LottiePreview() {
 
         console.log('preview rendered');
 
-        setMarkers(jsonData.markers || []);
-
         return () => {
             instance.removeEventListener('enterFrame', onEnterFrame);
             instance.destroy();
-            setMarkers([]);
         };
+
     }, [jsonData, texts]);
+
+    useEffect(() => {
+        if (!jsonData) return;
+
+        if (!markersSet) {
+            console.log('markers set');
+
+            setMarkers(jsonData.markers || []);
+            setMarkersSet(true);
+
+            return () => {
+                setMarkers([]);
+            };
+        }
+
+    }, [jsonData]);
 
     function formatTimeFromFrames(currentFrame, frameRate) {
         const seconds = Math.floor(currentFrame / frameRate);
@@ -85,6 +102,11 @@ function LottiePreview() {
         lottieInstance.goToAndStop(newFrame, true);
         setCurrentFrame(newFrame);
     };
+
+    const ProgressBar = React.memo(({width}) => (
+        <div id="progressBar" style={{width}}></div>
+    ));
+
 
     const goToNextMarker = () => {
         const nextMarker = markers.find(marker => marker.tm > currentFrame);
@@ -116,31 +138,32 @@ function LottiePreview() {
         }
     };
 
-    const ProgressBarMarkers = ({ totalFrames }) => {
+    const ProgressBarMarkers = React.memo(({markers, goToMarker}) => {
         return (
             <>
                 {markers.map((marker, index) => (
                     <div
                         key={index}
                         className="progress-bar-marker"
-                        style={{ left: `${(marker.tm / totalFrames) * 100}%` }}
+                        style={{left: `${(marker.tm / jsonData.op) * 100}%`}}
                     >
                         <span className="marker-tooltip" onClick={() => goToMarker(marker.tm)}>{marker.cm}</span>
                     </div>
                 ))}
             </>
         );
-    };
+    }, (prevProps, nextProps) => {
+        return prevProps.markers === nextProps.markers;
+    });
 
-    const goToMarker = (markerFrame) => {
-        console.log(isPlaying)
+    const goToMarker = useCallback((markerFrame) => {
         if (lottieInstance) {
             setIsPlaying(false);
-            console.log(isPlaying)
             lottieInstance.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
         }
-    };
+    }, [lottieInstance]);
+
 
     const downloadCurrentFrame = () => {
         if (!isPlaying && lottieInstance) {
@@ -150,7 +173,7 @@ function LottiePreview() {
 
             svgString = svgString.replace('</svg>', `${fontFaces}</svg>`);
 
-            const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml'});
             const svgUrl = URL.createObjectURL(svgBlob);
 
             const img = new Image();
@@ -187,17 +210,23 @@ function LottiePreview() {
             </div>
             <div id="previewControlContainer">
                 <div id="progressBarContainer">
-                    <div ref={progressBarRef} id="progressBar" style={{width: '0%'}}></div>
+                    <ProgressBar width={progressBarWidth}/>
                     <div id="markerContainer"></div>
-                    <ProgressBarMarkers totalFrames={jsonData.op} />
+                    <ProgressBarMarkers markers={markers} goToMarker={goToMarker}/>
                 </div>
                 <div id="previewControls">
-                    <div id="timeDisplay" title="Time (seconds:frame)">{formatTimeFromFrames(currentFrame, jsonData.fr)}</div>
-                    <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="frame back (Pause)" onClick={() => stepFrame(-1)}/>
-                    <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton" title="Play/Pause" onClick={togglePlayPause} />
-                    <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="frame next (Pause)" onClick={() => stepFrame(1)}/>
-                    <FontAwesomeIcon icon={faForwardFast} className="previewControlButton" title="Play to next Marker" onClick={goToNextMarker}/>
-                    <FontAwesomeIcon icon={faCamera} className="previewControlButton" title="Save current Frame" onClick={downloadCurrentFrame}/>{/*TODO: ausgrauen bei Play*/}
+                    <div id="timeDisplay"
+                         title="Time (seconds:frame)">{formatTimeFromFrames(currentFrame, jsonData.fr)}</div>
+                    <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="frame back (Pause)"
+                                     onClick={() => stepFrame(-1)}/>
+                    <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
+                                     title="Play/Pause" onClick={togglePlayPause}/>
+                    <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="frame next (Pause)"
+                                     onClick={() => stepFrame(1)}/>
+                    <FontAwesomeIcon icon={faForwardFast} className="previewControlButton" title="Play to next Marker"
+                                     onClick={goToNextMarker}/>
+                    <FontAwesomeIcon icon={faCamera} className="previewControlButton" title="Save current Frame"
+                                     onClick={downloadCurrentFrame}/>{/*TODO: ausgrauen bei Play*/}
                 </div>
             </div>
         </>

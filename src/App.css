@@ -312,6 +312,7 @@ input[type='file']::-webkit-file-upload-button {
   border: 1px solid var(--cream);
   border-left: 4px solid var(--red);
   transform: translateX(-4px);
+  z-index: 1000;
 }
 
 #downloadBtn {
