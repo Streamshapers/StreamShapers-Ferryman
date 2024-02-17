@@ -20,7 +20,7 @@ function LottiePreview() {
     const [currentFrame, setCurrentFrame] = useState(0);
     const [markers, setMarkers] = useState([]);
     const [markersSet, setMarkersSet] = useState(false);
-    const progressBarWidth = useRef('0%');
+    const [progressBarWidth, setProgressBarWidth] = useState(0);
 
     useEffect(() => {
         if (!jsonData) return;
@@ -39,11 +39,8 @@ function LottiePreview() {
 
         const onEnterFrame = (e) => {
             setCurrentFrame(Math.round(e.currentTime));
-            const progress = e.currentTime / (jsonData.op - jsonData.ip);
-            progressBarWidth.current = `${progress * 100}%`;
-            if (progressBarRef.current) {
-                progressBarRef.current.style.width = progressBarWidth.current;
-            }
+            const progress = e.currentTime / (jsonData.op - jsonData.ip) * 100;
+            setProgressBarWidth(progress);
         };
 
         instance.addEventListener('enterFrame', onEnterFrame);
@@ -61,7 +58,7 @@ function LottiePreview() {
     useEffect(() => {
         if (!jsonData) return;
 
-        if (!markersSet) {
+
             console.log('markers set');
 
             setMarkers(jsonData.markers || []);
@@ -70,7 +67,7 @@ function LottiePreview() {
             return () => {
                 setMarkers([]);
             };
-        }
+
 
     }, [jsonData]);
 
@@ -103,8 +100,8 @@ function LottiePreview() {
         setCurrentFrame(newFrame);
     };
 
-    const ProgressBar = React.memo(({width}) => (
-        <div id="progressBar" style={{width}}></div>
+    const ProgressBar = React.memo(({ width }) => (
+        <div id="progressBar" style={{ width: `${width}%` }}></div>
     ));
 
 
@@ -138,23 +135,26 @@ function LottiePreview() {
         }
     };
 
-    const ProgressBarMarkers = React.memo(({markers, goToMarker}) => {
+    const ProgressBarMarkers = React.memo(({ markers, goToMarker }) => {
         return (
             <>
                 {markers.map((marker, index) => (
                     <div
-                        key={index}
+                        key={marker.tm} // Verwenden Sie eine eindeutige und stabile Schlüsselprop
                         className="progress-bar-marker"
-                        style={{left: `${(marker.tm / jsonData.op) * 100}%`}}
+                        style={{ left: `${(marker.tm / jsonData.op) * 100}%` }}
                     >
-                        <span className="marker-tooltip" onClick={() => goToMarker(marker.tm)}>{marker.cm}</span>
+          <span className="marker-tooltip" onClick={() => goToMarker(marker.tm)}>
+            {marker.cm}
+          </span>
                     </div>
                 ))}
             </>
         );
     }, (prevProps, nextProps) => {
-        return prevProps.markers === nextProps.markers;
+        return prevProps.markers === nextProps.markers && prevProps.goToMarker === nextProps.goToMarker;
     });
+
 
     const goToMarker = useCallback((markerFrame) => {
         if (lottieInstance) {
@@ -210,7 +210,7 @@ function LottiePreview() {
             </div>
             <div id="previewControlContainer">
                 <div id="progressBarContainer">
-                    <ProgressBar width={progressBarWidth}/>
+                    <ProgressBar width={progressBarWidth} />
                     <div id="markerContainer"></div>
                     <ProgressBarMarkers markers={markers} goToMarker={goToMarker}/>
                 </div>
