@@ -15,6 +15,7 @@ export const GlobalStateProvider = ({children}) => {
     const [uploadedFonts, setUploadedFonts] = useState({});
     const [fontFaces, setFontFaces] = useState(null);
     const [textShowAll, setTextShowAll] = useState(false);
+    const [markers, setMarkers] = useState([]);
 
     useEffect(() => {
         if (!jsonData) {
@@ -97,7 +98,7 @@ export const GlobalStateProvider = ({children}) => {
     }, [uploadedFonts]);
 
     useEffect(() => {
-        if(!fontFaces){
+        if (!fontFaces) {
             return;
         }
         const styleElement = document.createElement('style');
@@ -269,7 +270,7 @@ export const GlobalStateProvider = ({children}) => {
             jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts,
             uploadedFonts, setUploadedFonts, originalTexts, setOriginalTexts, fontFaces, setFontFaces,
-            textShowAll, setTextShowAll
+            textShowAll, setTextShowAll, markers, setMarkers
         }}>
             {children}
         </GlobalStateContext.Provider>

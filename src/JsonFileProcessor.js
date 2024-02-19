@@ -4,7 +4,7 @@ import jsonElementsDisplay from "./JsonElementsDisplay";
 
 function JsonFileProcessor() {
     const {
-        setJsonData, setColors, error, setError, setTexts, setTextsLayerNames, setImages
+        setJsonData, setColors, error, setError, setTexts, setTextsLayerNames, setImages, setMarkers
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -43,6 +43,7 @@ function JsonFileProcessor() {
             resetState();
             const jsonData = JSON.parse(content);
             setJsonData(jsonData);
+            setMarkers(jsonData.markers);
         } catch (error) {
             setError(`Error reading the JSON file. Please make sure it is a valid JSON file. Error: ${error.message}`);
         }
