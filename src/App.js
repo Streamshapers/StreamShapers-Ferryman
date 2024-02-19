@@ -3,6 +3,7 @@ import JsonFileProcessor from "./JsonFileProcessor";
 import { GlobalStateProvider} from "./GlobalStateContext";
 import JsonElementsDisplay from "./JsonElementsDisplay";
 import LottiePreview from "./LottiePreview";
+import Splitter from "./Splitter";
 
 function App() {
     return (
@@ -16,7 +17,7 @@ function App() {
                     <div id="jsonElements">
                         <JsonElementsDisplay/>
                     </div>
-                    <div id="splitBar"></div>
+                    <Splitter/>
                     <div id="jsonPreview">
                         {<LottiePreview />}
                     </div>

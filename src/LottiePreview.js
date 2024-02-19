@@ -28,11 +28,9 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
 });
 
 function LottiePreview() {
-    const {jsonData, fontFaces, texts, markers} = useContext(GlobalStateContext);
+    const {jsonData, fontFaces, texts, markers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying} = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const [lottieInstance, setLottieInstance] = useState(null);
-    const [isPlaying, setIsPlaying] = useState(true);
-    const [currentFrame, setCurrentFrame] = useState(0);
     const progressBarRef = useRef(null);
 
     const formatTimeFromFrames = useCallback((frame, frameRate) => {
@@ -44,7 +42,6 @@ function LottiePreview() {
     useEffect(() => {
         if (!jsonData) return;
 
-        // Initialisieren der Lottie-Animation
         const instance = lottie.loadAnimation({
             container: animationContainerRef.current,
             renderer: 'svg',
@@ -95,14 +92,13 @@ function LottiePreview() {
         setCurrentFrame(newFrame);
     };
 
-    // Funktion zum Springen zu einem Marker
     const goToMarker = useCallback((markerFrame) => {
         if (lottieInstance) {
             setIsPlaying(false);
             lottieInstance.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
         }
-    }, [lottieInstance]);
+    }, [lottieInstance, setCurrentFrame]);
 
     const goToNextMarker = () => {
         const nextMarker = markers.find(marker => marker.tm > currentFrame);
@@ -158,7 +154,7 @@ function LottiePreview() {
                 const downloadUrl = canvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
                 downloadLink.href = downloadUrl;
-                downloadLink.download = 'current_frame.png'; // Anpassen für dynamischen Dateinamen
+                downloadLink.download = 'current_frame.png';
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);

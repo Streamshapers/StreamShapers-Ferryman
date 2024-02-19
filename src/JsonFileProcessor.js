@@ -1,10 +1,10 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {GlobalStateContext} from "./GlobalStateContext";
-import jsonElementsDisplay from "./JsonElementsDisplay";
 
 function JsonFileProcessor() {
     const {
-        setJsonData, setColors, error, setError, setTexts, setTextsLayerNames, setImages, setMarkers
+        setJsonData, setColors, error, setError, setTexts, setTextsLayerNames, setImages, setMarkers, setCurrentFrame,
+        setIsPlaying
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -13,6 +13,8 @@ function JsonFileProcessor() {
         setTexts([]);
         setTextsLayerNames([]);
         setImages([]);
+        setCurrentFrame(0);
+        setIsPlaying(true);
     };
 
     const processJsonFile = (file) => {

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {GlobalStateContext} from './GlobalStateContext';
 
 function TextsDisplay() {
@@ -16,23 +16,20 @@ function TextsDisplay() {
         }
 
         const tempJsonData = jsonData;
-        let currentTextIndex = 0; // Global counter for each text element found
+        let currentTextIndex = 0;
 
-        // Recursive function to search and update the specific text in the Lottie JSON
         function searchAndUpdateText(obj) {
             if (typeof obj === "object" && obj !== null) {
                 if (obj.t && obj.t.d && obj.t.d.k) {
                     obj.t.d.k.forEach((item) => {
-                        // Update the text only if the current index matches the provided textIndex
                         if (item.s && currentTextIndex === index) {
                             console.log("Updating text at index:", currentTextIndex);
                             item.s.t = newText;
                         }
-                        currentTextIndex++; // Increment the counter for each text element
+                        currentTextIndex++;
                     });
                 }
 
-                // Continue the search in all properties of the object
                 for (const key in obj) {
                     if (obj.hasOwnProperty(key)) {
                         searchAndUpdateText(obj[key]);
@@ -55,7 +52,6 @@ function TextsDisplay() {
         setTextShowAll(!textShowAll);
     };
 
-    // Filterfunktion, die entscheidet, welche Texte basierend auf textShowAll angezeigt werden
     const filteredTexts = texts && textsLayerNames && texts.filter((text, i) => {
         return textShowAll || textsLayerNames[i].startsWith('_');
     });
@@ -76,7 +72,7 @@ function TextsDisplay() {
             </div>
             <div id="text-inputs" className="text-inputs">
                 {filteredTexts.map((text, i) => {
-                    const index = texts.indexOf(text); // Finde den originalen Index des Textes
+                    const index = texts.indexOf(text);
                     return (
                         <div key={i} className="jsonText">
                             <label>{textsLayerNames[index]}:</label>

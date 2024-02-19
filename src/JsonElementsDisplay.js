@@ -4,6 +4,7 @@ import InfosDisplay from "./InfosDispaly";
 import FontsDisplay from "./FontsDisplay";
 import TextsDisplay from "./TextsDisplay";
 import ImagesDisplay from "./ImagesDisplay";
+import ColorsDisplay from "./ColorsDispaly";
 
 
 function JsonElementsDisplay() {
@@ -56,7 +57,7 @@ function JsonElementsDisplay() {
                         <i className={`fas ${isColorsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Colors
                     </h3>
                     <div className="accordion-body" style={{display: isColorsOpen ? 'block' : 'none'}}>
-                        <FontsDisplay/>
+                        <ColorsDisplay/>
                     </div>
                 </div>
             )}

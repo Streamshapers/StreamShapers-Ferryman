@@ -16,6 +16,8 @@ export const GlobalStateProvider = ({children}) => {
     const [fontFaces, setFontFaces] = useState(null);
     const [textShowAll, setTextShowAll] = useState(false);
     const [markers, setMarkers] = useState([]);
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(true);
 
     useEffect(() => {
         if (!jsonData) {
@@ -119,23 +121,19 @@ export const GlobalStateProvider = ({children}) => {
             let tempOriginalTexts = [];
             let tempTextsLayerNames = [];
 
-            if (typeof obj === "object") {
-                if (obj && obj.t && obj.t.d && obj.t.d.k && obj.t.d.k.length > 0) {
+            if (typeof obj === "object" && obj !== null) {
+                if (obj.t && obj.t.d && obj.t.d.k && Array.isArray(obj.t.d.k) && obj.t.d.k.length > 0 && obj.t.d.k[0].s && obj.t.d.k[0].s.t) {
                     tempTexts.push(obj.t.d.k[0].s.t);
                     tempOriginalTexts.push(obj.t.d.k[0].s.t);
                     tempTextsLayerNames.push(obj.nm);
                 }
 
-                for (const key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        const childResults = searchForTexts(obj[key]);
-                        if (childResults) {
-                            tempTexts.push(...childResults.texts);
-                            tempOriginalTexts.push(...childResults.originalTexts);
-                            tempTextsLayerNames.push(...childResults.textsLayerNames);
-                        }
-                    }
-                }
+                Object.keys(obj).forEach(key => {
+                    const childResults = searchForTexts(obj[key]);
+                    tempTexts.push(...childResults.texts);
+                    tempOriginalTexts.push(...childResults.originalTexts);
+                    tempTextsLayerNames.push(...childResults.textsLayerNames);
+                });
             }
 
             return {
@@ -170,24 +168,19 @@ export const GlobalStateProvider = ({children}) => {
 
         function searchForColors(obj, depth = 0) {
             let tempColors = [];
-            let tempColorsLayerName = [];
             const maxDepth = 10;
 
             if (depth > maxDepth) {
-                return tempColors;
+                return [];
             }
 
             if (typeof obj === "object") {
                 const colorProperties = ["fc", "sc", "fill", "stroke", "tr", "s", "b", "k"];
                 colorProperties.forEach((prop) => {
                     if (obj && obj[prop] && Array.isArray(obj[prop])) {
-                        const colorString = obj[prop]
-                            .map((c) => Math.round(c * 255).toString(16).padStart(2, "0"))
-                            .slice(0, 3)
-                            .join("");
-                        if (isValidColor(colorString) && !tempColors.some((color) => color.join("") === colorString)) {
-                            tempColors.push(obj[prop]);
-                            tempColorsLayerName.push(obj.nm);
+                        const colorString = getColorStringFromObject(obj[prop]);
+                        if (isValidColor(colorString) && !tempColors.includes(colorString)) {
+                            tempColors.push(colorString);
                         }
                     }
                 });
@@ -197,20 +190,18 @@ export const GlobalStateProvider = ({children}) => {
                     for (let i = 0; i < gradientColors.length; i++) {
                         const color = gradientColors[i];
                         if (typeof color === 'object' && color.p && color.k) {
-                            // Found gradient color, recursively find colors
                             const gradientColors = color.k;
                             for (let i = 0; i < gradientColors.length; i++) {
                                 const gradientColor = gradientColors[i];
                                 const colorString = getColorStringFromObject(gradientColor);
-                                if (isValidColor(colorString) && !tempColors.some((existingColor) => existingColor.join("") === colorString)) {
-                                    tempColors.push(gradientColor);
+                                if (isValidColor(colorString) && !tempColors.includes(colorString)) {
+                                    tempColors.push(colorString);
                                 }
                             }
                         } else {
-                            // Found regular color
                             const colorString = getColorStringFromObject(color);
-                            if (isValidColor(colorString) && !tempColors.some((existingColor) => existingColor.join("") === colorString)) {
-                                tempColors.push(color);
+                            if (isValidColor(colorString) && !tempColors.includes(colorString)) {
+                                tempColors.push(colorString);
                             }
                         }
                     }
@@ -224,16 +215,15 @@ export const GlobalStateProvider = ({children}) => {
                 }
             }
 
-            return {
-                tempColors
-            };
+            return tempColors;
         }
 
         if (jsonData) {
-            const {colors} = searchForColors(jsonData);
+            const colors = searchForColors(jsonData);
             setColors(colors);
         }
     }, [jsonData]);
+
 
     //########################################## Images ################################################################
 
@@ -242,7 +232,7 @@ export const GlobalStateProvider = ({children}) => {
             let tempImages = [];
             const imageProperties = ["u", "p"];
 
-            if (typeof obj === "object") {
+            if (typeof obj === "object" && obj !== null) {
                 imageProperties.forEach((prop) => {
                     if (obj[prop] && typeof obj[prop] === "string" && obj[prop].startsWith("data:image")) {
                         tempImages.push(obj[prop]);
@@ -268,9 +258,9 @@ export const GlobalStateProvider = ({children}) => {
     return (
         <GlobalStateContext.Provider value={{
             jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
-            setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts,
-            uploadedFonts, setUploadedFonts, originalTexts, setOriginalTexts, fontFaces, setFontFaces,
-            textShowAll, setTextShowAll, markers, setMarkers
+            setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
+            originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
+            setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying
         }}>
             {children}
         </GlobalStateContext.Provider>
