@@ -32,7 +32,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron": "electron ."
+    "electron": "electron .",
+    "package": "electron-packager . converter_app --platform=win32 --arch=x64 --out=dist --overwrite"
   },
   "eslintConfig": {
     "extends": [
