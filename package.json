@@ -2,7 +2,7 @@
   "name": "streamshapers_converter",
   "version": "0.1.0",
   "author": "Richard Weyer",
-  "license": "MIT",
+  "license": "GNU",
   "private": true,
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
@@ -19,10 +19,9 @@
   "electron": "electron .",
   "dist": "electron-builder",
   "main": "main.js",
-
   "build": {
-    "appId": "com.example.myapp",
-    "productName": "My Electron App",
+    "appId": "com.streamshapers.converter",
+    "productName": "StreamShapers Converter",
     "directories": {
       "output": "dist"
     }
@@ -48,9 +47,7 @@
       "not op_mini all"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 chrome version"
     ]
   },
   "devDependencies": {
