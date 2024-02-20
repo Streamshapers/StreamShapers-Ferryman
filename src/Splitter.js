@@ -12,7 +12,7 @@ function Splitter() {
         if (!mouseIsDown) return;
 
         const leftPanel = document.getElementById('jsonElements');
-        const newWidth = e.clientX - 100;
+        const newWidth = e.clientX - 30;
         if(leftPanel) leftPanel.style.width = `${newWidth}px`;
     };
 

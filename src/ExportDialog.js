@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
 
 function ExportDialog({isOpen, onClose}) {
@@ -11,12 +11,20 @@ function ExportDialog({isOpen, onClose}) {
 
     const RadioButton = ({label, value, onChange}) => {
         return (
-            <label>
+            <label className="exportRadioButton">
                 <input type="radio" checked={value} onChange={onChange}/>
                 {label}
             </label>
         );
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }, [isOpen]);
 
     const downloadFile = async () => {
         let fileContent;
@@ -97,28 +105,32 @@ function ExportDialog({isOpen, onClose}) {
 
     if (!isOpen) return null;
 
-    return (
-        <div id="exportDialogWindow">
-            <h2>Export</h2>
-            <div id="exportFileName">
-                <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
-                <input type="text" id="fileNameInput" value={String(fileName)} onChange={handleFileNameChange}/>
-                <span id="fileType">.{exportFormat}</span>
-            </div>
-            <div id="exportOptions">
-                <div id="export-format">
-                    <RadioButton value={exportFormat === 'html'} label="CasparCG HTML-Template"
-                                 onChange={handleExportFormat("html")}/>
-                    <RadioButton value={exportFormat === 'json'} label="JSON" onChange={handleExportFormat('json')}/>
-                    {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
+    return (<>
+            <div className="overlay"></div>
+            <div id="exportDialogWindow">
+                <h2>Export</h2>
+                <div id="exportFileName">
+                    <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
+                    <input type="text" id="fileNameInput" value={String(fileName)} onChange={handleFileNameChange}/>
+                    <span id="fileType">.{exportFormat}</span>
+                </div>
+                <div id="exportOptions">
+                    <div id="export-format">
+                        <RadioButton value={exportFormat === 'html'} label="CasparCG HTML-Template"
+                                     onChange={handleExportFormat("html")}/>
+                        <RadioButton value={exportFormat === 'json'} label="JSON"
+                                     onChange={handleExportFormat('json')}/>
+                        {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
+                    </div>
+                </div>
+                <div className="popupButtonArea">
+                    <button id="downloadBtn" onClick={onClose}>Schließen</button>
+                    <button id="downloadBtn" onClick={downloadFile}>Download File</button>
                 </div>
             </div>
-            <div className="popupButtonArea">
-                <button id="downloadBtn" onClick={onClose}>Schließen</button>
-                <button id="downloadBtn" onClick={downloadFile}>Download File</button>
-            </div>
-        </div>
-    );
+        </>
+    )
+        ;
 }
 
 export default ExportDialog;

@@ -19,6 +19,7 @@ export const GlobalStateProvider = ({children}) => {
     const [currentFrame, setCurrentFrame] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
     const [fileName, setFileName] =useState(null);
+    const [jsonFile, setJsonFile] = useState(null);
 
     useEffect(() => {
         if (!jsonData) {
@@ -72,9 +73,21 @@ export const GlobalStateProvider = ({children}) => {
         const newFonts = [];
         if (jsonData && jsonData.fonts && jsonData.fonts.list) {
             jsonData.fonts.list.forEach(font => {
-                const fontName = font.fFamily;
-                if (!newFonts.includes(fontName)) {
+                let fontName = font.fFamily;
+                const path = font.fPath;
+                const addUploadetFont = (name, data) => {
+                    setUploadedFonts(prevFonts => ({
+                        ...prevFonts,
+                        [name]: data
+                    }));
+                };
+                if (!newFonts.includes(fontName) && !path.startsWith("data:font")) {
                     newFonts.push(fontName);
+                }
+                if (path.startsWith("data:font")){
+                    fontName = font.fFamily + " " + font.fStyle;
+                    newFonts.push(fontName);
+                    addUploadetFont(fontName, path)
                 }
             });
         }
@@ -261,7 +274,8 @@ export const GlobalStateProvider = ({children}) => {
             jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
-            setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName
+            setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,
+            setJsonFile
         }}>
             {children}
         </GlobalStateContext.Provider>

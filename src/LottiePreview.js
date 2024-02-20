@@ -28,7 +28,16 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
 });
 
 function LottiePreview() {
-    const {jsonData, fontFaces, texts, markers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying} = useContext(GlobalStateContext);
+    const {
+        jsonData,
+        fontFaces,
+        texts,
+        markers,
+        currentFrame,
+        setCurrentFrame,
+        isPlaying,
+        setIsPlaying
+    } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const [lottieInstance, setLottieInstance] = useState(null);
     const progressBarRef = useRef(null);
@@ -178,26 +187,30 @@ function LottiePreview() {
 
     return (
         <>
-            <div id="animationPreview" ref={animationContainerRef}/>
-            <div id="previewControlContainer">
-                <div id="progressBarContainer">
-                    <div id="progressBar" ref={progressBarRef}/>
-                    <MarkersContainer markers={markers} goToMarker={goToMarker}/>
-                </div>
-                <div id="previewControls">
-                    <div id="timeDisplay" title="Time (seconds:frame)">
-                        {formatTimeFromFrames(currentFrame, jsonData.fr)}
+            <div id="previewWrapper">
+                <div id="animationPreview" ref={animationContainerRef}/>
+                <div id="previewControlContainer">
+                    <div id="progressBarContainer">
+                        <div id="progressBar" ref={progressBarRef}/>
+                        <MarkersContainer markers={markers} goToMarker={goToMarker}/>
                     </div>
-                    <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame zurück"
-                                     onClick={() => stepFrame(-1)}/>
-                    <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
-                                     title="Wiedergabe/Pause" onClick={togglePlayPause}/>
-                    <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame vor"
-                                     onClick={() => stepFrame(1)}/>
-                    <FontAwesomeIcon icon={faForwardFast} className="previewControlButton" title="Zum nächsten Marker"
-                                     onClick={goToNextMarker}/>
-                    <FontAwesomeIcon icon={faCamera} className="previewControlButton" title="Aktuellen Frame speichern"
-                                     onClick={downloadCurrentFrame}/>
+                    <div id="previewControls">
+                        <div id="timeDisplay" title="Time (seconds:frame)">
+                            {formatTimeFromFrames(currentFrame, jsonData.fr)}
+                        </div>
+                        <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame zurück"
+                                         onClick={() => stepFrame(-1)}/>
+                        <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
+                                         title="Wiedergabe/Pause" onClick={togglePlayPause}/>
+                        <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame vor"
+                                         onClick={() => stepFrame(1)}/>
+                        <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
+                                         title="Zum nächsten Marker"
+                                         onClick={goToNextMarker}/>
+                        <FontAwesomeIcon icon={faCamera} className="previewControlButton"
+                                         title="Aktuellen Frame speichern"
+                                         onClick={downloadCurrentFrame}/>
+                    </div>
                 </div>
             </div>
         </>

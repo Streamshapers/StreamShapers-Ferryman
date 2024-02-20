@@ -14,29 +14,19 @@ function FontsDisplay() {
             return;
         }
 
-        let format;
-        if (file.name.endsWith('.woff')) {
-            format = 'woff';
-        } else if (file.name.endsWith('.ttf')) {
-            format = 'truetype';
-        } else if (file.name.endsWith('.otf')) {
-            format = 'opentype';
-        }
-
         const reader = new FileReader();
         reader.onload = function (event) {
             if (typeof event.target.result === 'string') {
-                // Aktualisieren des uploadedFonts Zustands
                 setUploadedFonts(prevUploadedFonts => ({
                     ...prevUploadedFonts,
                     [fontName]: event.target.result
                 }));
 
-                // Aktualisieren des jsonData Zustands, um die fontPath zu leeren
                 if (jsonData && jsonData.fonts && jsonData.fonts.list) {
                     const updatedFontsList = jsonData.fonts.list.map(font => {
-                        if (font.fFamily === fontName) {
-                            return {...font, fPath: ""};
+                        const name = font.fFamily + " " + font.fStyle;
+                        if (name === fontName) {
+                            return {...font, fPath: "", fFamily: name};
                         }
                         return font;
                     });
