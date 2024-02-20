@@ -198,17 +198,17 @@ function LottiePreview() {
                         <div id="timeDisplay" title="Time (seconds:frame)">
                             {formatTimeFromFrames(currentFrame, jsonData.fr)}
                         </div>
-                        <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame zurück"
+                        <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame back"
                                          onClick={() => stepFrame(-1)}/>
                         <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
-                                         title="Wiedergabe/Pause" onClick={togglePlayPause}/>
-                        <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame vor"
+                                         title="Play/Pause" onClick={togglePlayPause}/>
+                        <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame next"
                                          onClick={() => stepFrame(1)}/>
                         <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
-                                         title="Zum nächsten Marker"
+                                         title="Play to next Marker"
                                          onClick={goToNextMarker}/>
                         <FontAwesomeIcon icon={faCamera} className="previewControlButton"
-                                         title="Aktuellen Frame speichern"
+                                         title="<Save current Frame>"
                                          onClick={downloadCurrentFrame}/>
                     </div>
                 </div>

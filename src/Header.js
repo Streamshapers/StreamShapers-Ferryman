@@ -22,7 +22,7 @@ function Header() {
                     <ThemeSwitch />
                     <div id="downloadArea" className="headerButton" onClick={openExportDialog}>
                         <span>Export </span>
-                        <FontAwesomeIcon icon={faFileExport} title="Exportieren"/>
+                        <FontAwesomeIcon icon={faFileExport} title="Export"/>
                     </div>
                 </div>
             </div>
