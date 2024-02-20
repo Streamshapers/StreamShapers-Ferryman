@@ -4,7 +4,7 @@ import {GlobalStateContext} from "./GlobalStateContext";
 function JsonFileProcessor() {
     const {
         setJsonData, setColors, error, setError, setTexts, setTextsLayerNames, setImages, setMarkers, setCurrentFrame,
-        setIsPlaying
+        setIsPlaying, setFileName
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -26,6 +26,9 @@ function JsonFileProcessor() {
             setError("Please select a valid JSON file.");
             return;
         }
+
+        setFileName(file.name.replace(/\.json$/, ''));
+
 
         const reader = new FileReader();
         reader.readAsText(file, "UTF-8");

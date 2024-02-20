@@ -18,6 +18,7 @@ export const GlobalStateProvider = ({children}) => {
     const [markers, setMarkers] = useState([]);
     const [currentFrame, setCurrentFrame] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
+    const [fileName, setFileName] =useState(null);
 
     useEffect(() => {
         if (!jsonData) {
@@ -260,7 +261,7 @@ export const GlobalStateProvider = ({children}) => {
             jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
-            setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying
+            setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName
         }}>
             {children}
         </GlobalStateContext.Provider>

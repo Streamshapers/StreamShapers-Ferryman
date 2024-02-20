@@ -12,23 +12,44 @@
   --gradient: linear-gradient(to right, #c1666b, #d4b483, #48a9a6, #3753bd);
   --black: #363636;
   --white: #e4dfda;
+  --background: #2A2D43;
 }
 
-body {
+body{
   font-family: Arial, sans-serif;
   margin: 0;
   background: var(--cream);
   color: var(--white);
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+#root{
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+#content{
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
-  margin: 0 auto;
-  width: 90vw;
+  margin: 0;
+  flex-grow: 1;
+  display: flex;
 }
 
-h1 {
+#contentWrapper{
+padding: 20px;
+  flex-grow: 1;
+}
+
+h1, h2 {
   color: var(--white);
-  margin: 0 0 20px 0;
+  margin: 0;
 }
 
 input{
@@ -56,23 +77,46 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 #headerContainer{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  margin: 20px auto auto;
+  margin: 0 auto auto;
   background: var(--primary);
   color: var(--white);
-  border-radius: 5px;
-  padding: 20px;
+  padding: 10px;
   box-sizing: border-box;
+  height: 60px;
+}
+
+.headerSide{
+  min-width: 20vw;
+}
+
+.headerButton{
+  font-size: 24px;
+  border-radius: 5px;
+  background-color: var(--secondary);
+  border: 1px solid var(--cream);
+  color: var(--cream);
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: background-color 0.3s;
+  float: right;
+}
+
+.headerButton:hover {
+  background-color: var(--cream);
+  color: var(--black);
 }
 
 #previewContainer {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: 20px;
   flex-direction: row;
   width: 100%;
-  height: 70vh;
+  height: 100%;
   box-sizing: border-box;
 }
 
@@ -88,18 +132,6 @@ input[type='file']::-webkit-file-upload-button {
 
 #splitBar:hover {
   background: rgba(54, 54, 54, 0.3);
-}
-
-#bottomContainer {
-  display: flex;
-  width: 100%;
-  margin: 20px auto auto;
-  padding: 20px;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--primary);
-  box-sizing: border-box;
-  border-radius: 5px;
 }
 
 #jsonElements {
@@ -212,10 +244,6 @@ input[type='file']::-webkit-file-upload-button {
   padding: 10px;
 }
 
-#jsonFile {
-
-}
-
 #jsonElements h2,
 #jsonElements h3 {
   color: var(--white);
@@ -237,7 +265,7 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 #animationPreview svg{
-  max-height: 55vh;
+
 }
 
 #progressBar {
@@ -316,87 +344,6 @@ input[type='file']::-webkit-file-upload-button {
   z-index: 1000;
 }
 
-#downloadBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  background-color: var(--secondary);
-  color: var(--white);
-  font-size: 16px;
-  border: 5px solid var(--lightblue);
-  cursor: pointer;
-  border-radius: 5px;
-  text-align: center;
-  min-height: 40px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-#downloadBtn:hover {
-  background-color: var(--blue);
-}
-
-#exportOptions {
-  color: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 5px solid var(--yellow);
-  background: var(--secondary);
-  padding: 0 20px;
-  border-radius: 5px;
-  min-height: 40px;
-  margin: auto 20px auto 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-#exportOptions select {
-  background: var(--secondary);
-  color: var(--white);
-  border: none;
-}
-
-#fileName {
-  display: flex;
-  align-items: center;
-  flex-grow: 2;
-  border: 5px solid var(--red);
-  background: var(--secondary);
-  min-height: 40px;
-  border-radius: 5px;
-  padding: 0 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-#fileNameInputLabel {
-  flex-grow: 1;
-  color: var(--white);
-}
-
-#fileNameInput {
-  flex-grow: 100;
-  border-radius: 5px;
-  border: none;
-  margin: 5px;
-  text-align: right;
-  color: var(--white);
-  background: var(--secondary);
-}
-
-#fileType {
-  color: var(--white);
-}
-
-#lastBottom {
-  min-width: 40px;
-  min-height: 40px;
-  margin-left: 20px;
-  border-radius: 5px;
-  border: 5px solid var(--blue);
-  background: var(--secondary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
 #jsonElements pre {
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -454,22 +401,6 @@ input[type='file']::-webkit-file-upload-button {
 .jsonText input{
   margin: auto 10px;
   min-width: 200px;
-}
-
-#exportOptions {
-  display: flex;
-  align-items: center;
-}
-
-#exportOptions label {
-  margin-right: 10px;
-}
-
-#export-format {
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
 }
 
 /*++++++++++++++++++Scrollbar+++++++++++++++++++++++++++++++*/
@@ -542,4 +473,60 @@ input[type='file']::-webkit-file-upload-button {
 .modal-content button:hover {
   background: var(--white);
   color: var(--red);
+}
+
+#exportDialogWindow{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--background);
+  border-radius: 5px;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.popupButtonArea{
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+#export-format {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#downloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: var(--secondary);
+  color: var(--white);
+  font-size: 16px;
+  border: 5px solid var(--lightblue);
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  min-height: 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+#downloadBtn:hover {
+  background-color: var(--blue);
+}
+
+#export-format label{
+  display: flex;
+  align-items: center;
+}
+
+#exportFileName{
+  display: flex;
+  align-items: center;
 }

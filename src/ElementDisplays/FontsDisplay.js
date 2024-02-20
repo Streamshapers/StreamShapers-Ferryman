@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {GlobalStateContext} from "./GlobalStateContext";
+import {GlobalStateContext} from "../GlobalStateContext";
 
 function FontsDisplay() {
     const {jsonData, setJsonData, fonts, uploadedFonts, setUploadedFonts} = useContext(GlobalStateContext);

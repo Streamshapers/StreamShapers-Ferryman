@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {GlobalStateContext} from './GlobalStateContext';
+import {GlobalStateContext} from '../GlobalStateContext';
 import InfosDisplay from "./InfosDispaly";
 import FontsDisplay from "./FontsDisplay";
 import TextsDisplay from "./TextsDisplay";

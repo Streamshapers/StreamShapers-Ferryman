@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<!--CasparCG-Lottie-Template - https://github.com/jdoppelp/CasparCG-Lottie-Template - by jdoppelp  @https://github.com/jdoppelp -  2023-04-21 -->
+<head>
+    <meta charset='utf-8'>
+    <title>Lottie Template 01</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            width: 100vw;
+        }
+
+        p {
+            font-size: 30px;
+            margin: 0 0 0 20px;
+            color: white
+        }
+
+        h1 {
+            margin-left: 20px;
+            color: white
+        }
+    </style>
+    ${fontFaceStyles}
+</head>
+
+<body id="animation">
+<!--Animations-Script-->
+<script>
+    "use strict"
+    //Paste Lottie File .JSON Code
+    let lottieTemplate = ${jsonData};
+    let playStatus = "";
+    let nextCount = 1;
+    let showInfo = false;
+    let currentSegment;
+    let currentSegmentFrames;
+    let animReady;
+    let animation;
+    let newAnimation;
+    let stopExist = false;
+    let lottieTemplateNew = {...lottieTemplate};
+
+
+    //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
+    const addFont = (fam, path) => {
+        let newFont = document.createElement('style')
+        newFont.appendChild(document.createTextNode(`\
+            @font-face {\
+                font-family: ${fam};\
+                src: url('${path}');\
+            }\
+            `));
+        document.head.appendChild(newFont);
+    }
+
+    //fix Marker Name
+    lottieTemplate.markers.forEach((marker) => {
+        let name = marker.cm
+        marker.cm = "name:" + name.toLowerCase()
+    })
+
+    function update(rawData) {
+        lottieTemplateNew = {...lottieTemplate};
+        if (rawData) {
+            if (rawData.startsWith("<templateData>")) {
+                let title = document.createElement("h1")
+                title.appendChild(document.createTextNode("Please send Data as JSON"))
+                document.body.appendChild(title)
+                console.error("Data must be send as JSON")
+            } else {
+                let parsed = JSON.parse(rawData)
+                for (let key of Object.keys(parsed)) {
+                    if (key === "_templateInfo") showInfo = true
+                    lottieTemplateNew.layers.forEach((layer) => {
+                        if (layer.nm === key) {
+                            layer.t.d.k[0].s.t = parsed[key]
+                        }
+                    })
+                }
+            }
+        }
+        if (playStatus === "") {
+            animation = bodymovin.loadAnimation({
+                container: document.getElementById("animation"),
+                renderer: "svg",
+                loop: false,
+                autoplay: false,
+                animationData: lottieTemplateNew,
+            })
+            let fonts = animation.renderer.data.fonts.list;
+            for (const font in fonts) {
+                let family = fonts[font].fFamily
+                let fontPath = fonts[font].fPath
+                if (fontPath !== '') {
+                    addFont(family, fontPath)
+                }
+            }
+            animReady = new Promise((resolve, reject) => {
+                animation.addEventListener("loaded_images", function () {
+                    console.log("READY")
+                    resolve("ready")
+                })
+
+            })
+
+            animation.addEventListener("enterFrame", () => {
+                for (let marker of lottieTemplate.markers) {
+                    if (marker.cm === "name:" + currentSegment) {
+                        currentSegmentFrames = marker.tm
+                    }
+                }
+                const currentFrame = animation.currentFrame + currentSegmentFrames
+                console.log(`Current Frame: ${currentFrame}`);
+            })
+
+        }
+        if (playStatus === "play") {
+            animation.destroy()
+            animation = bodymovin.loadAnimation({
+                container: document.getElementById("animation"),
+                renderer: "svg",
+                loop: false,
+                autoplay: false,
+                animationData: lottieTemplateNew,
+            })
+            for (let marker of lottieTemplateNew.markers) {
+                if (marker.cm === "name:" + currentSegment) {
+                    animation.goToAndStop(marker.tm + marker.dr, true)
+                }
+            }
+        }
+        if (showInfo) info()
+    }
+
+    function play() {
+        animReady.then(() => {
+            animation.destroy()
+            animation = bodymovin.loadAnimation({
+                container: document.getElementById("animation"),
+                renderer: "svg",
+                loop: false,
+                autoplay: false,
+                animationData: lottieTemplateNew,
+            })
+            animation.addEventListener("loaded_images", function () {
+                animation.goToAndPlay("start", true)
+                playStatus = "play"
+                currentSegment = "start"
+            })
+
+        })
+    }
+
+    function load() {
+        animReady.then(() => {
+            animation.goToAndStop(0, true)
+            playStatus = "loadeed"
+            currentSegment = "start"
+        })
+
+    }
+
+    function stop() {
+        for (let marker of lottieTemplate.markers) {
+            if (marker.cm === "name:" + "stop") {
+                stopExist = true
+            }
+        }
+        if (stopExist) {
+            animation.goToAndPlay("stop", true)
+        } else {
+            animation.destroy()
+        }
+        playStatus = "stop"
+    }
+
+    function next() {
+        animation.goToAndPlay("next" + nextCount, true)
+        currentSegment = "next" + nextCount
+        nextCount++
+
+    }
+
+    function info() {
+        animation.destroy()
+        let title = document.createElement("h1")
+        title.appendChild(document.createTextNode("These are the names of your After-Effects layers starting with \"_\"."))
+        document.body.appendChild(title)
+        lottieTemplate.layers.forEach((layer) => {
+            if (layer.nm.startsWith("_")) {
+
+                let nameElement = document.createElement("p")
+                let text = document.createTextNode(layer.nm)
+                let br = document.createElement("br")
+                nameElement.appendChild(text)
+                document.body.appendChild(nameElement);
+                document.body.appendChild(br);
+            }
+        })
+
+    }
+</script>
+<!-- Lottie.js-->
+<script>
+    ${lottieData}
+</script>
+</body>
+</html>

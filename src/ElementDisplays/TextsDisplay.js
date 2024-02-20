@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from 'react';
-import {GlobalStateContext} from './GlobalStateContext';
+import {GlobalStateContext} from '../GlobalStateContext';
 
 function TextsDisplay() {
     const { jsonData, texts, setTexts, originalTexts, textsLayerNames, setJsonData, textShowAll, setTextShowAll } = useContext(GlobalStateContext);
