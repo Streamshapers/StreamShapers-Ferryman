@@ -1,4 +1,4 @@
-# Lottie to CasparCG Converter
+# StremShapers Lottie to CasparCG Converter
 ![ScreenShot.png](img%2FScreenShot.png)
 ## Description
 
