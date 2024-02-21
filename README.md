@@ -1,5 +1,6 @@
-# Lottie to CasparCG Converter
+# StremShapers Lottie to CasparCG Converter
 ![ScreenShot.png](img%2FScreenShot.png)
+Try it out NOW: www.converter.streamshapers.com
 ## Description
 
 This React-based web application is designed to convert Lottie JSON animations into CasparCG compatible HTML templates. It provides a suite of tools for analyzing and customizing the converted animations, making it an essential utility for broadcasters and designers working with CasparCG graphics.
