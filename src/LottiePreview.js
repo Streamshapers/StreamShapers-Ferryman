@@ -36,7 +36,8 @@ function LottiePreview() {
         currentFrame,
         setCurrentFrame,
         isPlaying,
-        setIsPlaying
+        setIsPlaying,
+        fileName
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const [lottieInstance, setLottieInstance] = useState(null);
@@ -163,7 +164,7 @@ function LottiePreview() {
                 const downloadUrl = canvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
                 downloadLink.href = downloadUrl;
-                downloadLink.download = 'current_frame.png';
+                downloadLink.download = fileName + "_Frame_" + currentFrame + '.png';
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);

@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const url = require('url');
 const isDevPromise = import('electron-is-dev');
 
 
@@ -11,14 +12,16 @@ function createWindow() {
         height: 1000,
         webPreferences: {
             nodeIntegration: true,
+            webSecurity: false
         },
     });
 
-    const startURL = isDevPromise
-        ? 'http://localhost:3000'
-        : `file://${path.join(__dirname, '../build/index.html')}`;
-
-    mainWindow.loadURL(startURL);
+    mainWindow.webContents.openDevTools({ mode: 'bottom'} )
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, '/build/index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
 
     mainWindow.on('closed', () => (mainWindow = null));
 }

@@ -52,7 +52,7 @@ function TextsDisplay() {
         setTextShowAll(!textShowAll);
     };
 
-    const filteredTexts = texts && textsLayerNames && texts.filter((text, i) => {
+    const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
         return textShowAll || textsLayerNames[i].startsWith('_');
     });
 
@@ -71,15 +71,15 @@ function TextsDisplay() {
                 </div>
             </div>
             <div id="text-inputs" className="text-inputs">
-                {filteredTexts.map((text, i) => {
-                    const index = texts.indexOf(text);
+                {filteredTexts.map((textLayerName, i) => {
+                    const index = textsLayerNames.indexOf(textLayerName);
                     return (
                         <div key={i} className="jsonText">
-                            <label>{textsLayerNames[index]}:</label>
+                            <label>{textLayerName}:</label>
                             <input
                                 type="text"
                                 data-index={index}
-                                value={text}
+                                value={texts[index]}
                                 onChange={(e) => updateLottieText(index, e.target.value)}
                             />
                             <span>{originalTexts[index]}</span>

@@ -28,6 +28,7 @@ function JsonFileProcessor() {
         }
 
         setFileName(file.name.replace(/\.json$/, ''));
+
         setJsonFile(file);
     };
 

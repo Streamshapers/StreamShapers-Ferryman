@@ -7,12 +7,12 @@
     --primary-dark: #2c4295;
     --primary-light: #5871cf;
 
-    --secondary: #bd3796;
+    --secondary: #c1666b;
     --secondary-content: #fdf6fb;
-    --secondary-dark: #952c77;
+    --secondary-dark: #88494c;
     --secondary-light: #cf58ac;
 
-    --background: #eaedf5;
+    --background: #e4dfda;
     --foreground: #fafafd;
     --border: #d4d9ea;
 
@@ -34,14 +34,14 @@
     --primary-dark: #2c4295;
     --primary-light: #5871cf;
 
-    --secondary: #bd3796;
+    --secondary: #c1666b;
     --secondary-content: #fdf6fb;
-    --secondary-dark: #952c77;
+    --secondary-dark: #88494c;
     --secondary-light: #cf58ac;
 
-    --background: #eaedf5;
+    --background: #e4dfda;
     --foreground: #fafafd;
-    --border: #d4d9ea;
+    --border: #9d9d9d;
 
     --copy: #191e34;
     --copy-light: #42518a;
@@ -61,14 +61,14 @@
     --primary-dark: #2c4295;
     --primary-light: #5871cf;
 
-    --secondary: #bd3796;
+    --secondary: #c1666b;
     --secondary-content: #fdf6fb;
-    --secondary-dark: #952c77;
+    --secondary-dark: #88494c;
     --secondary-light: #cf58ac;
 
-    --background: #111422;
-    --foreground: #191e34;
-    --border: #293356;
+    --background: #1c2138;
+    --foreground: #252d4d;
+    --border: #3f5293;
 
     --copy: #fafafd;
     --copy-light: #cbd1e6;
@@ -309,7 +309,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .accordion-header {
     margin: 0;
-    background: var(--primary-light);
+    background: var(--primary);
     padding: 10px;
     border-radius: 5px 5px 0 0;
     border-bottom: 1px solid var(--border);
@@ -338,6 +338,7 @@ input[type='file']::-webkit-file-upload-button {
     min-width: 20%;
     margin-top: 10px;
     margin-right: 10px;
+    border: 1px solid var(--border);
 }
 
 .info-name {
@@ -370,11 +371,11 @@ input[type='file']::-webkit-file-upload-button {
 #textControls {
     display: flex;
     align-items: center;
-    border: none;
     padding: 10px;
     background: var(--background);
     border-radius: 5px;
     margin-bottom: 10px;
+    border: 1px solid var(--border);
 }
 
 .textControl {
@@ -462,12 +463,13 @@ input[type='file']::-webkit-file-upload-button {
 .previewControlButton {
     font-size: 24px;
     border-radius: 5px;
-    background-color: var(--primary-light);
+    background-color: var(--primary);
     border: 1px solid var(--border);
     color: var(--primary-content);
     cursor: pointer;
     padding: 5px 10px;
     transition: background-color 0.3s;
+    min-width: 20px;
 }
 
 .previewControlButton:hover {
@@ -479,7 +481,7 @@ input[type='file']::-webkit-file-upload-button {
     width: 60px;
     font-size: 24px;
     border-radius: 5px;
-    background-color: var(--primary-light);
+    background-color: var(--primary);
     color: var(--primary-content);
     padding: 5px 10px;
 }
@@ -616,7 +618,7 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     max-width: 400px;
-    color: var(--text-dark);
+    color: var(--copy);
 }
 
 .modal-content h2 {
@@ -627,7 +629,7 @@ input[type='file']::-webkit-file-upload-button {
     margin-top: 10px;
     padding: 5px 10px;
     background-color: var(--secondary);
-    color: var(--text-dark);
+    color: var(--copy);
     border: none;
     border-radius: 3px;
     cursor: pointer;

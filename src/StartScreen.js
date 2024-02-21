@@ -4,10 +4,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChartPie, faChartSimple, faFileArrowUp, faList} from "@fortawesome/free-solid-svg-icons";
 
 function StartScreen() {
-    const {jsonData, setJsonFile, jsonFile} = useContext(GlobalStateContext);
+    const {jsonData, setJsonFile, jsonFile, setFileName} = useContext(GlobalStateContext);
 
     const handleSampleFile = async (fileName) => {
-        const response = await fetch(`/samples/${fileName}`);
+        const response = await fetch(`./samples/${fileName}`);
         if (!response.ok) {
             console.error("Fehler beim Laden der Datei:", fileName);
             return;
@@ -16,6 +16,7 @@ function StartScreen() {
         const blob = new Blob([text], { type: 'application/json' });
 
         setJsonFile(blob);
+        setFileName(fileName.replace(/\.json$/, ''));
     };
 
 
