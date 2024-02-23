@@ -1,5 +1,5 @@
 # StremShapers Lottie to CasparCG Converter
-![ScreenShot.png](img%2FScreenShot.png)
+![ScreenShot.png](img%2FScreenshot.png)
 
 Try it out NOW: www.converter.streamshapers.com
 ## Description
