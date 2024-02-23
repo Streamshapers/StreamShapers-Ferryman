@@ -16,7 +16,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.webContents.openDevTools({ mode: 'bottom'} )
+    //mainWindow.webContents.openDevTools({ mode: 'bottom'} )
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, '/build/index.html'),
         protocol: 'file:',
