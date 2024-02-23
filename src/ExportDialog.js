@@ -59,12 +59,17 @@ function ExportDialog({isOpen, onClose}) {
                     }
                     const template = await response.text();
 
+                    let fontFacesString = '';
+                    for (const font in fontFaces){
+                        fontFacesString += fontFaces[font];
+                    }
+
                     let jsonDataString = JSON.stringify(jsonData);
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${jsonData}', jsonDataString)
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${fontFaceStyles}', "<style>" + String(fontFaces) + "</style>")
+                        .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${lottieData}', "<script>" + lottiePlayerCode + "</script>");
 

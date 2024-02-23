@@ -3,14 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { ThemeProvider } from './Theme/ThemeContext';
+import {ThemeProvider} from './Theme/ThemeContext';
+import {GlobalStateProvider} from "./GlobalStateContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <ThemeProvider>
-            <App/>
-        </ThemeProvider>
+        <GlobalStateProvider>
+            <ThemeProvider>
+                <App/>
+            </ThemeProvider>
+        </GlobalStateProvider>
     </React.StrictMode>
 );
 

@@ -54,7 +54,7 @@ function FontsDisplay() {
                     <div key={font} className='font-item'>
                         <span id={indicatorId} style={indicatorStyle}>{indicator}</span>
                         {font}
-                        <input type='file' accept='.ttf' onChange={(e) => uploadFont(e.target.files, font)}/>
+                        <input type='file' accept='.ttf,.otf,.woff' onChange={(e) => uploadFont(e.target.files, font)}/>
                     </div>
                 );
             })}

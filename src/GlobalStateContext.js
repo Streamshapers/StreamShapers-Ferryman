@@ -13,13 +13,14 @@ export const GlobalStateProvider = ({children}) => {
     const [infos, setInfos] = useState({});
     const [fonts, setFonts] = useState([]);
     const [uploadedFonts, setUploadedFonts] = useState({});
-    const [fontFaces, setFontFaces] = useState(null);
+    const [fontFaces, setFontFaces] = useState([]);
     const [textShowAll, setTextShowAll] = useState(false);
     const [markers, setMarkers] = useState([]);
     const [currentFrame, setCurrentFrame] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
-    const [fileName, setFileName] =useState(null);
+    const [fileName, setFileName] = useState(null);
     const [jsonFile, setJsonFile] = useState(null);
+    const [theme, setTheme] = useState('dark');
 
     useEffect(() => {
         if (!jsonData) {
@@ -84,8 +85,9 @@ export const GlobalStateProvider = ({children}) => {
                 if (!newFonts.includes(fontName) && !path.startsWith("data:font")) {
                     newFonts.push(fontName);
                 }
-                if (path.startsWith("data:font")){
+                if (path.startsWith("data:font")) {
                     fontName = font.fFamily + " " + font.fStyle;
+                    font.fFamily = fontName;
                     newFonts.push(fontName);
                     addUploadetFont(fontName, path)
                 }
@@ -93,38 +95,36 @@ export const GlobalStateProvider = ({children}) => {
         }
 
         setFonts(newFonts);
-
     }, [jsonData]);
 
     useEffect(() => {
         let styles = '';
+        let newFontFaces = [];
         for (const fontName in uploadedFonts) {
             if (uploadedFonts.hasOwnProperty(fontName)) {
                 const fontBase64 = uploadedFonts[fontName];
-                styles += `
+                styles = `
                 @font-face {
                     font-family: '${fontName}';
                     src: url('${fontBase64}');
                 }
-                
             `;
+                newFontFaces.push(styles);
             }
         }
-        setFontFaces(styles);
+        setFontFaces(newFontFaces);
     }, [uploadedFonts]);
 
     useEffect(() => {
         if (!fontFaces) {
             return;
         }
-        const styleElement = document.createElement('style');
-        styleElement.setAttribute('type', 'text/css');
-        styleElement.innerHTML = fontFaces.toString();
-        document.head.appendChild(styleElement);
-
-        return () => {
-            document.head.removeChild(styleElement);
-        };
+        for (const face in fontFaces) {
+            const styleElement = document.createElement('style');
+            styleElement.setAttribute('type', 'text/css');
+            styleElement.innerHTML = fontFaces[face].toString();
+            document.head.appendChild(styleElement);
+        }
     }, [fontFaces]);
 
     //######################################## Texts ###############################################################
@@ -275,7 +275,7 @@ export const GlobalStateProvider = ({children}) => {
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
             setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,
-            setJsonFile
+            setJsonFile, theme, setTheme
         }}>
             {children}
         </GlobalStateContext.Provider>

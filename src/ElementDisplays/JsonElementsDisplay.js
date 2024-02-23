@@ -20,59 +20,61 @@ function JsonElementsDisplay() {
     }
 
     return (
-        <div className="accordion">
-            {infos && Object.keys(infos).length > 0 && (
-                <div className="accordion-item infos">
-                    <h3 className="accordion-header" onClick={() => setIsInfoOpen(!isInfoOpen)}>
-                        <i className={`fas ${isInfoOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Info
-                    </h3>
-                    <div className="accordion-body" style={{display: isInfoOpen ? 'block' : 'none'}}>
-                        <InfosDisplay/>
-                    </div>
-                </div>
-            )}
-            {fonts && fonts.length > 0 && (
-                <div className="accordion-item fonts">
-                    <h3 className="accordion-header" onClick={() => setIsFontsOpen(!isFontsOpen)}>
-                        <i className={`fas ${isFontsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Fonts
-                    </h3>
-                    <div className="accordion-body" style={{display: isFontsOpen ? 'block' : 'none'}}>
-                        <FontsDisplay/>
-                    </div>
-                </div>
-            )}
-            {texts && texts.length > 0 && (
-                <div className="accordion-item texts">
-                    <h3 className="accordion-header" onClick={() => setIsTextsOpen(!isTextsOpen)}>
-                        <i className={`fas ${isTextsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Texts
-                    </h3>
-                    <div className="accordion-body" style={{display: isTextsOpen ? 'block' : 'none'}}>
-                        <TextsDisplay/>
-                    </div>
-                </div>
-            )}
-            {colors && colors.length > 0 && (
-                <div className="accordion-item colors">
-                    <h3 className="accordion-header" onClick={() => setIsColorsOpen(!isColorsOpen)}>
-                        <i className={`fas ${isColorsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Colors
-                    </h3>
-                    <div className="accordion-body" style={{display: isColorsOpen ? 'block' : 'none'}}>
-                        <ColorsDisplay/>
-                    </div>
-                </div>
-            )}
-            {images && images.length > 0 && (
-                <div className="accordion-item images">
-                    <h3 className="accordion-header" onClick={() => setIsImagesOpen(!isImagesOpen)}>
-                        <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
-                    </h3>
-                    <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
-                        <div className='image-preview'>
-                            <ImagesDisplay/>
+        <div className="accordion-wrapper">
+            <div className="accordion">
+                {infos && Object.keys(infos).length > 0 && (
+                    <div className="accordion-item infos">
+                        <h3 className="accordion-header" onClick={() => setIsInfoOpen(!isInfoOpen)}>
+                            <i className={`fas ${isInfoOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Info
+                        </h3>
+                        <div className="accordion-body" style={{display: isInfoOpen ? 'block' : 'none'}}>
+                            <InfosDisplay/>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+                {fonts && fonts.length > 0 && (
+                    <div className="accordion-item fonts">
+                        <h3 className="accordion-header" onClick={() => setIsFontsOpen(!isFontsOpen)}>
+                            <i className={`fas ${isFontsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Fonts
+                        </h3>
+                        <div className="accordion-body" style={{display: isFontsOpen ? 'block' : 'none'}}>
+                            <FontsDisplay/>
+                        </div>
+                    </div>
+                )}
+                {texts && texts.length > 0 && (
+                    <div className="accordion-item texts">
+                        <h3 className="accordion-header" onClick={() => setIsTextsOpen(!isTextsOpen)}>
+                            <i className={`fas ${isTextsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Texts
+                        </h3>
+                        <div className="accordion-body" style={{display: isTextsOpen ? 'block' : 'none'}}>
+                            <TextsDisplay/>
+                        </div>
+                    </div>
+                )}
+                {colors && colors.length > 0 && (
+                    <div className="accordion-item colors">
+                        <h3 className="accordion-header" onClick={() => setIsColorsOpen(!isColorsOpen)}>
+                            <i className={`fas ${isColorsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Colors
+                        </h3>
+                        <div className="accordion-body" style={{display: isColorsOpen ? 'block' : 'none'}}>
+                            <ColorsDisplay/>
+                        </div>
+                    </div>
+                )}
+                {images && images.length > 0 && (
+                    <div className="accordion-item images">
+                        <h3 className="accordion-header" onClick={() => setIsImagesOpen(!isImagesOpen)}>
+                            <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
+                        </h3>
+                        <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
+                            <div className='image-preview'>
+                                <ImagesDisplay/>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

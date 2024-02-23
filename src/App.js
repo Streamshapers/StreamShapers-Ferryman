@@ -7,15 +7,16 @@ import DropJson from "./DropJson";
 
 function App() {
     return (
-        <GlobalStateProvider>
-            <DropJson />
+        <>
+            <DropJson/>
             <div id="content">
                 <Header/>
                 <ConverterView/>
                 <StartScreen/>
             </div>
-        </GlobalStateProvider>
-    );
+        </>
+    )
+        ;
 }
 
 export default App;

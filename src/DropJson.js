@@ -13,14 +13,23 @@ function DropJson() {
             e.preventDefault();
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                const file = files[0];
-                if (file.type === "application/json") {
-                    setJsonFile(file);
-                } else {
-                    console.error("Bitte lade eine JSON-Datei hoch.");
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                    if (file.type === "application/json" || fileExtension === "json") {
+                        setJsonFile(file);
+                    } //else if (["ttf", "otf", "woff"].includes(fileExtension)) {
+                      //  setFontFile(file);
+                    //}
+                else {
+                        console.error("Nicht unterstützter Dateityp.");
+                    }
                 }
             }
         };
+
+
 
         document.addEventListener('dragover', handleDragOver);
         document.addEventListener('drop', handleDrop);

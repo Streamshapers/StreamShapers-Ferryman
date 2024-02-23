@@ -1,9 +1,10 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect} from 'react';
+import {GlobalStateContext} from "../GlobalStateContext";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const [theme, setTheme] = useState('dark');
+    const {theme, setTheme} = useContext(GlobalStateContext);
 
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));

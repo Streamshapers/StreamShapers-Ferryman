@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChartPie, faChartSimple, faFileArrowUp, faList} from "@fortawesome/free-solid-svg-icons";
 
 function StartScreen() {
-    const {jsonData, setJsonFile, jsonFile, setFileName} = useContext(GlobalStateContext);
+    const {jsonData, setJsonFile, setFileName} = useContext(GlobalStateContext);
 
     const handleSampleFile = async (fileName) => {
         const response = await fetch(`./samples/${fileName}`);
@@ -19,6 +19,13 @@ function StartScreen() {
         setFileName(fileName.replace(/\.json$/, ''));
     };
 
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            setJsonFile(file);
+        }
+    }
 
     if (jsonData) {
         return null;
@@ -32,6 +39,8 @@ function StartScreen() {
                     <div id="uploadIcon">
                         <FontAwesomeIcon icon={faFileArrowUp}/>
                     </div>
+                    <h2>or</h2>
+                    <input type="file" id="jsonFile" accept=".json" onChange={handleFileChange}/>
                 </div>
                 <div id="sampleWrapper">
                     <h2>Or start with one of our Samples:</h2>
