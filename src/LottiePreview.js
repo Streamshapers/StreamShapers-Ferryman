@@ -145,8 +145,9 @@ function LottiePreview() {
             const svgElement = lottieInstance.renderer.svgElement;
             const serializer = new XMLSerializer();
             let svgString = serializer.serializeToString(svgElement);
-
-            svgString = svgString.replace('</svg>', `${fontFaces}</svg>`);
+            for (const face in fontFaces) {
+                svgString = svgString.replace('</svg>', `${face}</svg>`);
+            }
 
             const svgBlob = new Blob([svgString], {type: 'image/svg+xml'});
             const svgUrl = URL.createObjectURL(svgBlob);

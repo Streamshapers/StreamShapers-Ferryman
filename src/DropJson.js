@@ -2,7 +2,7 @@ import { useEffect, useContext } from 'react';
 import { GlobalStateContext } from "./GlobalStateContext";
 
 function DropJson() {
-    const { setJsonFile } = useContext(GlobalStateContext);
+    const { setJsonFile, setFileName } = useContext(GlobalStateContext);
 
     useEffect(() => {
         const handleDragOver = (e) => {
@@ -19,6 +19,7 @@ function DropJson() {
 
                     if (file.type === "application/json" || fileExtension === "json") {
                         setJsonFile(file);
+                        setFileName(file.name.replace(/\.json$/, ''));
                     } //else if (["ttf", "otf", "woff"].includes(fileExtension)) {
                       //  setFontFile(file);
                     //}

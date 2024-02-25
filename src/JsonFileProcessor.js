@@ -5,7 +5,6 @@ import {faFile, faFileArrowUp, faFileExport} from "@fortawesome/free-solid-svg-i
 
 function JsonFileProcessor() {
     const {
-        jsonData,
         setJsonData,
         setColors,
         setError,

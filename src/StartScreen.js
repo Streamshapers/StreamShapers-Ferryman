@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChartPie, faChartSimple, faFileArrowUp, faList} from "@fortawesome/free-solid-svg-icons";
 
 function StartScreen() {
-    const {jsonData, setJsonFile, setFileName} = useContext(GlobalStateContext);
+    const {jsonData, setJsonFile, setFileName, setError, error} = useContext(GlobalStateContext);
 
     const handleSampleFile = async (fileName) => {
         const response = await fetch(`./samples/${fileName}`);
@@ -19,12 +19,19 @@ function StartScreen() {
         setFileName(fileName.replace(/\.json$/, ''));
     };
 
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-
-        if (file) {
-            setJsonFile(file);
+    function handleFileChange(file) {
+        if (!file) {
+            setError("Select a file please.");
+            return;
         }
+        if (file.type !== 'application/json') {
+            setError("Please select a valid JSON file.");
+            return;
+        }
+
+        setFileName(file.name.replace(/\.json$/, ''));
+
+        setJsonFile(file);
     }
 
     if (jsonData) {
@@ -40,7 +47,9 @@ function StartScreen() {
                         <FontAwesomeIcon icon={faFileArrowUp}/>
                     </div>
                     <h2>or</h2>
-                    <input type="file" id="jsonFile" accept=".json" onChange={handleFileChange}/>
+                    <input type="file" id="jsonFile" accept=".json"
+                           onChange={(e) => handleFileChange(e.target.files[0])}/>
+                    {error && <div className="error-message">{error}</div>}
                 </div>
                 <div id="sampleWrapper">
                     <h2>Or start with one of our Samples:</h2>

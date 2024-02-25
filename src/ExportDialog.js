@@ -46,6 +46,7 @@ function ExportDialog({isOpen, onClose}) {
             }
             lottiePlayerCode = await localScriptResponse.text();
         }
+        console.log(lottiePlayerCode)
 
         switch (exportFormat) {
             case 'html':
@@ -71,7 +72,7 @@ function ExportDialog({isOpen, onClose}) {
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${lottieData}', "<script>" + lottiePlayerCode + "</script>");
+                        .replace('${lottieData}', lottiePlayerCode);
 
 
                 } catch (error) {
