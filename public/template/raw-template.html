@@ -37,6 +37,7 @@
     let lottieTemplate = ${jsonData};
     let playStatus = "";
     let nextCount = 1;
+    let nextTotal = 0;
     let showInfo = false;
     let currentSegment;
     let currentSegmentFrames;
@@ -44,7 +45,7 @@
     let animation;
     let newAnimation;
     let stopExist = false;
-    let lottieTemplateNew = {...lottieTemplate};
+
 
 
     //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
@@ -58,15 +59,23 @@
             `));
         document.head.appendChild(newFont);
     }
-
-    //fix Marker Name
+    //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
         let name = marker.cm
         marker.cm = "name:" + name.toLowerCase()
+        if (name.includes("next")){
+            nextTotal ++
+        }
+        if (name == "stop") {
+                stopExist = true
+        }
+
     })
+    let lottieTemplateNew = {...lottieTemplate};
 
     function update(rawData) {
         lottieTemplateNew = {...lottieTemplate};
+        
         if (rawData) {
             if (rawData.startsWith("<templateData>")) {
                 let title = document.createElement("h1")
@@ -102,7 +111,7 @@
                 }
             }
             animReady = new Promise((resolve, reject) => {
-                animation.addEventListener("loaded_images", function () {
+                animation.addEventListener("DOMLoaded", function () {
                     console.log("READY")
                     resolve("ready")
                 })
@@ -138,40 +147,45 @@
         if (showInfo) info()
     }
 
-    function play() {
-        animReady.then(() => {
-            animation.destroy()
-            animation = bodymovin.loadAnimation({
-                container: document.getElementById("animation"),
-                renderer: "svg",
-                loop: false,
-                autoplay: false,
-                animationData: lottieTemplateNew,
-            })
-            animation.addEventListener("loaded_images", function () {
-                animation.goToAndPlay("start", true)
-                playStatus = "play"
-                currentSegment = "start"
-            })
 
-        })
-    }
+    function playWhenReady() {
+            if (!animReady) {
+                setTimeout(() => {
+                    playWhenReady();
+                }, 5);
+            } else {
+                animReady.then(() => {
+                    animation.goToAndPlay("start", true);
+                    playStatus = "play";
+                    currentSegment = "start";
+                });
+            }
+        }
+            function play() {
+
+            if (animReady !== false) {
+                animReady.then(() => {
+                    animation.goToAndPlay("start", true);
+                    playStatus = "play";
+                    currentSegment = "start";
+                });
+            } else {
+                playWhenReady();
+            }
+        }
+
 
     function load() {
         animReady.then(() => {
             animation.goToAndStop(0, true)
-            playStatus = "loadeed"
+            playStatus = "loaded"
             currentSegment = "start"
         })
 
     }
 
     function stop() {
-        for (let marker of lottieTemplate.markers) {
-            if (marker.cm === "name:" + "stop") {
-                stopExist = true
-            }
-        }
+        console.log(stopExist)
         if (stopExist) {
             animation.goToAndPlay("stop", true)
         } else {
@@ -181,9 +195,13 @@
     }
 
     function next() {
-        animation.goToAndPlay("next" + nextCount, true)
-        currentSegment = "next" + nextCount
-        nextCount++
+        if (nextCount > nextTotal && stopExist){
+            animation.goToAndPlay("stop", true)
+        } else {
+            animation.goToAndPlay("next" + nextCount, true)
+            currentSegment = "next" + nextCount
+            nextCount++
+        }
 
     }
 
