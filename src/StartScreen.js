@@ -1,7 +1,7 @@
 import {useContext} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChartPie, faChartSimple, faFileArrowUp, faList} from "@fortawesome/free-solid-svg-icons";
+import {faChartPie, faChartSimple, faFileArrowUp, faList, faUser, faHashtag} from "@fortawesome/free-solid-svg-icons";
 
 function StartScreen() {
     const {jsonData, setJsonFile, setFileName, setError, error} = useContext(GlobalStateContext);
@@ -54,13 +54,21 @@ function StartScreen() {
                 <div id="sampleWrapper">
                     <h2>Or start with one of our Samples:</h2>
                     <div id="samples">
-                        <div className="sample" onClick={() => handleSampleFile("BarChart_Ver05.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("BarChart_Ver07_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faChartSimple}/>
                             <h4>BarChart</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("PieChart_Ver03.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("PieChart_Ver06_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faChartPie}/>
                             <h4>PieChart</h4>
+                        </div>
+                        <div className="sample" onClick={() => handleSampleFile("LowerThird_Ver07_fontsEmbedded.json")}>
+                            <FontAwesomeIcon className="icon" icon={faUser}/>
+                            <h4>Lowerthird</h4>
+                        </div>
+                        <div className="sample" onClick={() => handleSampleFile("Cornerlogo_Ver03_fontsEmbedded.json")}>
+                            <FontAwesomeIcon className="icon" icon={faHashtag}/>
+                            <h4>Cornerlogo</h4>
                         </div>
                         <div className="sample" onClick={() => handleSampleFile("List_Ver02.json")}>
                             <FontAwesomeIcon className="icon" icon={faList}/>
