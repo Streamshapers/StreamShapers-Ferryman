@@ -23,7 +23,7 @@ function TextsDisplay() {
                 if (obj.t && obj.t.d && obj.t.d.k) {
                     obj.t.d.k.forEach((item) => {
                         if (item.s && currentTextIndex === index) {
-                            console.log("Updating text at index:", currentTextIndex);
+                            //console.log("Updating text at index:", currentTextIndex);
                             item.s.t = newText;
                         }
                         currentTextIndex++;

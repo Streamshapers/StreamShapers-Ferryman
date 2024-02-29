@@ -68,9 +68,7 @@ function JsonElementsDisplay() {
                             <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
                         </h3>
                         <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
-                            <div className='image-preview'>
                                 <ImagesDisplay/>
-                            </div>
                         </div>
                     </div>
                 )}

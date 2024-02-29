@@ -2,12 +2,33 @@ import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
 
 function ExportDialog({isOpen, onClose}) {
-    const {jsonData, fileName, setFileName, setIsPlaying, fontFaces} = useContext(GlobalStateContext);
+    const {
+        jsonData,
+        fileName,
+        setFileName,
+        setIsPlaying,
+        fontFaces,
+        uploadedFonts,
+        fonts
+    } = useContext(GlobalStateContext);
     const [exportFormat, setExportFormat] = useState("html");
+    const [allFontsLoaded, setAllFontsLoaded] = useState(false);
 
     if (isOpen) {
         setIsPlaying(false);
     }
+
+    useEffect(() => {
+        let allUploaded = true;
+        for (const font of fonts) {
+            if (!uploadedFonts.hasOwnProperty(font)) {
+                allUploaded = false;
+                break;
+            }
+        }
+        setAllFontsLoaded(allUploaded);
+    }, [uploadedFonts, fonts]);
+
 
     const RadioButton = ({label, value, onChange}) => {
         return (
@@ -61,7 +82,7 @@ function ExportDialog({isOpen, onClose}) {
                     const template = await response.text();
 
                     let fontFacesString = '';
-                    for (const font in fontFaces){
+                    for (const font in fontFaces) {
                         fontFacesString += fontFaces[font];
                     }
 
@@ -115,6 +136,17 @@ function ExportDialog({isOpen, onClose}) {
             <div className="overlay"></div>
             <div id="exportDialogWindow">
                 <h2>Export</h2>
+                {!allFontsLoaded && <div id="font-alert-wrapper">
+                    <div id="font-alert">
+                        The animation contains fonts that you haven't uploaded.
+                    </div>
+                    <div id="font-alert">
+                        This may result in some fonts not being displayed as intended in the animation.
+                    </div>
+                    <div id="font-alert">
+                        Please close this dialog and upload all fonts in the fonts Tab.
+                    </div>
+                </div>}
                 <div id="exportFileName">
                     <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                     <input type="text" id="fileNameInput" value={String(fileName)} onChange={handleFileNameChange}/>
@@ -130,7 +162,7 @@ function ExportDialog({isOpen, onClose}) {
                     </div>
                 </div>
                 <div className="popupButtonArea">
-                    <button id="downloadBtn" onClick={onClose}>Schließen</button>
+                    <button id="downloadBtn" onClick={onClose}>Close</button>
                     <button id="downloadBtn" onClick={downloadFile}>Download File</button>
                 </div>
             </div>

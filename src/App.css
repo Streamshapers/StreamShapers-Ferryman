@@ -286,6 +286,10 @@ input[type='file']::-webkit-file-upload-button {
     color: var(--secondary-content);
 }
 
+#info-button {
+    margin-right: 10px;
+}
+
 #previewContainer {
     display: flex;
     justify-content: space-between;
@@ -374,6 +378,10 @@ input[type='file']::-webkit-file-upload-button {
     padding-right: 0;
 }
 
+.images .accordion-body{
+    padding-top: 0;
+}
+
 .info-item {
     display: flex;
     justify-content: center;
@@ -437,11 +445,52 @@ input[type='file']::-webkit-file-upload-button {
     padding: 0;
 }
 
-.image-preview img {
-    background: var(--foreground);
+#image-preview {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.imgPreview {
+    background: url(../public/transparent-background.png);
     border-radius: 5px;
     padding: 10px;
     border: 1px solid var(--border);
+    height: 100px;
+}
+
+.image-preview-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--foreground);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.image-preview-wrapper button {
+    margin-top: 5px;
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.img-input-wrapper{
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    justify-content: space-around;
+    border:1px solid var(--border);
+    border-radius: 5px;
+    margin-top: 5px;
+    background: var(--background);
+    width: calc(100% - 10px);
+}
+
+.img-input-wrapper input{
+    margin-right: 5px;
 }
 
 #jsonElements h2,
@@ -453,7 +502,6 @@ input[type='file']::-webkit-file-upload-button {
     max-height: 100%;
     display: flex;
     flex-direction: column;
-    background: var(--background);
 }
 
 #jsonPreview {
@@ -476,20 +524,13 @@ input[type='file']::-webkit-file-upload-button {
     flex-shrink: 1;
     flex-basis: auto;
     overflow: hidden;
-
+    background: url(../public/transparent-background.png);
 }
 
 #animationPreview svg {
     flex-grow: 1;
     width: 100%;
     height: 100%;
-}
-
-#progressBar {
-    width: 0;
-    height: 20px;
-    background-color: var(--primary);
-    border-radius: 5px;
 }
 
 #previewControlContainer {
@@ -500,7 +541,7 @@ input[type='file']::-webkit-file-upload-button {
     border: 1px solid var(--border);
     padding: 50px 20px 20px 20px;
     border-radius: 0 0 5px 5px;
-    height: 150px;
+    height: 160px;
 }
 
 #previewControls {
@@ -508,6 +549,7 @@ input[type='file']::-webkit-file-upload-button {
     justify-content: space-between;
     align-items: center;
     padding: 20px 0 0 0;
+    margin-top: 10px;
 }
 
 .previewControlButton {
@@ -543,12 +585,19 @@ input[type='file']::-webkit-file-upload-button {
     height: 20px;
 }
 
+#progressBar {
+    width: 0;
+    height: 20px;
+    background-color: var(--primary);
+    border-radius: 5px;
+}
+
 .progress-bar-marker {
     position: absolute;
-    bottom: 0;
+    bottom: -1px;
     height: 160%;
     width: 4px;
-    background-color: var(--error);
+    background-color: var(--secondary);
 }
 
 .marker-tooltip {
@@ -560,19 +609,23 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 0 5px 5px 0;
     padding: 2px 5px 2px 5px;
     border: 1px solid var(--border);
-    border-left: 4px solid var(--error);
+    border-left: 4px solid var(--secondary);
     transform: translateX(-4px);
     z-index: 800;
+}
+
+.marker-duration {
+    height: 10px;
+    background-color: var(--secondary);
+    position: absolute;
+    bottom: 0;
+    border-radius: 0 5px 5px 5px;
+    top: 21px;
 }
 
 #jsonElements pre {
     white-space: pre-wrap;
     word-wrap: break-word;
-}
-
-.imgPreview {
-    width: 100px;
-    height: auto;
 }
 
 .color-pickers {
@@ -655,57 +708,7 @@ input[type='file']::-webkit-file-upload-button {
     padding-bottom: 0;
 }
 
-/*+++++++++++++++++++++++++ Popup ++++++++++++++++++++++++++++++++++++++*/
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--primary);
-}
-
-.modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--secondary);
-    border: 10px solid var(--primary);
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    color: var(--copy);
-}
-
-.modal-content h2 {
-    margin-top: 0;
-}
-
-.modal-content button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: var(--secondary);
-    color: var(--copy);
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition-duration: 0.5s;
-}
-
-.modal-content button + button {
-    margin-left: 20px;
-}
-
-.modal-content button:hover {
-    background: var(--secondary);
-    color: var(--secondary-content);
-}
+/*+++++++++++++++++++++++++ Export ++++++++++++++++++++++++++++++++++++++*/
 
 .overlay {
     position: fixed;
@@ -795,4 +798,54 @@ input[type='file']::-webkit-file-upload-button {
 #exportFileName input {
     flex-grow: 1;
     margin: 0 5px 0 5px;
+}
+
+#font-alert-wrapper {
+    background: var(--error);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#font-alert {
+    color: var(--error-content);
+}
+
+/*############################### Info Dialog ####################################################*/
+
+#infoDialogWindow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--background);
+    border-radius: 5px;
+    padding: 20px;
+    z-index: 1001;
+    border: 1px solid var(--border);
+    min-width: 30vw;
+}
+
+#info-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+}
+
+#info-version {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#info-version h3 {
+    margin-top: 0;
+}
+
+#info-copyright {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

@@ -13,19 +13,34 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const MarkersContainer = React.memo(({markers, goToMarker}) => {
     const {jsonData} = useContext(GlobalStateContext);
+
     return (
-        markers.map((marker) => (
-            <div
-                key={marker.tm}
-                className="progress-bar-marker"
-                style={{left: `${(marker.tm / jsonData.op) * 100}%`}}
-                onClick={() => goToMarker(marker.tm)}
-            >
-                <span className="marker-tooltip">{marker.cm}</span>
-            </div>
+        markers.map((marker, index) => (
+            <>
+                <div
+                    key={`marker-${marker.tm}`}
+                    className="progress-bar-marker"
+                    style={{
+                        left: `${(marker.tm / jsonData.op) * 100}%`,
+                    }}
+                    onClick={() => goToMarker(marker.tm)}
+                >
+                    <span className="marker-tooltip">{marker.cm}</span>
+                </div>
+                <div
+                    key={`duration-${marker.tm}`}
+                    className="marker-duration"
+                    style={{
+                        left: `${(marker.tm / jsonData.op) * 100}%`,
+                        width: `${(marker.dr / jsonData.op) * 100}%`,
+                        //top: index % 2 === 0 ? '25px' : '20px',
+                    }}
+                ></div>
+            </>
         ))
     );
 });
+
 
 function LottiePreview() {
     const {
@@ -110,33 +125,22 @@ function LottiePreview() {
         }
     }, [lottieInstance, setCurrentFrame]);
 
-    const goToNextMarker = () => {
-        const nextMarker = markers.find(marker => marker.tm > currentFrame);
-        if (nextMarker) {
+    const playCurrenMarker = () => {
+        const currentMarker = markers.find(marker => currentFrame >= marker.tm && currentFrame < marker.tm + marker.dr);
+        if (currentMarker) {
             setIsPlaying(true);
 
             const checkInterval = setInterval(() => {
                 const currentFrame = Math.round(lottieInstance.currentFrame);
-                if (currentFrame >= nextMarker.tm) {
+                if (currentFrame >= currentMarker.tm + currentMarker.dr) {
                     clearInterval(checkInterval);
                     setIsPlaying(false);
-                    setCurrentFrame(nextMarker.tm);
+                    lottieInstance.goToAndStop(currentMarker.tm + currentMarker.dr, true);
+                    setCurrentFrame(currentMarker.tm + currentMarker.dr);
                 }
             }, 1000 / jsonData.fr);
         } else {
-            if (!isPlaying) {
-                setIsPlaying(true);
 
-                const checkInterval = setInterval(() => {
-                    const currentFrame = Math.round(lottieInstance.currentFrame);
-                    if (currentFrame >= jsonData.op - 1) {
-                        clearInterval(checkInterval);
-                        lottieInstance.goToAndStop(jsonData.ip, true);
-                        setIsPlaying(false);
-                        setCurrentFrame(jsonData.ip);
-                    }
-                }, 1000 / jsonData.fr);
-            }
         }
     };
 
@@ -206,9 +210,11 @@ function LottiePreview() {
                                          title="Play/Pause" onClick={togglePlayPause}/>
                         <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame next"
                                          onClick={() => stepFrame(1)}/>
-                        <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
-                                         title="Play to next Marker"
-                                         onClick={goToNextMarker}/>
+                        {jsonData.markers && jsonData.markers.length > 0 &&
+                            <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
+                                             title="Play to next Marker"
+                                             onClick={playCurrenMarker}/>}
+
                         <FontAwesomeIcon icon={faCamera} className="previewControlButton"
                                          title="<Save current Frame>"
                                          onClick={downloadCurrentFrame}/>
