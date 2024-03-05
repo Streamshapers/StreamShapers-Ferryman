@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "electron-packager": "^17.1.2",
     "lottie-web": "^5.12.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -33,7 +34,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "packageWin": "electron-packager . converter_app --platform=win32 --arch=x64 --out=distWin --overwrite",
-    "packageMac": "electron-packager . converter_app --platform=darwin --arch=x64 --out=distMac --overwrite"
+    "packageMac": "electron-packager . converter_app --platform=darwin --arch=x64 --out=distMac --overwrite --ignore=node_modules/electron-* --ignore=tests --ignore=docs --asar=false"
   },
   "eslintConfig": {
     "extends": [
