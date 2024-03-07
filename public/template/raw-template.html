@@ -75,24 +75,37 @@
 
     function update(rawData) {
         lottieTemplateNew = {...lottieTemplate};
+        let parsed
         
         if (rawData) {
             if (rawData.startsWith("<templateData>")) {
-                let title = document.createElement("h1")
-                title.appendChild(document.createTextNode("Please send Data as JSON"))
-                document.body.appendChild(title)
-                console.error("Data must be send as JSON")
-            } else {
-                let parsed = JSON.parse(rawData)
-                for (let key of Object.keys(parsed)) {
-                    if (key === "_templateInfo") showInfo = true
-                    lottieTemplateNew.layers.forEach((layer) => {
-                        if (layer.nm === key) {
-                            layer.t.d.k[0].s.t = parsed[key]
-                        }
-                    })
+                let parser = new DOMParser();
+                let xmlDoc = parser.parseFromString(rawData, "text/xml");
+
+                // JSON-Objekt initialisieren
+                let json = {};
+
+                // Durch die 'componentData' Elemente iterieren
+                let components = xmlDoc.getElementsByTagName("componentData");
+                for (let component of components) {
+                    let id = component.getAttribute("id"); // 'id' des componentData Elements
+                    let dataElement = component.getElementsByTagName("data")[0];
+                    let value = dataElement.getAttribute("value"); // 'value' Attribut des 'data' Elements
+                    json[id] = value;
                 }
+                parsed = json
+            } else {
+                parsed = JSON.parse(rawData)
             }
+            for (let key of Object.keys(parsed)) {
+                if (key === "_templateInfo") showInfo = true
+                lottieTemplateNew.layers.forEach((layer) => {
+                    if (layer.nm === key) {
+                        layer.t.d.k[0].s.t = parsed[key]
+                    }
+                })
+            }
+            
         }
         if (playStatus === "") {
             animation = bodymovin.loadAnimation({
