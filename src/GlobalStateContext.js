@@ -77,25 +77,42 @@ export const GlobalStateProvider = ({children}) => {
                 let fontName = font.fFamily;
                 const path = font.fPath;
                 const addUploadetFont = (name, data) => {
-                    setUploadedFonts(prevFonts => ({
-                        ...prevFonts,
-                        [name]: data
-                    }));
+                    setUploadedFonts(prevFonts => {
+                        // Prüfen, ob der Schriftname bereits in prevFonts existiert, um Duplikate zu vermeiden
+                        if (!prevFonts[name]) {
+                            return {
+                                ...prevFonts,
+                                [name]: data
+                            };
+                        }
+                        return prevFonts; // Keine Änderung, wenn der Name bereits existiert
+                    });
                 };
+
+                // Für normale Schriftarten, die nicht mit "data:font" beginnen
                 if (!newFonts.includes(fontName) && !path.startsWith("data:font")) {
                     newFonts.push(fontName);
                 }
+
+                // Für eingebettete Schriftarten, die mit "data:font" beginnen
                 if (path.startsWith("data:font")) {
-                    fontName = font.fFamily + " " + font.fStyle;
+                    if (!font.fFamily.endsWith(font.fStyle)) {
+                        fontName = font.fFamily + " " + font.fStyle;
+                    }
                     font.fFamily = fontName;
-                    newFonts.push(fontName);
-                    addUploadetFont(fontName, path)
+
+                    // Überprüfen, ob die Schriftart bereits zu newFonts hinzugefügt wurde, um Doppelungen zu vermeiden
+                    if (!newFonts.includes(fontName)) {
+                        newFonts.push(fontName);
+                        addUploadetFont(fontName, path);
+                    }
                 }
             });
         }
 
         setFonts(newFonts);
-    }, [jsonData]);
+    }, [jsonData, setUploadedFonts]);
+
 
     useEffect(() => {
         let styles = '';

@@ -28,20 +28,20 @@ function InfoDialog({isOpen, onClose}) {
                     <h1>Converter</h1>
                 </div>
                 <div id="info-version">
-                    <h3>v1.1.0 Beta</h3>
+                    <h3>v1.2.0 Beta</h3>
                 </div>
                 <div>
                     <div className="accordion-wrapper">
                         <div className="accordion">
-                                <div className="accordion-item imprint">
-                                    <h3 className="accordion-header" onClick={() => setIsImprintOpen(!isImprintOpen)}>
-                                        <i className={`fas ${isImprintOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Imprint
-                                    </h3>
-                                    <div className="accordion-body" style={{display: isImprintOpen ? 'block' : 'none'}}>
-                                        <p>StreamShapers by Jan-Philipp Peters, Nico Peters and Richard Weyer</p>
-                                        <p>E-Mail: mail@streamshapers.com</p>
-                                    </div>
+                            <div className="accordion-item imprint">
+                                <h3 className="accordion-header" onClick={() => setIsImprintOpen(!isImprintOpen)}>
+                                    <i className={`fas ${isImprintOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Imprint
+                                </h3>
+                                <div className="accordion-body" style={{display: isImprintOpen ? 'block' : 'none'}}>
+                                    <p>StreamShapers by Jan-Philipp Peters, Nico Peters and Richard Weyer</p>
+                                    <p>E-Mail: mail@streamshapers.com</p>
                                 </div>
+                            </div>
                         </div>
                     </div>
                 </div>

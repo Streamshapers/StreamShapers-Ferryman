@@ -5,6 +5,7 @@ import FontsDisplay from "./FontsDisplay";
 import TextsDisplay from "./TextsDisplay";
 import ImagesDisplay from "./ImagesDisplay";
 import ColorsDisplay from "./ColorsDispaly";
+import MarkersDisplay from "./MarkersDisplay";
 
 
 function JsonElementsDisplay() {
@@ -14,6 +15,7 @@ function JsonElementsDisplay() {
     const [isTextsOpen, setIsTextsOpen] = useState(false);
     const [isColorsOpen, setIsColorsOpen] = useState(false);
     const [isImagesOpen, setIsImagesOpen] = useState(false);
+    const [isMarkersOpen, setIsMarkersOpen] = useState(false);
 
     if (!jsonData) {
         return null;
@@ -62,13 +64,23 @@ function JsonElementsDisplay() {
                         </div>
                     </div>
                 )}
+                {jsonData.markers && jsonData.markers.length > 0 && (
+                    <div className="accordion-item markers">
+                        <h3 className="accordion-header" onClick={() => setIsMarkersOpen(!isMarkersOpen)}>
+                            <i className={`fas ${isMarkersOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Marker
+                        </h3>
+                        <div className="accordion-body" style={{display: isMarkersOpen ? 'block' : 'none'}}>
+                            <MarkersDisplay/>
+                        </div>
+                    </div>
+                )}
                 {images && images.length > 0 && (
                     <div className="accordion-item images">
                         <h3 className="accordion-header" onClick={() => setIsImagesOpen(!isImagesOpen)}>
                             <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
                         </h3>
                         <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
-                                <ImagesDisplay/>
+                            <ImagesDisplay/>
                         </div>
                     </div>
                 )}

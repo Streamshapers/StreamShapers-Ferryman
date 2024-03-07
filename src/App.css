@@ -378,7 +378,7 @@ input[type='file']::-webkit-file-upload-button {
     padding-right: 0;
 }
 
-.images .accordion-body{
+.images .accordion-body {
     padding-top: 0;
 }
 
@@ -477,20 +477,42 @@ input[type='file']::-webkit-file-upload-button {
     padding: 5px;
 }
 
-.img-input-wrapper{
+.img-input-wrapper {
     display: flex;
     align-items: center;
     padding: 5px;
     justify-content: space-around;
-    border:1px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: 5px;
     margin-top: 5px;
     background: var(--background);
     width: calc(100% - 10px);
 }
 
-.img-input-wrapper input{
+.img-input-wrapper input {
     margin-right: 5px;
+}
+
+.markers-wrapper {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.marker-inputs {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.marker-input-name {
+    min-width: 100px;
+    max-width: 400px;
+    flex-grow: 1;
+}
+
+.marker-input-start, .marker-input-end {
+    width: 50px;
 }
 
 #jsonElements h2,
@@ -524,13 +546,13 @@ input[type='file']::-webkit-file-upload-button {
     flex-shrink: 1;
     flex-basis: auto;
     overflow: hidden;
-    background: url(../public/transparent-background.png);
 }
 
 #animationPreview svg {
     flex-grow: 1;
     width: 100%;
     height: 100%;
+    background: url(../public/transparent-background.png);
 }
 
 #previewControlContainer {
