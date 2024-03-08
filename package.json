@@ -33,7 +33,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "packageWin": "electron-packager . converter_app --platform=win32 --arch=x64 --out=distWin --overwrite",
+    "packageWin": "electron-packager . converter_app --platform=win32 --arch=x64 --out=distWin --overwrite --ignore=node_modules/electron-* --ignore=tests --ignore=docs --asar=true",
     "packageMac": "electron-packager . converter_app --platform=darwin --arch=x64 --out=distMac --overwrite --ignore=node_modules/electron-* --ignore=tests --ignore=docs --asar=false"
   },
   "eslintConfig": {

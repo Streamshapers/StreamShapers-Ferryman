@@ -52,25 +52,25 @@ function StartScreen() {
                     {error && <div className="error-message">{error}</div>}
                 </div>
                 <div id="sampleWrapper">
-                    <h2>Or start with one of our Samples:</h2>
+                    <h2>Or check out one of our Samples</h2>
                     <div id="samples">
-                        <div className="sample" onClick={() => handleSampleFile("BarChart_Ver07_fontsEmbedded.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("BarChart_Ver08_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faChartSimple}/>
                             <h4>BarChart</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("PieChart_Ver06_fontsEmbedded.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("PieChart_Ver08_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faChartPie}/>
                             <h4>PieChart</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("LowerThird_Ver07_fontsEmbedded.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("LowerThird_Ver08_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faUser}/>
                             <h4>Lowerthird</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("Cornerlogo_Ver03_fontsEmbedded.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("Cornerlogo_Ver04_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faHashtag}/>
                             <h4>Cornerlogo</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("List_Ver02.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("List_Ver06_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faList}/>
                             <h4>List</h4>
                         </div>
