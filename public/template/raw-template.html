@@ -45,6 +45,7 @@
     let animation;
     let newAnimation;
     let stopExist = false;
+    let showLogs = false
 
     //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
     const addFont = (fam, path) => {
@@ -96,6 +97,7 @@
             }
             for (let key of Object.keys(parsed)) {
                 if (key === "_templateInfo") showInfo = true
+                if (key === "_debug") showLogs = true
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
                         layer.t.d.k[0].s.t = parsed[key]
@@ -121,7 +123,7 @@
             }
             animReady = new Promise((resolve, reject) => {
                 animation.addEventListener("DOMLoaded", function () {
-                    console.log("READY")
+                    if (showLogs) console.log("Template - Ready")
                     resolve("ready")
                 })
             })
@@ -133,7 +135,7 @@
                     }
                 }
                 const currentFrame = animation.currentFrame + currentSegmentFrames
-                console.log(`Current Frame: ${currentFrame}`);
+                if (showLogs) console.log(`Template - Current Frame: ${currentFrame}`);
             })
 
         }
@@ -162,6 +164,7 @@
             }, 5);
         } else {
             animReady.then(() => {
+                if (showLogs) console.log("Template - Play 'start' marker")
                 animation.goToAndPlay("start", true);
                 playStatus = "play";
                 currentSegment = "start";
@@ -173,6 +176,7 @@
 
         if (animReady !== false) {
             animReady.then(() => {
+                if (showLogs) console.log("Template - Play 'start' marker")
                 animation.goToAndPlay("start", true);
                 playStatus = "play";
                 currentSegment = "start";
@@ -184,6 +188,7 @@
 
     function load() {
         animReady.then(() => {
+            if (showLogs) console.log("Template - Loaded on first Frame")
             animation.goToAndStop(0, true)
             playStatus = "loaded"
             currentSegment = "start"
@@ -191,10 +196,11 @@
     }
 
     function stop() {
-        console.log(stopExist)
         if (stopExist) {
             animation.goToAndPlay("stop", true)
+            if (showLogs) console.log("Template - Play 'stop' Marker")
         } else {
+            if (showLogs) console.log("Template - No 'stop' marker - destroy Animation")
             animation.destroy()
         }
         playStatus = "stop"
@@ -203,7 +209,9 @@
     function next() {
         if (nextCount > nextTotal && stopExist) {
             animation.goToAndPlay("stop", true)
+            if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker")
         } else {
+            if (showLogs) console.log("Template - Play 'next"+nextCount+"' Marker")
             animation.goToAndPlay("next" + nextCount, true)
             currentSegment = "next" + nextCount
             nextCount++
