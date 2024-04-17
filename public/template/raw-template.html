@@ -45,7 +45,8 @@
     let animation;
     let newAnimation;
     let stopExist = false;
-    let showLogs = false
+    let showLogs = false;
+    let imagesPathPrefix = ${imagePath};
 
     //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
     const addFont = (fam, path) => {
@@ -58,6 +59,24 @@
             `));
         document.head.appendChild(newFont);
     }
+
+
+            //updates Images Assets by there Refid  //Credits to HeineFro  @https://github.com/HeineFro
+            function updateAssetsByRefid(array, searchValue, newValue) {
+            const foundObject = array.find(obj => obj['id'] === searchValue);
+
+            if (foundObject) {
+                foundObject['u'] = imagesPathPrefix
+                foundObject['p'] = newValue;
+                foundObject['e'] = 0
+                return foundObject;
+            }
+
+            return null;
+        }
+
+
+
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
         let name = marker.cm
@@ -100,7 +119,11 @@
                 if (key === "_debug") showLogs = true
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
-                        layer.t.d.k[0].s.t = parsed[key]
+                        if ('refId' in layer) {
+                            updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, parsed[key])
+                        } else {
+                            layer.t.d.k[0].s.t = parsed[key]
+                        }
                     }
                 })
             }
@@ -219,22 +242,29 @@
     }
 
     function info() {
-        animation.destroy()
-        let title = document.createElement("h1")
-        title.appendChild(document.createTextNode("These are the names of your After-Effects layers starting with \"_\"."))
-        document.body.appendChild(title)
-        lottieTemplate.layers.forEach((layer) => {
-            if (layer.nm.startsWith("_")) {
+            animation.destroy()
+            let title = document.createElement("h1")
+            title.appendChild(document.createTextNode("These are the names of your After-Effects layers starting with \"_\"."))
+            document.body.appendChild(title)
+            lottieTemplate.layers.forEach((layer) => {
+                if (layer.nm.startsWith("_")) {
 
-                let nameElement = document.createElement("p")
-                let text = document.createTextNode(layer.nm)
-                let br = document.createElement("br")
-                nameElement.appendChild(text)
-                document.body.appendChild(nameElement);
-                document.body.appendChild(br);
-            }
-        })
-    }
+                    let nameElement = document.createElement("p")
+                    let text = document.createTextNode(layer.nm)
+                    let br = document.createElement("br")
+                    nameElement.appendChild(text)
+                    document.body.appendChild(nameElement);
+                    document.body.appendChild(br);
+                }
+            })
+            let nameElement = document.createElement("p")
+            let text = document.createTextNode("Your image path is: '"+imagesPathPrefix+"'")
+            let br = document.createElement("br")
+            nameElement.appendChild(text)
+            document.body.appendChild(nameElement);
+            document.body.appendChild(br);
+            
+        }
 </script>
 <!-- Lottie.js-->
 <script>
