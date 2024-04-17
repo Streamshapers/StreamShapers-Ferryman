@@ -54,7 +54,17 @@ function JsonElementsDisplay() {
                         </div>
                     </div>
                 )}
-                {colors && colors.length > 0 && (
+                {images && images.length > 0 && (
+                    <div className="accordion-item images">
+                        <h3 className="accordion-header" onClick={() => setIsImagesOpen(!isImagesOpen)}>
+                            <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
+                        </h3>
+                        <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
+                            <ImagesDisplay/>
+                        </div>
+                    </div>
+                )}
+                {/*{colors && colors.length > 0 && (
                     <div className="accordion-item colors">
                         <h3 className="accordion-header" onClick={() => setIsColorsOpen(!isColorsOpen)}>
                             <i className={`fas ${isColorsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Colors
@@ -63,24 +73,14 @@ function JsonElementsDisplay() {
                             <ColorsDisplay/>
                         </div>
                     </div>
-                )}
+                )}*/}
                 {jsonData.markers && jsonData.markers.length > 0 && (
                     <div className="accordion-item markers">
                         <h3 className="accordion-header" onClick={() => setIsMarkersOpen(!isMarkersOpen)}>
-                            <i className={`fas ${isMarkersOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Marker
+                            <i className={`fas ${isMarkersOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Markers
                         </h3>
                         <div className="accordion-body" style={{display: isMarkersOpen ? 'block' : 'none'}}>
                             <MarkersDisplay/>
-                        </div>
-                    </div>
-                )}
-                {images && images.length > 0 && (
-                    <div className="accordion-item images">
-                        <h3 className="accordion-header" onClick={() => setIsImagesOpen(!isImagesOpen)}>
-                            <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
-                        </h3>
-                        <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
-                            <ImagesDisplay/>
                         </div>
                     </div>
                 )}

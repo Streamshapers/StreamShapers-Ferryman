@@ -365,10 +365,6 @@ input[type='file']::-webkit-file-upload-button {
     padding-bottom: 0;
 }
 
-.accordion .images {
-    margin-bottom: 0;
-}
-
 .colors .accordion-body {
     padding-bottom: 0;
 }
@@ -376,10 +372,6 @@ input[type='file']::-webkit-file-upload-button {
 .infos .accordion-body {
     display: flex;
     padding-right: 0;
-}
-
-.images .accordion-body {
-    padding-top: 0;
 }
 
 .info-item {
@@ -422,7 +414,7 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
 }
 
-#textControls {
+.controls {
     display: flex;
     align-items: center;
     padding: 5px;
@@ -432,17 +424,13 @@ input[type='file']::-webkit-file-upload-button {
     border: 1px solid var(--border);
 }
 
-.textControl {
+.control-item {
     display: flex;
     align-items: center;
     background: var(--background);
     border-radius: 5px;
     padding: 5px;
     border: 1px solid var(--border);
-}
-
-.text-inputs {
-    padding: 0;
 }
 
 #image-preview {
@@ -479,6 +467,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .img-input-wrapper {
     display: flex;
+    flex-direction: column;
     align-items: center;
     padding: 5px;
     justify-content: space-around;
@@ -487,10 +476,7 @@ input[type='file']::-webkit-file-upload-button {
     margin-top: 5px;
     background: var(--background);
     width: calc(100% - 10px);
-}
-
-.img-input-wrapper input {
-    margin-right: 5px;
+    gap: 5px;
 }
 
 .markers-wrapper {
@@ -687,6 +673,7 @@ input[type='file']::-webkit-file-upload-button {
     flex-wrap: nowrap;
     flex-direction: column;
     justify-content: space-between;
+    padding: 0;
 }
 
 .jsonText {

@@ -9,7 +9,9 @@ function ExportDialog({isOpen, onClose}) {
         setIsPlaying,
         fontFaces,
         uploadedFonts,
-        fonts
+        fonts,
+        imagePath,
+        setImagePath
     } = useContext(GlobalStateContext);
     const [exportFormat, setExportFormat] = useState("html");
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
@@ -54,6 +56,10 @@ function ExportDialog({isOpen, onClose}) {
         let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
         let lottiePlayerCode = '';
 
+        if(imagePath != null && !imagePath.endsWith("/")){
+            setImagePath(`${imagePath}/`);
+        }
+
         try {
             const response = await fetch(lottieScriptUrl);
             if (!response.ok) throw new Error('CDN nicht erreichbar');
@@ -74,7 +80,6 @@ function ExportDialog({isOpen, onClose}) {
                 mimeType = 'text/html';
                 extension = '.html';
                 try {
-                    // Lade dein HTML-Template
                     const response = await fetch('/template/raw-template.html');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -87,14 +92,16 @@ function ExportDialog({isOpen, onClose}) {
                     }
 
                     let jsonDataString = JSON.stringify(jsonData);
+
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${jsonData}', jsonDataString)
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${lottieData}', lottiePlayerCode);
+                        .replace('${lottieData}', lottiePlayerCode)
 
+                        .replace('${imagePath}', imagePath);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);

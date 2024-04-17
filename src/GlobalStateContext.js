@@ -21,6 +21,8 @@ export const GlobalStateProvider = ({children}) => {
     const [fileName, setFileName] = useState(null);
     const [jsonFile, setJsonFile] = useState(null);
     const [theme, setTheme] = useState('dark');
+    const [refImages, setRefImages] = useState([]);
+    const [imagePath, setImagePath] = useState(null);
 
     useEffect(() => {
         if (!jsonData) {
@@ -259,6 +261,34 @@ export const GlobalStateProvider = ({children}) => {
     //########################################## Images ################################################################
 
     useEffect(() => {
+        function searchForObjectsWithRefId(obj) {
+            let tempList = [];
+
+            if (typeof obj === "object" && obj !== null) {
+                // Prüfen, ob das Objekt die Eigenschaften 'nm' und 'refId' hat
+                if (obj.hasOwnProperty('nm') && obj.hasOwnProperty('refId')) {
+                    tempList.push(obj);
+                }
+
+                // Durch alle Schlüssel des Objekts iterieren und rekursiv suchen
+                Object.keys(obj).forEach(key => {
+                    if (typeof obj[key] === 'object') {
+                        const childResults = searchForObjectsWithRefId(obj[key]);
+                        tempList = tempList.concat(childResults);
+                    }
+                });
+            }
+
+            return tempList;
+        }
+        if (jsonData) {
+            const imageNames = searchForObjectsWithRefId(jsonData);
+            setRefImages(imageNames);
+            console.log(imageNames);
+        }
+    }, [jsonData]);
+
+    useEffect(() => {
         function searchForImages(obj) {
             let tempImages = [];
             const imageProperties = ["u", "p"];
@@ -292,7 +322,7 @@ export const GlobalStateProvider = ({children}) => {
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
             setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,
-            setJsonFile, theme, setTheme
+            setJsonFile, theme, setTheme, refImages, imagePath, setImagePath
         }}>
             {children}
         </GlobalStateContext.Provider>

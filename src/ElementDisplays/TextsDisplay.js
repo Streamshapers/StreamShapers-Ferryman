@@ -58,8 +58,8 @@ function TextsDisplay() {
 
     return (
         <div>
-            <div id="textControls">
-                <div className="textControl">
+            <div className="controls">
+                <div className="control-item">
                     <label htmlFor="textShowAll">Show All</label>
                     <input
                         type="checkbox"
