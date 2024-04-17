@@ -55,9 +55,11 @@ function ExportDialog({isOpen, onClose}) {
         let extension;
         let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
         let lottiePlayerCode = '';
+        let correctPath;
 
         if(imagePath != null && !imagePath.endsWith("/")){
             setImagePath(`${imagePath}/`);
+            correctPath = `${imagePath}/`;
         }
 
         try {
@@ -92,7 +94,7 @@ function ExportDialog({isOpen, onClose}) {
                     }
 
                     let jsonDataString = JSON.stringify(jsonData);
-                    const path = `"${imagePath}"`
+                    const path = `"${correctPath}"`
 
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
