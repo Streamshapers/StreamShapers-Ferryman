@@ -60,6 +60,8 @@ function ExportDialog({isOpen, onClose}) {
         if(imagePath != null && !imagePath.endsWith("/")){
             setImagePath(`${imagePath}/`);
             correctPath = `${imagePath}/`;
+        } else{
+            correctPath = imagePath;
         }
 
         try {

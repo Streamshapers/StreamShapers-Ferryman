@@ -571,6 +571,10 @@ input[type='file']::-webkit-file-upload-button {
     margin-top: 10px;
 }
 
+.control-input-images{
+    margin-left: 6px;
+}
+
 .previewControlButton {
     font-size: 24px;
     border-radius: 5px;

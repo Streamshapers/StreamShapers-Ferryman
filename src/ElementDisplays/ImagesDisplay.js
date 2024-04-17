@@ -92,11 +92,14 @@ function ImagePreview() {
                     />
                 </div>
                 <div className="control-item">
+                    <label>Image Folder:</label>
                     <input
                         type="text"
                         value={imagePath}
                         onChange={(e) => changeImagePath(e.target.value)}
                         placeholder="images/"
+                        title="Choose your image folder path next to your HTML-Template"
+                        className="control-input-images"
                     />
                 </div>
             </div>
@@ -111,7 +114,7 @@ function ImagePreview() {
                                 onChange={(e) => changeImageLayerName(asset.refId, e.target.value)}
                                 placeholder="Layer name"
                             />
-                            <i>{jsonData.assets.find(img => img.id === asset.refId).w}px x{jsonData.assets.find(img => img.id === asset.refId).h}px</i>
+                            <i>{jsonData.assets.find(img => img.id === asset.refId).w}px x {jsonData.assets.find(img => img.id === asset.refId).h}px</i>
                         </div>
 
                         <button onClick={() => replaceImage(asset.refId)} title="change image">change</button>
