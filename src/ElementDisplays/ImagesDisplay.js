@@ -80,7 +80,7 @@ function ImagePreview() {
 
     return (
         <>
-            <div className="controls">
+            <div className="controls imageControls">
                 <div className="control-item">
                     <label htmlFor="textShowAll">Show All</label>
                     <input
@@ -96,7 +96,7 @@ function ImagePreview() {
                         type="text"
                         value={imagePath}
                         onChange={(e) => changeImagePath(e.target.value)}
-                        placeholder="imagePath"
+                        placeholder="images/"
                     />
                 </div>
             </div>

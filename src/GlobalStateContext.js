@@ -22,7 +22,7 @@ export const GlobalStateProvider = ({children}) => {
     const [jsonFile, setJsonFile] = useState(null);
     const [theme, setTheme] = useState('dark');
     const [refImages, setRefImages] = useState([]);
-    const [imagePath, setImagePath] = useState(null);
+    const [imagePath, setImagePath] = useState("images/");
 
     useEffect(() => {
         if (!jsonData) {

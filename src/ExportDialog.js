@@ -92,6 +92,7 @@ function ExportDialog({isOpen, onClose}) {
                     }
 
                     let jsonDataString = JSON.stringify(jsonData);
+                    const path = `"${imagePath}"`
 
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
@@ -101,7 +102,7 @@ function ExportDialog({isOpen, onClose}) {
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${lottieData}', lottiePlayerCode)
 
-                        .replace('${imagePath}', imagePath);
+                        .replace('${imagePath}', path);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);

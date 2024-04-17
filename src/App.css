@@ -416,12 +416,18 @@ input[type='file']::-webkit-file-upload-button {
 
 .controls {
     display: flex;
+    flex-direction: row;
+    gap: 5px;
     align-items: center;
     padding: 5px;
     background: var(--foreground);
     border-radius: 5px;
     margin-bottom: 10px;
     border: 1px solid var(--border);
+}
+
+.imageControls{
+    margin-bottom: 0;
 }
 
 .control-item {
@@ -431,12 +437,14 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
     padding: 5px;
     border: 1px solid var(--border);
+    height: 30px
 }
 
 #image-preview {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
+    gap: 5px;
 }
 
 .imgPreview {
@@ -458,11 +466,14 @@ input[type='file']::-webkit-file-upload-button {
     margin-top: 10px;
 }
 
-.image-preview-wrapper button {
+.image-preview-wrapper > button {
     margin-top: 5px;
     width: 100%;
     border-radius: 5px;
     padding: 5px;
+    background: var(--background);
+    color: var(--copy);
+    border: 1px solid var(--border);
 }
 
 .img-input-wrapper {
