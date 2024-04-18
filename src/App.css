@@ -449,8 +449,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .imgPreview {
     background: url(../public/transparent-background.png);
-    border-radius: 5px;
-    padding: 10px;
+    padding: 0;
     border: 1px solid var(--border);
     height: 100px;
 }
