@@ -82,7 +82,7 @@ function StartScreen() {
                             <FontAwesomeIcon className="icon" icon={faList}/>
                             <h4>List</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("Photodisplay_Ver04_fontsEmbedded.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("Photodisplay_Ver05_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faImage}/>
                             <h4>Images</h4>
                         </div>
