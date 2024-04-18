@@ -518,7 +518,7 @@ input[type='file']::-webkit-file-upload-button {
 
 #jsonElements h2,
 #jsonElements h3 {
-    color: var(--primary-content);
+    color: #fff;
 }
 
 #previewWrapper {
