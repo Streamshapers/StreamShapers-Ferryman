@@ -92,9 +92,19 @@ function LottiePreview() {
 
     }, [jsonData, texts]);
 
+    const adjustSvgWidth = () => {
+        if (animationContainerRef.current) {
+            const svgElement = animationContainerRef.current.querySelector('svg');
+            if (svgElement) {
+                svgElement.style.width = 'auto';
+            }
+        }
+    };
+
     useEffect(() => {
         if (!lottieInstance) return;
         isPlaying ? lottieInstance.play() : lottieInstance.pause();
+        adjustSvgWidth();
     }, [isPlaying, lottieInstance]);
 
     const togglePlayPause = () => {
@@ -187,6 +197,19 @@ function LottiePreview() {
         }
     }, [currentFrame, jsonData]);
 
+    const calculateAspectRatio = (width, height) => {
+        const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+        const divisor = gcd(width, height);
+        return `${width / divisor} / ${height / divisor}`;
+    };
+
+    const aspectRatio = calculateAspectRatio(jsonData.w, jsonData.h);
+
+    const style = {
+        aspectRatio: aspectRatio,
+        maxWidth: jsonData.w
+    };
+
     if (!jsonData) {
         return null;
     }
@@ -194,7 +217,7 @@ function LottiePreview() {
     return (
         <>
             <div id="previewWrapper">
-                <div id="animationPreview" ref={animationContainerRef}/>
+                <div id="animationPreview" style={style} ref={animationContainerRef}/>
                 <div id="previewControlContainer">
                     <div id="progressBarContainer">
                         <div id="progressBar" ref={progressBarRef}/>
