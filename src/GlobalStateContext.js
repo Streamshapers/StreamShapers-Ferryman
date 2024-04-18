@@ -284,7 +284,6 @@ export const GlobalStateProvider = ({children}) => {
         if (jsonData) {
             const imageNames = searchForObjectsWithRefId(jsonData);
             setRefImages(imageNames);
-            console.log(imageNames);
         }
     }, [jsonData]);
 
