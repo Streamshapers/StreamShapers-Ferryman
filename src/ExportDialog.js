@@ -22,7 +22,6 @@ function ExportDialog({isOpen, onClose}) {
     const [startMarkerCheck, setStartMarkerCheck] = useState(false);
     const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
     const [base64Images, setBase64Images] = useState([]);
-    const [jsonNotEmbedded, setJsonNotEmbedded] = useState(jsonData);
 
     if (isOpen) {
         setIsPlaying(false);
@@ -61,26 +60,6 @@ function ExportDialog({isOpen, onClose}) {
         }
     }, [jsonData, imageEmbed]);
 
-    useEffect(() => {
-        if (jsonData && jsonData.assets) {
-            if (imagePath != null && !imagePath.endsWith("/")) {
-                setImagePath(`${imagePath}/`);
-            }
-            const updatedJsonData = JSON.parse(JSON.stringify(jsonData));
-
-
-            updatedJsonData.assets.forEach(asset => {
-                if (asset.p && asset.p.startsWith('data:image')) {
-                    asset.p = asset.id + ".png";
-                    asset.e = 0;
-                    asset.u = imagePath;
-                }
-            });
-
-            setJsonNotEmbedded(updatedJsonData);
-        }
-    }, [jsonData, imagePath]);
-
     const RadioButton = ({label, value, onChange}) => {
         return (
             <label className="exportRadioButton">
@@ -107,6 +86,7 @@ function ExportDialog({isOpen, onClose}) {
         let lottiePlayerCode = '';
         let correctPath;
         const zip = new JSZip();
+        let jsonWithoutImages = "";
 
         if (imagePath != null && !imagePath.endsWith("/")) {
             setImagePath(`${imagePath}/`);
@@ -129,6 +109,21 @@ function ExportDialog({isOpen, onClose}) {
             lottiePlayerCode = await localScriptResponse.text();
         }
 
+        if (jsonData && jsonData.assets) {
+            if (imagePath != null && !imagePath.endsWith("/")) {
+                setImagePath(`${imagePath}/`);
+            }
+            jsonWithoutImages = JSON.parse(JSON.stringify(jsonData));
+
+            jsonWithoutImages.assets.forEach(asset => {
+                if (asset.p && asset.p.startsWith('data:image')) {
+                    asset.p = asset.id + ".png";
+                    asset.e = 0;
+                    asset.u = imagePath;
+                }
+            });
+        }
+
         switch (exportFormat) {
             case 'html':
                 mimeType = 'text/html';
@@ -149,7 +144,7 @@ function ExportDialog({isOpen, onClose}) {
                     if (imageEmbed === "embed") {
                         jsonDataString = JSON.stringify(jsonData);
                     } else if (imageEmbed === "extra") {
-                        jsonDataString = JSON.stringify(jsonNotEmbedded);
+                        jsonDataString = JSON.stringify(jsonWithoutImages);
                     }
                     const path = `"${correctPath}"`
 
@@ -174,7 +169,7 @@ function ExportDialog({isOpen, onClose}) {
                 if (imageEmbed === "embed") {
                     fileContent = JSON.stringify(jsonData);
                 } else if (imageEmbed === "extra") {
-                    fileContent = JSON.stringify(jsonNotEmbedded);
+                    fileContent = JSON.stringify(jsonWithoutImages);
                 }
                 break;
             default:
