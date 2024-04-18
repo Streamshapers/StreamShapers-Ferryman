@@ -11,10 +11,13 @@ function ExportDialog({isOpen, onClose}) {
         uploadedFonts,
         fonts,
         imagePath,
-        setImagePath
+        setImagePath,
+        markers
     } = useContext(GlobalStateContext);
     const [exportFormat, setExportFormat] = useState("html");
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
+    const [startMarkerCheck, setStartMarkerCheck] = useState(false);
+    const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
 
     if (isOpen) {
         setIsPlaying(false);
@@ -142,21 +145,38 @@ function ExportDialog({isOpen, onClose}) {
         console.log(fileName)
     };
 
+    useEffect(() => {
+        const startExists = markers.some(event => event.cm === 'start');
+        const stopExists = markers.some(event => event.cm === 'stop');
+        setStartMarkerCheck(startExists);
+        setStopMarkerCheck(stopExists);
+    }, [markers]);
+
     if (!isOpen) return null;
 
     return (<>
             <div className="overlay"></div>
             <div id="exportDialogWindow">
                 <h2>Export</h2>
-                {!allFontsLoaded && <div id="font-alert-wrapper">
-                    <div id="font-alert">
+                {!allFontsLoaded && <div className="alert-wrapper">
+                    <div className="alert">
                         The animation contains fonts that you haven't uploaded.
                     </div>
-                    <div id="font-alert">
+                    <div className="alert">
                         This may result in some fonts not being displayed as intended in the animation.
                     </div>
-                    <div id="font-alert">
+                    <div className="alert">
                         Please close this dialog and upload all fonts in the fonts Tab.
+                    </div>
+                </div>}
+                {!startMarkerCheck && <div className="alert-wrapper">
+                    <div className="alert">
+                        Your animation has no start marker and might not play correctly in CasparCG.
+                    </div>
+                </div>}
+                {!stopMarkerCheck && <div className="alert-wrapper">
+                    <div className="alert">
+                        Your animation has no stop marker and might not play correctly in CasparCG.
                     </div>
                 </div>}
                 <div id="exportFileName">
