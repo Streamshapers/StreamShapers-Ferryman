@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
+import JSZip from 'jszip';
 
 function ExportDialog({isOpen, onClose}) {
     const {
@@ -12,12 +13,16 @@ function ExportDialog({isOpen, onClose}) {
         fonts,
         imagePath,
         setImagePath,
-        markers
+        markers,
+        refImages
     } = useContext(GlobalStateContext);
+    const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
     const [startMarkerCheck, setStartMarkerCheck] = useState(false);
     const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
+    const [base64Images, setBase64Images] = useState([]);
+    const [jsonNotEmbedded, setJsonNotEmbedded] = useState(jsonData);
 
     if (isOpen) {
         setIsPlaying(false);
@@ -34,6 +39,47 @@ function ExportDialog({isOpen, onClose}) {
         setAllFontsLoaded(allUploaded);
     }, [uploadedFonts, fonts]);
 
+    useEffect(() => {
+        if (jsonData && jsonData.assets) {
+            const files = jsonData.assets
+                .filter(asset => asset.p && asset.p.startsWith('data:image'))
+                .map((asset, index) => {
+                    const [header, base64] = asset.p.split(',');
+                    const mime = header.match(/:(.*?);/)[1];
+                    const bstr = atob(base64);
+                    const n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+
+                    for (let i = 0; i < n; i++) {
+                        u8arr[i] = bstr.charCodeAt(i);
+                    }
+
+                    return new File([u8arr], `image_${index}.${mime.split('/')[1]}`, {type: mime});
+                });
+
+            setBase64Images(files);
+        }
+    }, [jsonData, imageEmbed]);
+
+    useEffect(() => {
+        if (jsonData && jsonData.assets) {
+            if (imagePath != null && !imagePath.endsWith("/")) {
+                setImagePath(`${imagePath}/`);
+            }
+            const updatedJsonData = JSON.parse(JSON.stringify(jsonData));
+
+
+            updatedJsonData.assets.forEach(asset => {
+                if (asset.p && asset.p.startsWith('data:image')) {
+                    asset.p = asset.id + ".png";
+                    asset.e = 0;
+                    asset.u = imagePath;
+                }
+            });
+
+            setJsonNotEmbedded(updatedJsonData);
+        }
+    }, [jsonData, imagePath]);
 
     const RadioButton = ({label, value, onChange}) => {
         return (
@@ -52,6 +98,7 @@ function ExportDialog({isOpen, onClose}) {
         }
     }, [isOpen]);
 
+
     const downloadFile = async () => {
         let fileContent;
         let mimeType;
@@ -59,11 +106,12 @@ function ExportDialog({isOpen, onClose}) {
         let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
         let lottiePlayerCode = '';
         let correctPath;
+        const zip = new JSZip();
 
-        if(imagePath != null && !imagePath.endsWith("/")){
+        if (imagePath != null && !imagePath.endsWith("/")) {
             setImagePath(`${imagePath}/`);
             correctPath = `${imagePath}/`;
-        } else{
+        } else {
             correctPath = imagePath;
         }
 
@@ -80,7 +128,6 @@ function ExportDialog({isOpen, onClose}) {
             }
             lottiePlayerCode = await localScriptResponse.text();
         }
-        console.log(lottiePlayerCode)
 
         switch (exportFormat) {
             case 'html':
@@ -98,7 +145,12 @@ function ExportDialog({isOpen, onClose}) {
                         fontFacesString += fontFaces[font];
                     }
 
-                    let jsonDataString = JSON.stringify(jsonData);
+                    let jsonDataString
+                    if (imageEmbed === "embed") {
+                        jsonDataString = JSON.stringify(jsonData);
+                    } else if (imageEmbed === "extra") {
+                        jsonDataString = JSON.stringify(jsonNotEmbedded);
+                    }
                     const path = `"${correctPath}"`
 
                     fileContent = template
@@ -119,11 +171,47 @@ function ExportDialog({isOpen, onClose}) {
             case 'json':
                 mimeType = 'application/json';
                 extension = '.json';
-                fileContent = JSON.stringify(jsonData);
+                if (imageEmbed === "embed") {
+                    fileContent = JSON.stringify(jsonData);
+                } else if (imageEmbed === "extra") {
+                    fileContent = JSON.stringify(jsonNotEmbedded);
+                }
                 break;
             default:
                 console.warn('Unbekanntes Exportformat:', exportFormat);
                 return;
+        }
+
+        if (exportFormat === 'html' || exportFormat === 'json') {
+            if (imageEmbed === "extra") {
+                zip.file(`${fileName}${extension}`, fileContent, {type: mimeType});
+
+                let imageFolderName;
+                if(imagePath.endsWith("/")){
+                    imageFolderName = imagePath.slice(0, -1);
+                }else{
+                    imageFolderName = imagePath;
+                }
+
+                const imgFolder = zip.folder(imageFolderName);
+
+                base64Images.forEach((file, index) => {
+                    imgFolder.file(file.name, file);
+                });
+
+                zip.generateAsync({type: "blob"}).then(function (content) {
+                    const url = URL.createObjectURL(content);
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = url;
+                    downloadLink.download = `${fileName}.zip`;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(url);
+                });
+
+                return;
+            }
         }
 
         const blob = new Blob([fileContent], {type: mimeType});
@@ -140,6 +228,12 @@ function ExportDialog({isOpen, onClose}) {
     const handleExportFormat = (format) => () => {
         setExportFormat(format);
     };
+
+    const handleImageExport = (option) => () => {
+        setImageEmbed(option);
+        console.log(imageEmbed)
+    };
+
     const handleFileNameChange = (e) => {
         setFileName(e.target.value);
         console.log(fileName)
@@ -185,6 +279,12 @@ function ExportDialog({isOpen, onClose}) {
                     <span id="fileType">.{exportFormat}</span>
                 </div>
                 <div id="exportOptions">
+                    {refImages.length > 0 && <div id="image-export-options">
+                        <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
+                                     onChange={handleImageExport("embed")}/>
+                        <RadioButton value={imageEmbed === 'extra'} label="Images separately"
+                                     onChange={handleImageExport('extra')}/>
+                    </div>}
                     <div id="export-format">
                         <RadioButton value={exportFormat === 'html'} label="CasparCG HTML-Template"
                                      onChange={handleExportFormat("html")}/>

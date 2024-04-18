@@ -1,7 +1,15 @@
 import {useContext} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChartPie, faChartSimple, faFileArrowUp, faList, faUser, faHashtag} from "@fortawesome/free-solid-svg-icons";
+import {
+    faChartPie,
+    faChartSimple,
+    faFileArrowUp,
+    faList,
+    faUser,
+    faHashtag,
+    faImage
+} from "@fortawesome/free-solid-svg-icons";
 
 function StartScreen() {
     const {jsonData, setJsonFile, setFileName, setError, error} = useContext(GlobalStateContext);
@@ -73,6 +81,10 @@ function StartScreen() {
                         <div className="sample" onClick={() => handleSampleFile("List_Ver06_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faList}/>
                             <h4>List</h4>
+                        </div>
+                        <div className="sample" onClick={() => handleSampleFile("Photodisplay_Ver04_fontsEmbedded.json")}>
+                            <FontAwesomeIcon className="icon" icon={faImage}/>
+                            <h4>Images</h4>
                         </div>
                     </div>
                 </div>
