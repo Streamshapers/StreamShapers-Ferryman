@@ -876,6 +876,19 @@ input[type='file']::-webkit-file-upload-button {
     color: var(--error-content);
 }
 
+.success-wrapper {
+    background: var(--success);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: 2s;
+}
+
+.success {
+    color: var(--success-content);
+}
+
 /*############################### Info Dialog ####################################################*/
 
 #infoDialogWindow {

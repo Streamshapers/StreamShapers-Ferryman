@@ -22,10 +22,18 @@ function ExportDialog({isOpen, onClose}) {
     const [startMarkerCheck, setStartMarkerCheck] = useState(false);
     const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
     const [base64Images, setBase64Images] = useState([]);
+    const [message, setMessage] = useState(null);
 
     if (isOpen) {
         setIsPlaying(false);
     }
+
+    const showAlert = (msg, duration = 10000) => {
+        setMessage(msg);
+        setTimeout(() => {
+            setMessage(null);
+        }, duration);
+    };
 
     useEffect(() => {
         let allUploaded = true;
@@ -173,7 +181,7 @@ function ExportDialog({isOpen, onClose}) {
                 }
                 break;
             default:
-                console.warn('Unbekanntes Exportformat:', exportFormat);
+                console.warn('unknown exportformat:', exportFormat);
                 return;
         }
 
@@ -203,6 +211,7 @@ function ExportDialog({isOpen, onClose}) {
                     downloadLink.click();
                     document.body.removeChild(downloadLink);
                     URL.revokeObjectURL(url);
+                    showAlert("Download started!");
                 });
 
                 return;
@@ -218,6 +227,7 @@ function ExportDialog({isOpen, onClose}) {
         downloadLink.click();
         document.body.removeChild(downloadLink);
         URL.revokeObjectURL(url);
+        showAlert("Download started!");
     };
 
     const handleExportFormat = (format) => () => {
@@ -247,6 +257,11 @@ function ExportDialog({isOpen, onClose}) {
             <div className="overlay"></div>
             <div id="exportDialogWindow">
                 <h2>Export</h2>
+                {message && (
+                    <div className="success-wrapper">
+                        <div className="success alert-success">{message}</div>
+                    </div>
+                )}
                 {!allFontsLoaded && <div className="alert-wrapper">
                     <div className="alert">
                         The animation contains fonts that you haven't uploaded.
