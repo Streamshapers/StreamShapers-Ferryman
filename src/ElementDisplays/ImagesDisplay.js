@@ -114,7 +114,7 @@ function ImagePreview() {
                                 onChange={(e) => changeImageLayerName(asset.refId, e.target.value)}
                                 placeholder="Layer name"
                             />
-                            <i>{jsonData.assets.find(img => img.id === asset.refId).w}px x {jsonData.assets.find(img => img.id === asset.refId).h}px</i>
+                            <span>{jsonData.assets.find(img => img.id === asset.refId).w}px x {jsonData.assets.find(img => img.id === asset.refId).h}px</span>
                         </div>
 
                         <button onClick={() => replaceImage(asset.refId)} title="change image">change</button>
