@@ -29,7 +29,8 @@
     ${fontFaceStyles}
 </head>
 
-<body id="animation">
+<body>
+    <div id="animation1"></div>
 <!--Animations-Script-->
 <script>
     "use strict"
@@ -47,7 +48,10 @@
     let stopExist = false;
     let showLogs = false;
     let imagesPathPrefix = ${imagePath};
+    let updateCounter = 1
+    let currentFrame
 
+    
     //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
     const addFont = (fam, path) => {
         let newFont = document.createElement('style')
@@ -90,7 +94,7 @@
     })
     let lottieTemplateNew = {...lottieTemplate};
 
-    function update(rawData) {
+    async function update(rawData) {
         lottieTemplateNew = {...lottieTemplate};
         let parsed
 
@@ -130,7 +134,7 @@
         }
         if (playStatus === "") {
             animation = bodymovin.loadAnimation({
-                container: document.getElementById("animation"),
+                container: document.getElementById("animation1"),
                 renderer: "svg",
                 loop: false,
                 autoplay: false,
@@ -157,66 +161,56 @@
                         currentSegmentFrames = marker.tm
                     }
                 }
-                const currentFrame = animation.currentFrame + currentSegmentFrames
+                currentFrame = animation.currentFrame + currentSegmentFrames
                 if (showLogs) console.log(`Template - Current Frame: ${currentFrame}`);
             })
 
         }
         if (playStatus === "play") {
-            animation.destroy()
-            animation = bodymovin.loadAnimation({
-                container: document.getElementById("animation"),
+            updateCounter++
+            let newDiv = document.createElement("div");
+            newDiv.id = "animation"+updateCounter;
+            document.body.appendChild(newDiv);
+
+            let newAnimation = bodymovin.loadAnimation({
+                container: document.getElementById("animation"+updateCounter),
                 renderer: "svg",
                 loop: false,
                 autoplay: false,
                 animationData: lottieTemplateNew,
             })
-            for (let marker of lottieTemplateNew.markers) {
-                if (marker.cm === "name:" + currentSegment) {
-                    animation.goToAndStop(marker.tm + marker.dr, true)
-                }
-            }
+
+            newAnimation.addEventListener("DOMLoaded", function () {
+                    if (showInfo) console.log("Template - updated Animation Ready")
+                    newAnimation.goToAndStop(currentFrame, true)
+                    animation.destroy()
+                    document.getElementById("animation"+(updateCounter-1)).remove()
+                    animation = newAnimation
+                    animation.addEventListener("enterFrame", () => {
+                        for (let marker of lottieTemplate.markers) {
+                            if (marker.cm === "name:" + currentSegment) {
+                                currentSegmentFrames = marker.tm
+                            }
+                        }
+                        currentFrame = animation.currentFrame + currentSegmentFrames
+                        if(showLogs) console.log(`Current Frame: ${currentFrame}`);
+                    })
+
+                    newAnimation = null
+                })
         }
         if (showInfo) info()
     }
 
-    function playWhenReady() {
-        if (!animReady) {
-            setTimeout(() => {
-                playWhenReady();
-            }, 5);
-        } else {
-            animReady.then(() => {
-                if (showLogs) console.log("Template - Play 'start' marker")
-                animation.goToAndPlay("start", true);
-                playStatus = "play";
-                currentSegment = "start";
-            });
-        }
+
+    async function play() {
+        await animReady
+        animation.goToAndPlay("start", true);
+        playStatus = "play";
+        currentSegment = "start";
+        if (showLogs) console.log("Template - Play 'start' marker")
     }
 
-    function play() {
-
-        if (animReady !== false) {
-            animReady.then(() => {
-                if (showLogs) console.log("Template - Play 'start' marker")
-                animation.goToAndPlay("start", true);
-                playStatus = "play";
-                currentSegment = "start";
-            });
-        } else {
-            playWhenReady();
-        }
-    }
-
-    function load() {
-        animReady.then(() => {
-            if (showLogs) console.log("Template - Loaded on first Frame")
-            animation.goToAndStop(0, true)
-            playStatus = "loaded"
-            currentSegment = "start"
-        })
-    }
 
     function stop() {
         if (stopExist) {
