@@ -1,6 +1,6 @@
 import JsonFileProcessor from "./JsonFileProcessor";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircleInfo, faFileExport, faInfo} from "@fortawesome/free-solid-svg-icons";
+import {faCircleInfo, faCircleQuestion, faFileExport, faInfo, faQuestion} from "@fortawesome/free-solid-svg-icons";
 import React, {useContext, useState} from "react";
 import ExportDialog from "./ExportDialog";
 import ThemeSwitch from "./Theme/ThemeSwitch";
@@ -25,11 +25,14 @@ function Header() {
                     {jsonFile && <JsonFileProcessor/>}
                 </div>
                 <div id="header-title">
-                    <img id="logo-img" src={theme === 'dark' ? './logo-light.png' : './logo-dark.png'} alt="logo"/>
+                    <a href="https://www.streamshapers.com/"><img id="logo-img" src={theme === 'dark' ? './logo-light.png' : './logo-dark.png'} alt="logo"/></a>
                     <h1>Converter</h1>
                 </div>
                 <div className="headerSide">
                     <ThemeSwitch/>
+                    <a id="question-button" className="headerButton">
+                        <FontAwesomeIcon icon={faCircleQuestion} title="Help"/>
+                    </a>
                     <div id="info-button" className="headerButton" onClick={openInfoDialog}>
                         <FontAwesomeIcon icon={faCircleInfo} title="Export"/>
                     </div>

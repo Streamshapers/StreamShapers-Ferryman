@@ -290,6 +290,10 @@ input[type='file']::-webkit-file-upload-button {
     margin-right: 10px;
 }
 
+#question-button{
+    margin-right: 10px;
+}
+
 #previewContainer {
     display: flex;
     justify-content: space-between;
