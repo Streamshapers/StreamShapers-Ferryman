@@ -785,7 +785,12 @@ input[type='file']::-webkit-file-upload-button {
     padding: 20px;
     z-index: 1001;
     border: 1px solid var(--border);
-    min-width: 30vw;
+    width: 50vw;
+    max-width: 600px;
+    min-width: 360px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
 #exportDialogWindow h2 {
@@ -929,4 +934,27 @@ input[type='file']::-webkit-file-upload-button {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.tab-navigation button {
+    padding: 10px 20px;
+    margin-right: 5px;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    color: var(--copy);
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 2px solid var(--border);
+}
+
+.tab-content {
+    padding: 20px;
+    border: 1px solid var(--border);
+    flex-grow: 1;
+}
+
+.tab-button.active {
+    background-color: var(--foreground);
+    border-bottom: 2px solid var(--primary);
+    font-weight: bold;
 }

@@ -23,10 +23,16 @@ function ExportDialog({isOpen, onClose}) {
     const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
     const [base64Images, setBase64Images] = useState([]);
     const [message, setMessage] = useState(null);
+    const [activeTab, setActiveTab] = useState('default');
+
 
     if (isOpen) {
         setIsPlaying(false);
     }
+
+    const handleTabChange = tabName => {
+        setActiveTab(tabName);
+    };
 
     const showAlert = (msg, duration = 10000) => {
         setMessage(msg);
@@ -190,9 +196,9 @@ function ExportDialog({isOpen, onClose}) {
                 zip.file(`${fileName}${extension}`, fileContent, {type: mimeType});
 
                 let imageFolderName;
-                if(imagePath.endsWith("/")){
+                if (imagePath.endsWith("/")) {
                     imageFolderName = imagePath.slice(0, -1);
-                }else{
+                } else {
                     imageFolderName = imagePath;
                 }
 
@@ -283,26 +289,41 @@ function ExportDialog({isOpen, onClose}) {
                         Your animation has no stop marker and might not play correctly in CasparCG.
                     </div>
                 </div>}
-                <div id="exportFileName">
-                    <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
-                    <input type="text" id="fileNameInput" value={String(fileName)} onChange={handleFileNameChange}/>
-                    <span id="fileType">.{exportFormat}</span>
+                <div className="tab-navigation">
+                    <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`} onClick={() => handleTabChange('default')}>Default</button>
+                    <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`} onClick={() => handleTabChange('spx')}>SPX</button>
                 </div>
-                <div id="exportOptions">
-                    {refImages.length > 0 && <div id="image-export-options">
-                        <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
-                                     onChange={handleImageExport("embed")}/>
-                        <RadioButton value={imageEmbed === 'extra'} label="Images separately"
-                                     onChange={handleImageExport('extra')}/>
-                    </div>}
-                    <div id="export-format">
-                        <RadioButton value={exportFormat === 'html'} label="CasparCG HTML-Template"
-                                     onChange={handleExportFormat("html")}/>
-                        <RadioButton value={exportFormat === 'json'} label="JSON"
-                                     onChange={handleExportFormat('json')}/>
-                        {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
+                {activeTab === 'default' && (
+                    <div className="tab-content">
+                        <div id="exportFileName">
+                            <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
+                            <input type="text" id="fileNameInput" value={String(fileName)}
+                                   onChange={handleFileNameChange}/>
+                            <span id="fileType">.{exportFormat}</span>
+                        </div>
+                        <div id="exportOptions">
+                            {refImages.length > 0 && <div id="image-export-options">
+                                <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
+                                             onChange={handleImageExport("embed")}/>
+                                <RadioButton value={imageEmbed === 'extra'} label="Images separately"
+                                             onChange={handleImageExport('extra')}/>
+                            </div>}
+                            <div id="export-format">
+                                <RadioButton value={exportFormat === 'html'} label="CasparCG HTML-Template"
+                                             onChange={handleExportFormat("html")}/>
+                                <RadioButton value={exportFormat === 'json'} label="JSON"
+                                             onChange={handleExportFormat('json')}/>
+                                {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
+                {activeTab === 'spx' && (
+                    <div className="tab-content">
+                        <input type="checkbox" id="spx-compatible"/>
+                        <label for="spx-compatible">Export SPX compatible</label>
+                    </div>
+                )}
                 <div className="popupButtonArea">
                     <button id="downloadBtn" onClick={onClose}>Close</button>
                     <button id="downloadBtn" onClick={downloadFile}>Download File</button>

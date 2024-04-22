@@ -30,7 +30,7 @@ function Header() {
                 </div>
                 <div className="headerSide">
                     <ThemeSwitch/>
-                    <a id="question-button" className="headerButton">
+                    <a id="question-button" className="headerButton" href="https://www.streamshapers.com/docs/streamshapers-converter/">
                         <FontAwesomeIcon icon={faCircleQuestion} title="Help"/>
                     </a>
                     <div id="info-button" className="headerButton" onClick={openInfoDialog}>
