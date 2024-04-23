@@ -23,6 +23,7 @@ export const GlobalStateProvider = ({children}) => {
     const [theme, setTheme] = useState('dark');
     const [refImages, setRefImages] = useState([]);
     const [imagePath, setImagePath] = useState("images/");
+    const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
 
     useEffect(() => {
         if (!jsonData) {
@@ -315,13 +316,58 @@ export const GlobalStateProvider = ({children}) => {
         }
     }, [jsonData]);
 
+    //############################################ SPX ############################################################
+
+    useEffect(() => {
+        const rawSpxJson = {
+            "description": "",
+            "playserver": "OVERLAY",
+            "playchannel": "1",
+            "playlayer": "5",
+            "webplayout": "5",
+            "out": "manual",
+            "dataformat": "json",
+            "uicolor": "7",
+            "DataFields": []
+        };
+        let spxExportJson = {...rawSpxJson};
+
+        if(fileName){
+            spxExportJson.description = fileName;
+        }
+
+        let textsWithNames = {};
+
+        if(texts && textsLayerNames){
+            for (let i = 0; i < texts.length; i++){
+                if(textsLayerNames[i] && textsLayerNames[i].startsWith('_')) {
+                    textsWithNames[textsLayerNames[i]] = texts[i];
+                }
+            }
+            console.log(textsWithNames);
+        }
+
+        if (Object.keys(textsWithNames).length > 0) {
+            spxExportJson.DataFields = Object.keys(textsWithNames).map((key, index) => ({
+                "field": `f${index + 1}`,
+                "ftype": "textfield",
+                "title": key,
+                "value": textsWithNames[key]
+            }));
+            console.log(spxExportJson);
+        }
+
+        setSPXGCTemplateDefinition(spxExportJson);
+    }, [fileName, texts, textsLayerNames]);
+
     return (
         <GlobalStateContext.Provider value={{
             jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
             setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,
-            setJsonFile, theme, setTheme, refImages, imagePath, setImagePath
+            setJsonFile, theme, setTheme, refImages, imagePath, setImagePath, SPXGCTemplateDefinition,
+            setSPXGCTemplateDefinition
         }}>
             {children}
         </GlobalStateContext.Provider>

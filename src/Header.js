@@ -2,7 +2,7 @@ import JsonFileProcessor from "./JsonFileProcessor";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleInfo, faCircleQuestion, faFileExport, faInfo, faQuestion} from "@fortawesome/free-solid-svg-icons";
 import React, {useContext, useState} from "react";
-import ExportDialog from "./ExportDialog";
+import ExportDialog from "./Export/ExportDialog";
 import ThemeSwitch from "./Theme/ThemeSwitch";
 import {GlobalStateContext} from "./GlobalStateContext";
 import InfoDialog from "./InfoDialog";

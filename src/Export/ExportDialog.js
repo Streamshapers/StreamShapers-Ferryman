@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
-import {GlobalStateContext} from "./GlobalStateContext";
+import {GlobalStateContext} from "../GlobalStateContext";
 import JSZip from 'jszip';
+import SpxExport from "./SpxExport";
 
 function ExportDialog({isOpen, onClose}) {
     const {
@@ -14,7 +15,8 @@ function ExportDialog({isOpen, onClose}) {
         imagePath,
         setImagePath,
         markers,
-        refImages
+        refImages,
+        SPXGCTemplateDefinition
     } = useContext(GlobalStateContext);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
@@ -169,8 +171,10 @@ function ExportDialog({isOpen, onClose}) {
                         .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${lottieData}', lottiePlayerCode)
-
-                        .replace('${imagePath}', path);
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${imagePath}', path)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${spx}', "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>");
 
                 } catch (error) {
                     console.error('Error loading the template:', error);
@@ -290,8 +294,12 @@ function ExportDialog({isOpen, onClose}) {
                     </div>
                 </div>}
                 <div className="tab-navigation">
-                    <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`} onClick={() => handleTabChange('default')}>Default</button>
-                    <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`} onClick={() => handleTabChange('spx')}>SPX</button>
+                    <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('default')}>Default
+                    </button>
+                    <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('spx')}>SPX
+                    </button>
                 </div>
                 {activeTab === 'default' && (
                     <div className="tab-content">
@@ -319,10 +327,7 @@ function ExportDialog({isOpen, onClose}) {
                     </div>
                 )}
                 {activeTab === 'spx' && (
-                    <div className="tab-content">
-                        <input type="checkbox" id="spx-compatible"/>
-                        <label for="spx-compatible">Export SPX compatible</label>
-                    </div>
+                    <SpxExport/>
                 )}
                 <div className="popupButtonArea">
                     <button id="downloadBtn" onClick={onClose}>Close</button>
