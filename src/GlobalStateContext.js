@@ -1,4 +1,5 @@
 import React, {createContext, useEffect, useState} from 'react';
+import {forEach} from "jszip";
 
 export const GlobalStateContext = createContext();
 
@@ -24,6 +25,7 @@ export const GlobalStateProvider = ({children}) => {
     const [refImages, setRefImages] = useState([]);
     const [imagePath, setImagePath] = useState("images/");
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
+    const [spxExport, setSpxExport] = useState(true);
 
     useEffect(() => {
         if (!jsonData) {
@@ -328,6 +330,7 @@ export const GlobalStateProvider = ({children}) => {
             "out": "manual",
             "dataformat": "json",
             "uicolor": "7",
+            "steps": `${markers.length - 1}`,
             "DataFields": []
         };
         let spxExportJson = {...rawSpxJson};
@@ -344,21 +347,32 @@ export const GlobalStateProvider = ({children}) => {
                     textsWithNames[textsLayerNames[i]] = texts[i];
                 }
             }
-            console.log(textsWithNames);
         }
 
         if (Object.keys(textsWithNames).length > 0) {
             spxExportJson.DataFields = Object.keys(textsWithNames).map((key, index) => ({
-                "field": `f${index + 1}`,
+                "field": key,
                 "ftype": "textfield",
                 "title": key,
                 "value": textsWithNames[key]
             }));
-            console.log(spxExportJson);
         }
 
+        if(refImages){
+            refImages.forEach(refImage => {
+                spxExportJson.DataFields.push({
+                    "field": refImage.nm,
+                    "ftype": "filelist",
+                    "title": "Choose Image",
+                    "assetfolder" : `/media/images/`,
+                    "extension" : "png",
+                    "value": `/${imagePath}${refImage.refId}`
+                });
+            });
+        }
+        console.log(spxExportJson.DataFields);
         setSPXGCTemplateDefinition(spxExportJson);
-    }, [fileName, texts, textsLayerNames]);
+    }, [fileName, texts, textsLayerNames, jsonData, refImages]);
 
     return (
         <GlobalStateContext.Provider value={{
@@ -367,7 +381,7 @@ export const GlobalStateProvider = ({children}) => {
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
             setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,
             setJsonFile, theme, setTheme, refImages, imagePath, setImagePath, SPXGCTemplateDefinition,
-            setSPXGCTemplateDefinition
+            setSPXGCTemplateDefinition, spxExport, setSpxExport
         }}>
             {children}
         </GlobalStateContext.Provider>

@@ -786,9 +786,9 @@ input[type='file']::-webkit-file-upload-button {
     z-index: 1001;
     border: 1px solid var(--border);
     width: 50vw;
-    max-width: 600px;
+    max-width: 800px;
     min-width: 360px;
-    min-height: 400px;
+    height: 600px;
     display: flex;
     flex-direction: column;
 }
@@ -938,7 +938,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .tab-navigation button {
     padding: 10px 20px;
-    margin-right: 5px;
+    margin-right: 0;
     background-color: var(--background);
     border: 1px solid var(--border);
     color: var(--copy);
@@ -951,10 +951,13 @@ input[type='file']::-webkit-file-upload-button {
     padding: 20px;
     border: 1px solid var(--border);
     flex-grow: 1;
+    box-sizing: border-box;
+    overflow: auto;
 }
 
 .tab-button.active {
     background-color: var(--foreground);
+    border: 2px solid var(--border);
     border-bottom: 2px solid var(--primary);
     font-weight: bold;
 }
@@ -963,4 +966,81 @@ input[type='file']::-webkit-file-upload-button {
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+.spx-settings{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.spx-setting{
+    border: 1px solid var(--border);
+    background: var(--background);
+    border-radius: 5px;
+}
+
+.spx-setting-header{
+    display: flex;
+    flex-direction: row;
+    background: var(--foreground);
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.spx-setting-header input{
+    background: var(--background);
+}
+
+#spx-item-key{
+    width: 100px;
+    background: var(--primary);
+    border: 1px solid var(--border);
+    color: var(--primary-content);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+select{
+    border-radius: 5px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--copy);
+}
+
+.spx-extra-settings{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.dropdown-item{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+button{
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--copy);
+    padding: 5px;
+}
+
+.spx-extra-settings input{
+    background: var(--background);
+    color: var(--copy);
+}
+
+.spx-export-button{
+    border-radius: 5px;
+    width: 40px;
 }

@@ -4,20 +4,8 @@ import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
 
 function ExportDialog({isOpen, onClose}) {
-    const {
-        jsonData,
-        fileName,
-        setFileName,
-        setIsPlaying,
-        fontFaces,
-        uploadedFonts,
-        fonts,
-        imagePath,
-        setImagePath,
-        markers,
-        refImages,
-        SPXGCTemplateDefinition
-    } = useContext(GlobalStateContext);
+    const {jsonData, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
+        markers, refImages, SPXGCTemplateDefinition, spxExport } = useContext(GlobalStateContext);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
@@ -145,7 +133,9 @@ function ExportDialog({isOpen, onClose}) {
                 mimeType = 'text/html';
                 extension = '.html';
                 try {
-                    const response = await fetch('/template/raw-template.html');
+                    let response = null;
+                    response = await fetch('/template/raw-template.html');
+
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -163,6 +153,10 @@ function ExportDialog({isOpen, onClose}) {
                         jsonDataString = JSON.stringify(jsonWithoutImages);
                     }
                     const path = `"${correctPath}"`
+                    let spxTag = " ";
+                    if(spxExport){
+                        spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
+                    }
 
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
@@ -174,7 +168,7 @@ function ExportDialog({isOpen, onClose}) {
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${imagePath}', path)
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${spx}', "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>");
+                        .replace('${spx}', spxTag);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);

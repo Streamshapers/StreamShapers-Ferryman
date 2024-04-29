@@ -28,7 +28,7 @@ function InfoDialog({isOpen, onClose}) {
                     <h1>Converter</h1>
                 </div>
                 <div id="info-version">
-                    <h3>v1.3.3</h3>
+                    <h3>v1.4.0</h3>
                 </div>
                 <div>
                     <div className="accordion-wrapper">

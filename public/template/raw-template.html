@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
-<!--CasparCG-Lottie-Template - https://github.com/jdoppelp/CasparCG-Lottie-Template - by jdoppelp  @https://github.com/jdoppelp -  2023-04-21 -->
+<!--CasparCG-Lottie-Template - StreamShapers-->
+<!--######## visit streamshapers.com #######-->
 <head>
     <meta charset='utf-8'>
     <title>Lottie Template 01</title>
@@ -31,7 +32,7 @@
 </head>
 
 <body>
-    <div id="animation1"></div>
+<div id="animation1"></div>
 <!--Animations-Script-->
 <script>
     "use strict"
@@ -52,7 +53,6 @@
     let updateCounter = 1
     let currentFrame
 
-    
     //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
     const addFont = (fam, path) => {
         let newFont = document.createElement('style')
@@ -65,22 +65,19 @@
         document.head.appendChild(newFont);
     }
 
+    //updates Images Assets by there Refid  //Credits to HeineFro  @https://github.com/HeineFro
+    function updateAssetsByRefid(array, searchValue, newValue) {
+        const foundObject = array.find(obj => obj['id'] === searchValue);
 
-            //updates Images Assets by there Refid  //Credits to HeineFro  @https://github.com/HeineFro
-            function updateAssetsByRefid(array, searchValue, newValue) {
-            const foundObject = array.find(obj => obj['id'] === searchValue);
-
-            if (foundObject) {
-                foundObject['u'] = imagesPathPrefix
-                foundObject['p'] = newValue;
-                foundObject['e'] = 0
-                return foundObject;
-            }
-
-            return null;
+        if (foundObject) {
+            foundObject['u'] = imagesPathPrefix
+            foundObject['p'] = newValue;
+            foundObject['e'] = 0
+            return foundObject;
         }
 
-
+        return null;
+    }
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -170,11 +167,11 @@
         if (playStatus === "play") {
             updateCounter++
             let newDiv = document.createElement("div");
-            newDiv.id = "animation"+updateCounter;
+            newDiv.id = "animation" + updateCounter;
             document.body.appendChild(newDiv);
 
             let newAnimation = bodymovin.loadAnimation({
-                container: document.getElementById("animation"+updateCounter),
+                container: document.getElementById("animation" + updateCounter),
                 renderer: "svg",
                 loop: false,
                 autoplay: false,
@@ -182,23 +179,23 @@
             })
 
             newAnimation.addEventListener("DOMLoaded", function () {
-                    if (showInfo) console.log("Template - updated Animation Ready")
-                    newAnimation.goToAndStop(currentFrame, true)
-                    animation.destroy()
-                    document.getElementById("animation"+(updateCounter-1)).remove()
-                    animation = newAnimation
-                    animation.addEventListener("enterFrame", () => {
-                        for (let marker of lottieTemplate.markers) {
-                            if (marker.cm === "name:" + currentSegment) {
-                                currentSegmentFrames = marker.tm
-                            }
+                if (showInfo) console.log("Template - updated Animation Ready")
+                newAnimation.goToAndStop(currentFrame, true)
+                animation.destroy()
+                document.getElementById("animation" + (updateCounter - 1)).remove()
+                animation = newAnimation
+                animation.addEventListener("enterFrame", () => {
+                    for (let marker of lottieTemplate.markers) {
+                        if (marker.cm === "name:" + currentSegment) {
+                            currentSegmentFrames = marker.tm
                         }
-                        currentFrame = animation.currentFrame + currentSegmentFrames
-                        if(showLogs) console.log(`Current Frame: ${currentFrame}`);
-                    })
-
-                    newAnimation = null
+                    }
+                    currentFrame = animation.currentFrame + currentSegmentFrames
+                    if (showLogs) console.log(`Current Frame: ${currentFrame}`);
                 })
+
+                newAnimation = null
+            })
         }
         if (showInfo) info()
     }
@@ -229,7 +226,7 @@
             animation.goToAndPlay("stop", true)
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker")
         } else {
-            if (showLogs) console.log("Template - Play 'next"+nextCount+"' Marker")
+            if (showLogs) console.log("Template - Play 'next" + nextCount + "' Marker")
             animation.goToAndPlay("next" + nextCount, true)
             currentSegment = "next" + nextCount
             nextCount++
@@ -237,29 +234,29 @@
     }
 
     function info() {
-            animation.destroy()
-            let title = document.createElement("h1")
-            title.appendChild(document.createTextNode("These are the names of your After-Effects layers starting with \"_\"."))
-            document.body.appendChild(title)
-            lottieTemplate.layers.forEach((layer) => {
-                if (layer.nm.startsWith("_")) {
+        animation.destroy()
+        let title = document.createElement("h1")
+        title.appendChild(document.createTextNode("These are the names of your After-Effects layers starting with \"_\"."))
+        document.body.appendChild(title)
+        lottieTemplate.layers.forEach((layer) => {
+            if (layer.nm.startsWith("_")) {
 
-                    let nameElement = document.createElement("p")
-                    let text = document.createTextNode(layer.nm)
-                    let br = document.createElement("br")
-                    nameElement.appendChild(text)
-                    document.body.appendChild(nameElement);
-                    document.body.appendChild(br);
-                }
-            })
-            let nameElement = document.createElement("p")
-            let text = document.createTextNode("Your image path is: '"+imagesPathPrefix+"'")
-            let br = document.createElement("br")
-            nameElement.appendChild(text)
-            document.body.appendChild(nameElement);
-            document.body.appendChild(br);
-            
-        }
+                let nameElement = document.createElement("p")
+                let text = document.createTextNode(layer.nm)
+                let br = document.createElement("br")
+                nameElement.appendChild(text)
+                document.body.appendChild(nameElement);
+                document.body.appendChild(br);
+            }
+        })
+        let nameElement = document.createElement("p")
+        let text = document.createTextNode("Your image path is: '" + imagesPathPrefix + "'")
+        let br = document.createElement("br")
+        nameElement.appendChild(text)
+        document.body.appendChild(nameElement);
+        document.body.appendChild(br);
+
+    }
 </script>
 <!-- Lottie.js-->
 <script>
