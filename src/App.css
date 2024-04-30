@@ -290,7 +290,7 @@ input[type='file']::-webkit-file-upload-button {
     margin-right: 10px;
 }
 
-#question-button{
+#question-button {
     margin-right: 10px;
 }
 
@@ -430,7 +430,7 @@ input[type='file']::-webkit-file-upload-button {
     border: 1px solid var(--border);
 }
 
-.imageControls{
+.imageControls {
     margin-bottom: 0;
 }
 
@@ -480,7 +480,7 @@ input[type='file']::-webkit-file-upload-button {
     transition-duration: 0.5s;
 }
 
-.image-preview-wrapper > button:hover{
+.image-preview-wrapper > button:hover {
     background: var(--primary);
 }
 
@@ -585,7 +585,7 @@ input[type='file']::-webkit-file-upload-button {
     margin-top: 10px;
 }
 
-.control-input-images{
+.control-input-images {
     margin-left: 6px;
 }
 
@@ -719,18 +719,18 @@ input[type='file']::-webkit-file-upload-button {
     flex-grow: 1;
 }
 
-.jsonText .text-layer-name{
+.jsonText .text-layer-name {
     flex-grow: 0;
     margin: 0;
     width: 100px;
 }
 
-.jsonText span{
+.jsonText span {
     text-align: right;
     min-width: 100px;
 }
 
-#text-input-header{
+#text-input-header {
     display: flex;
     font-weight: bold;
     padding-bottom: 5px;
@@ -898,6 +898,18 @@ input[type='file']::-webkit-file-upload-button {
     color: var(--success-content);
 }
 
+.warning-wrapper {
+    background: var(--warning);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: 2s;
+}
+.warning{
+    color: var(--warning-content);
+}
+
 /*############################### Info Dialog ####################################################*/
 
 #infoDialogWindow {
@@ -962,41 +974,51 @@ input[type='file']::-webkit-file-upload-button {
     font-weight: bold;
 }
 
-.export-checkbox{
+.export-checkbox {
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-.spx-settings{
+.spx-settings {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
 }
 
-.spx-setting{
+.spx-setting {
     border: 1px solid var(--border);
     background: var(--background);
     border-radius: 5px;
 }
 
-.spx-setting-header{
+.spx-setting-header {
     display: flex;
     flex-direction: row;
     background: var(--foreground);
-    justify-content: space-between;
     border: 1px solid var(--border);
     padding: 10px;
     border-radius: 5px;
+    gap: 20px;
 }
 
-.spx-setting-header input{
+.spx-setting-header input {
     background: var(--background);
 }
 
-#spx-item-key{
-    width: 100px;
+.spx-export-right {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#spx-item-key {
+    display: flex;
+    align-items: center;
+    min-width: 100px;
+    height: 35px;
     background: var(--primary);
     border: 1px solid var(--border);
     color: var(--primary-content);
@@ -1004,14 +1026,19 @@ input[type='file']::-webkit-file-upload-button {
     padding: 5px;
 }
 
-select{
+#spx-item-key p {
+    margin: 0;
+}
+
+.spx-settings select {
     border-radius: 5px;
     background: var(--background);
     border: 1px solid var(--border);
     color: var(--copy);
+    height: 25px;
 }
 
-.spx-extra-settings{
+.spx-extra-settings {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1020,14 +1047,14 @@ select{
     padding: 10px;
 }
 
-.dropdown-item{
+.dropdown-item {
     display: flex;
     gap: 10px;
     justify-content: center;
     align-items: center;
 }
 
-button{
+button {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: 5px;
@@ -1035,12 +1062,22 @@ button{
     padding: 5px;
 }
 
-.spx-extra-settings input{
+.spx-extra-settings input {
     background: var(--background);
     color: var(--copy);
 }
 
-.spx-export-button{
+.spx-export-button {
     border-radius: 5px;
     width: 40px;
+}
+
+#spx-export-filetype-input {
+    width: 50px;
+}
+
+.spx-settings label {
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
 }

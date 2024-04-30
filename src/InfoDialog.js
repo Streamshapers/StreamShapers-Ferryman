@@ -1,9 +1,8 @@
 import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
-import InfosDisplay from "./ElementDisplays/InfosDispaly";
 
 function InfoDialog({isOpen, onClose}) {
-    const {setIsPlaying, theme} = useContext(GlobalStateContext);
+    const {setIsPlaying, theme, converterVersion} = useContext(GlobalStateContext);
     const [isImprintOpen, setIsImprintOpen] = useState(false);
 
     if (isOpen) {
@@ -28,7 +27,7 @@ function InfoDialog({isOpen, onClose}) {
                     <h1>Converter</h1>
                 </div>
                 <div id="info-version">
-                    <h3>v1.4.0</h3>
+                    <h3>{converterVersion}</h3>
                 </div>
                 <div>
                     <div className="accordion-wrapper">

@@ -9,7 +9,6 @@ function SpxExport() {
         setSpxExport,
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
-        refImages
     } = useContext(GlobalStateContext);
 
     function handleCheckboxChange(event) {
@@ -23,6 +22,11 @@ function SpxExport() {
 
                 if (e.target.name === 'ftype' && e.target.value === 'dropdown' && !field.items) {
                     updatedField.items = [{text: "", value: ""}];
+                }
+
+                if (e.target.name === 'ftype' && e.target.value === 'filelist' && (!field.assetfolder || !field.extension)) {
+                    updatedField.assetfolder = field.assetfolder || "";
+                    updatedField.extension = field.extension || "";
                 }
 
                 return updatedField;
@@ -82,26 +86,54 @@ function SpxExport() {
                     {SPXGCTemplateDefinition.DataFields.map((field, index) => (
                         <div key={index} className="spx-setting">
                             <div className="spx-setting-header">
-                                <div id="spx-item-key">{field.field}</div>
-                                {field.ftype !== 'filelist' && (
-                                    <select name="ftype" value={field.ftype} onChange={e => handleChange(index, e)}>
-                                        <option value="textfield">Text Field</option>
-                                        <option value="dropdown">Dropdown</option>
-                                        <option value="textarea">Textarea</option>
-                                        <option value="checkbox">Checkbox</option>
-                                    </select>)}
-                                <input type="text" name="title" value={field.title}
-                                       onChange={e => handleChange(index, e)}/>
-                                <input type="text" name="value" value={field.value}
-                                       onChange={e => handleChange(index, e)}/>
-                                {field.ftype === 'filelist' && (
-                                    <input type="text" name="assetfolder" placeholder="Asset Folder Path"
-                                           value={field.assetfolder} onChange={e => handleChange(index, e)}/>
-                                )}
-                                {field.ftype === 'filelist' && (
-                                    <input type="text" name="extension" placeholder="File Extension"
-                                           value={field.extension} onChange={e => handleChange(index, e)}/>
-                                )}
+                                <div id="spx-item-key"><p>{field.field}</p></div>
+                                <div className="spx-export-right">
+                                    {field.ftype !== 'filelist' && (
+                                        <label>
+                                            fieldtype
+                                        <select name="ftype" value={field.ftype} onChange={e => handleChange(index, e)}>
+                                            <option value="textfield">Text Field</option>
+                                            <option value="dropdown">Dropdown</option>
+                                            <option value="textarea">Textarea</option>
+                                            <option value="checkbox">Checkbox</option>
+                                        </select>
+                                        </label>
+                                            )}
+                                    <label>
+                                        title
+                                        <input type="text" name="title" value={field.title}
+                                               onChange={e => handleChange(index, e)}/>
+                                    </label>
+                                    <label>
+                                        value
+                                        {field.ftype !== 'checkbox' && (
+                                            <input type="text" name="value" value={field.value}
+                                                   onChange={e => handleChange(index, e)}/>
+                                        )}
+                                        {field.ftype === 'checkbox' && (
+                                            <select name="value" value={field.value}
+                                                    onChange={e => handleChange(index, e)}>
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                            </select>
+                                        )}
+                                    </label>
+                                    {field.ftype === 'filelist' && (
+                                        <label>
+                                            assetfolder
+                                            <input type="text" name="assetfolder" placeholder="Asset Folder Path"
+                                                   value={field.assetfolder} onChange={e => handleChange(index, e)}/>
+                                        </label>
+                                    )}
+                                    {field.ftype === 'filelist' && (
+                                        <label>
+                                            extension
+                                            <input type="text" name="extension" placeholder="File Extension"
+                                                   id="spx-export-filetype-input"
+                                                   value={field.extension} onChange={e => handleChange(index, e)}/>
+                                        </label>
+                                    )}
+                                </div>
                             </div>
                             {field.ftype === 'dropdown' && field.items && (
                                 <div className="dropdown-settings spx-extra-settings">

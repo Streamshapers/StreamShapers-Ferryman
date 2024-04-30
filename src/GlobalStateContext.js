@@ -1,9 +1,9 @@
 import React, {createContext, useEffect, useState} from 'react';
-import {forEach} from "jszip";
 
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
+    const [converterVersion] = useState("v1.4.1");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -25,7 +25,7 @@ export const GlobalStateProvider = ({children}) => {
     const [refImages, setRefImages] = useState([]);
     const [imagePath, setImagePath] = useState("images/");
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
-    const [spxExport, setSpxExport] = useState(true);
+    const [spxExport, setSpxExport] = useState(false);
 
     useEffect(() => {
         if (!jsonData) {
@@ -366,17 +366,17 @@ export const GlobalStateProvider = ({children}) => {
                     "title": "Choose Image",
                     "assetfolder" : `/media/images/`,
                     "extension" : "png",
-                    "value": `/${imagePath}${refImage.refId}`
+                    "value": `/media/images/${refImage.refId}.png`
                 });
             });
         }
         console.log(spxExportJson.DataFields);
         setSPXGCTemplateDefinition(spxExportJson);
-    }, [fileName, texts, textsLayerNames, jsonData, refImages]);
+    }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
 
     return (
         <GlobalStateContext.Provider value={{
-            jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
+            converterVersion, jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
             setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,

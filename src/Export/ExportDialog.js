@@ -4,7 +4,7 @@ import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
 
 function ExportDialog({isOpen, onClose}) {
-    const {jsonData, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
+    const {jsonData, converterVersion, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
         markers, refImages, SPXGCTemplateDefinition, spxExport } = useContext(GlobalStateContext);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
@@ -92,10 +92,12 @@ function ExportDialog({isOpen, onClose}) {
         const zip = new JSZip();
         let jsonWithoutImages = "";
 
-        if (imagePath != null && !imagePath.endsWith("/")) {
+        if (imagePath != null && !imagePath.endsWith("/") && !spxExport) {
             setImagePath(`${imagePath}/`);
             correctPath = `${imagePath}/`;
-        } else {
+        }else if(spxExport){
+            correctPath = "";
+        }else {
             correctPath = imagePath;
         }
 
@@ -161,6 +163,8 @@ function ExportDialog({isOpen, onClose}) {
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${jsonData}', jsonDataString)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${version}', converterVersion)
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
                         // eslint-disable-next-line no-template-curly-in-string
@@ -266,6 +270,13 @@ function ExportDialog({isOpen, onClose}) {
                         <div className="success alert-success">{message}</div>
                     </div>
                 )}
+                {spxExport && (
+                    <div className="warning-wrapper">
+                        <div className="warning">
+                            When exporting for SPX, the imagePath set in the Images settings will be overwritten.
+                        </div>
+                    </div>
+                )}
                 {!allFontsLoaded && <div className="alert-wrapper">
                     <div className="alert">
                         The animation contains fonts that you haven't uploaded.
@@ -289,7 +300,7 @@ function ExportDialog({isOpen, onClose}) {
                 </div>}
                 <div className="tab-navigation">
                     <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('default')}>Default
+                            onClick={() => handleTabChange('default')}>General
                     </button>
                     <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`}
                             onClick={() => handleTabChange('spx')}>SPX
@@ -311,7 +322,7 @@ function ExportDialog({isOpen, onClose}) {
                                              onChange={handleImageExport('extra')}/>
                             </div>}
                             <div id="export-format">
-                                <RadioButton value={exportFormat === 'html'} label="CasparCG HTML-Template"
+                                <RadioButton value={exportFormat === 'html'} label="HTML-Template"
                                              onChange={handleExportFormat("html")}/>
                                 <RadioButton value={exportFormat === 'json'} label="JSON"
                                              onChange={handleExportFormat('json')}/>
