@@ -38,7 +38,7 @@ function InfoDialog({isOpen, onClose}) {
                                 </h3>
                                 <div className="accordion-body" style={{display: isImprintOpen ? 'block' : 'none'}}>
                                     <p>StreamShapers by Jan-Philipp Peters, Nico Peters and Richard Weyer</p>
-                                    <p>E-Mail: mail@streamshapers.com</p>
+                                    <p>E-Mail: <a href="mailto:mail@streamshapers.com">mail@streamshapers.com</a></p>
                                 </div>
                             </div>
                         </div>

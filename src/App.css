@@ -107,6 +107,12 @@ body {
     min-height: 100vh;
 }
 
+a{
+    text-decoration: none;
+    color: var(--primary);
+    font-weight: bold;
+}
+
 #content {
     min-width: 100vw;
     min-height: 100vh;
@@ -135,6 +141,10 @@ body {
     flex-direction: column;
     min-height: 50vh;
     justify-content: space-around;
+}
+
+#startWrapper p{
+    text-align: center;
 }
 
 #uploadWrapper {
@@ -785,10 +795,10 @@ input[type='file']::-webkit-file-upload-button {
     padding: 20px;
     z-index: 1001;
     border: 1px solid var(--border);
-    width: 50vw;
-    max-width: 800px;
-    min-width: 360px;
-    height: 600px;
+    width: 60vw;
+    min-width: 500px;
+    height: 60vh;
+    min-height: 600px;
     display: flex;
     flex-direction: column;
 }
@@ -1005,10 +1015,14 @@ input[type='file']::-webkit-file-upload-button {
 
 .spx-setting-header input {
     background: var(--background);
+    width: auto;
+    min-width: 80px;
+    max-width: 300px;
 }
 
 .spx-export-right {
     display: flex;
+    flex-direction: row;
     gap: 20px;
     flex-wrap: wrap;
     align-items: center;
@@ -1077,7 +1091,22 @@ button {
 }
 
 .spx-settings label {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+}
+
+.spx-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.spx-checkbox{
+    display: flex;
+    gap: 5px;
+}
+
+#spx-logo{
+    width: 50px;
 }

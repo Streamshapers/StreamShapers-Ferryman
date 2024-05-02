@@ -74,12 +74,17 @@ function SpxExport() {
         });
         setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
     };
-
+    //TODO: Tooltips für label
     return (
         <div className="tab-content">
-            <div className="export-checkbox">
-                <input type="checkbox" id="spx-compatible" checked={spxExport} onChange={handleCheckboxChange}/>
-                <label htmlFor="spx-compatible">Export SPX compatible</label>
+            <div className="export-checkbox spx-header">
+                <div className="spx-checkbox">
+                    <input type="checkbox" id="spx-compatible" checked={spxExport} onChange={handleCheckboxChange}/>
+                    <label htmlFor="spx-compatible">Export SPX compatible</label>
+                </div>
+                <a href="https://www.spx.graphics/" target="_blank">
+                    <img id="spx-logo" src="./SPX_logo.png" alt=""/>
+                </a>
             </div>
             {spxExport &&
                 <div className="spx-settings">
@@ -91,14 +96,15 @@ function SpxExport() {
                                     {field.ftype !== 'filelist' && (
                                         <label>
                                             fieldtype
-                                        <select name="ftype" value={field.ftype} onChange={e => handleChange(index, e)}>
-                                            <option value="textfield">Text Field</option>
-                                            <option value="dropdown">Dropdown</option>
-                                            <option value="textarea">Textarea</option>
-                                            <option value="checkbox">Checkbox</option>
-                                        </select>
+                                            <select name="ftype" value={field.ftype}
+                                                    onChange={e => handleChange(index, e)}>
+                                                <option value="textfield">Text Field</option>
+                                                <option value="dropdown">Dropdown</option>
+                                                <option value="textarea">Textarea</option>
+                                                <option value="checkbox">Checkbox</option>
+                                            </select>
                                         </label>
-                                            )}
+                                    )}
                                     <label>
                                         title
                                         <input type="text" name="title" value={field.title}
