@@ -122,6 +122,9 @@
             for (let key of Object.keys(parsed)) {
                 if (key === "_templateInfo") showInfo = true
                 if (key === "_debug") showLogs = true
+                if (key === "epochID") imagesPathPrefix = ""
+            }
+            for (let key of Object.keys(parsed)) {
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
                         if ('refId' in layer) {
