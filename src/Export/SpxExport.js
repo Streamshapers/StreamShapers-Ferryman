@@ -82,7 +82,7 @@ function SpxExport() {
                     <input type="checkbox" id="spx-compatible" checked={spxExport} onChange={handleCheckboxChange}/>
                     <label htmlFor="spx-compatible">Export SPX compatible</label>
                 </div>
-                <a href="https://www.spx.graphics/" target="_blank">
+                <a href="https://www.spx.graphics/" target="_blank" rel="noreferrer">
                     <img id="spx-logo" src="./SPX_logo.png" alt=""/>
                 </a>
             </div>
@@ -107,17 +107,17 @@ function SpxExport() {
                                     )}
                                     <label>
                                         title
-                                        <input type="text" name="title" value={field.title}
+                                        <input type="text" name="title" value={field.title} title="Title to identify field in SPX"
                                                onChange={e => handleChange(index, e)}/>
                                     </label>
                                     <label>
                                         value
                                         {field.ftype !== 'checkbox' && (
-                                            <input type="text" name="value" value={field.value}
+                                            <input type="text" name="value" value={field.value} title="Initial value of your field"
                                                    onChange={e => handleChange(index, e)}/>
                                         )}
                                         {field.ftype === 'checkbox' && (
-                                            <select name="value" value={field.value}
+                                            <select name="value" value={field.value} title="Initial value of your checkbox"
                                                     onChange={e => handleChange(index, e)}>
                                                 <option value="0">0</option>
                                                 <option value="1">1</option>
@@ -127,15 +127,14 @@ function SpxExport() {
                                     {field.ftype === 'filelist' && (
                                         <label>
                                             assetfolder
-                                            <input type="text" name="assetfolder" placeholder="Asset Folder Path"
+                                            <input type="text" name="assetfolder" placeholder="Asset Folder Path" title="Path to your image folder"
                                                    value={field.assetfolder} onChange={e => handleChange(index, e)}/>
                                         </label>
                                     )}
                                     {field.ftype === 'filelist' && (
-                                        <label>
+                                        <label id="spx-export-filetype-input">
                                             extension
-                                            <input type="text" name="extension" placeholder="File Extension"
-                                                   id="spx-export-filetype-input"
+                                            <input type="text" name="extension" placeholder="File Extension" title="File Extension"
                                                    value={field.extension} onChange={e => handleChange(index, e)}/>
                                         </label>
                                     )}

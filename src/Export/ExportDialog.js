@@ -92,24 +92,22 @@ function ExportDialog({isOpen, onClose}) {
         const zip = new JSZip();
         let jsonWithoutImages = "";
 
-        if (imagePath != null && !imagePath.endsWith("/") && !spxExport) {
+        if (imagePath != null && !imagePath.endsWith("/")) {
             setImagePath(`${imagePath}/`);
             correctPath = `${imagePath}/`;
-        }else if(spxExport){
-            correctPath = "";
         }else {
             correctPath = imagePath;
         }
 
         try {
             const response = await fetch(lottieScriptUrl);
-            if (!response.ok) throw new Error('CDN nicht erreichbar');
+            if (!response.ok) throw new Error('CDN not answering');
             lottiePlayerCode = await response.text();
         } catch (error) {
-            console.error('Fehler beim Laden des LottiePlayer-Codes vom CDN, verwende lokale Kopie:', error);
+            console.error('Error loading Lottie Player from CDN, use local image:', error);
             const localScriptResponse = await fetch('/lottie/lottie.min.js');
             if (!localScriptResponse.ok) {
-                console.error('Fehler beim Laden der lokalen LottiePlayer-Kopie:', localScriptResponse.statusText);
+                console.error('Error loading local Lottie image:', localScriptResponse.statusText);
                 return;
             }
             lottiePlayerCode = await localScriptResponse.text();
@@ -270,13 +268,13 @@ function ExportDialog({isOpen, onClose}) {
                         <div className="success alert-success">{message}</div>
                     </div>
                 )}
-                {spxExport && (
+                {/*{spxExport && (
                     <div className="warning-wrapper">
                         <div className="warning">
                             When exporting for SPX, the imagePath set in the Images settings will be overwritten.
                         </div>
                     </div>
-                )}
+                )}*/}
                 {!allFontsLoaded && <div className="alert-wrapper">
                     <div className="alert">
                         The animation contains fonts that you haven't uploaded.

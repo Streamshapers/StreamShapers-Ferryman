@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [converterVersion] = useState("v1.4.1");
+    const [converterVersion] = useState("v1.4.2");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -370,7 +370,6 @@ export const GlobalStateProvider = ({children}) => {
                 });
             });
         }
-        console.log(spxExportJson.DataFields);
         setSPXGCTemplateDefinition(spxExportJson);
     }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
 
