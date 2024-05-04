@@ -6,14 +6,13 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons";
 function SpxExport() {
     const {
         spxExport,
-        setSpxExport,
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
     } = useContext(GlobalStateContext);
 
-    function handleCheckboxChange(event) {
+    /*function handleCheckboxChange(event) {
         setSpxExport(event.target.checked);
-    }
+    }*/
 
     const handleChange = (index, e) => {
         const newFields = SPXGCTemplateDefinition.DataFields.map((field, i) => {
@@ -74,14 +73,15 @@ function SpxExport() {
         });
         setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
     };
-    //TODO: Tooltips für label
+
     return (
         <div className="tab-content">
             <div className="export-checkbox spx-header">
-                <div className="spx-checkbox">
+                <h3>SPX Export Settings</h3>
+                {/*<div className="spx-checkbox">
                     <input type="checkbox" id="spx-compatible" checked={spxExport} onChange={handleCheckboxChange}/>
                     <label htmlFor="spx-compatible">Export SPX compatible</label>
-                </div>
+                </div>*/}
                 <a href="https://www.spx.graphics/" target="_blank" rel="noreferrer">
                     <img id="spx-logo" src="./SPX_logo.png" alt=""/>
                 </a>

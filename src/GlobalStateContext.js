@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [converterVersion] = useState("v1.4.2");
+    const [converterVersion] = useState("v1.4.3");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -25,7 +25,7 @@ export const GlobalStateProvider = ({children}) => {
     const [refImages, setRefImages] = useState([]);
     const [imagePath, setImagePath] = useState("images/");
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
-    const [spxExport, setSpxExport] = useState(false);
+    const [spxExport, setSpxExport] = useState(true);
 
     useEffect(() => {
         if (!jsonData) {

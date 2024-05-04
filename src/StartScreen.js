@@ -90,8 +90,11 @@ function StartScreen() {
                 </div>
                 <p>Welcome to StreamShapers Converter!
                     We hope this tool will help you to create your own real time graphics.
-                    It was just released in April 2024, that's why you might encounter problems. If so, we want to encourage you to report issues or missing features back to us.
-                    For further improvements find us on <a href="https://discord.gg/ksNhRkzrM6">Discord</a> or reach out via <a href="mailto:mail@streamshapers.com">Email</a>! ❤</p>
+                    It was just released in April 2024, that's why you might encounter problems. If so, we want to
+                    encourage you to report issues or  missing
+                    features on <a href="https://github.com/Streamshapers/StreamShapers-Converter" target="_blank" rel="noreferrer">GitHub</a> to us.
+                    For further improvements find us on <a href="https://discord.gg/ksNhRkzrM6" target="_blank" rel="noreferrer">Discord</a> or reach out
+                    via <a href="mailto:mail@streamshapers.com" target="_blank" rel="noreferrer">Email</a>! Thank You ❤</p>
             </div>
         </div>
     );

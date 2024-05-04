@@ -1100,6 +1100,11 @@ button {
 .spx-header{
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+.spx-header h3{
+    margin: 0;
 }
 
 .spx-checkbox{
@@ -1109,4 +1114,37 @@ button {
 
 #spx-logo{
     width: 50px;
+}
+
+/* ############################## Window to Narrow ########################################### */
+@media (width < 1080px) {
+    .warning {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        z-index: 1000;
+        font-size: 1.6rem;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    #to-narrow-img{
+        width: 40vw;
+        min-width: 400px;
+        margin-bottom: 5vh;
+    }
+}
+@media (width > 1080px) {
+    .warning {
+        display: none;
+    }
 }
