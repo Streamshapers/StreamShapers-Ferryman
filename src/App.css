@@ -140,6 +140,7 @@ a{
     border-radius: 5px;
     max-width: 100vw;
     max-height: calc(100vh - 60px);
+    min-height: calc(100vh - 100px);
     align-items: center;
     justify-content: center;
 
@@ -1171,6 +1172,7 @@ button {
 
     #jsonElements{
         width: 100%;
+        height: auto;
     }
 
     #animationPreview{
@@ -1185,6 +1187,10 @@ button {
     #previewControls{
         justify-content: space-around;
         margin: 0;
+    }
+
+    #timeDisplay{
+        width: 80px;
     }
 }
 
