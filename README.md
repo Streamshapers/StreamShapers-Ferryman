@@ -1,20 +1,19 @@
-# StremShapers Lottie to CasparCG Converter
+# StreamShapers Converter
 ![converter_screen](https://github.com/Streamshapers/StreamShapers-Converter/assets/96991719/a6d0a94d-6b50-40bd-ad0e-c557dde53e31)
 
 
-Try it out now: www.converter.streamshapers.com
+### Try it out now: www.converter.streamshapers.com
 ## Description
 
-This React-based web application is designed to convert Lottie JSON animations into CasparCG compatible HTML templates. It provides a suite of tools for analyzing and customizing the converted animations, making it an essential utility for broadcasters and designers working with CasparCG graphics.
-The HTML-Template is based on jdoppelp's Template: https://github.com/jdoppelp/CasparCG-Lottie-Template. More Lotties can be found at PeterNicos's Repo: https://github.com/PeterNicos/LottiesForBroadcast
+This React-based web application is designed to convert Lottie JSON animations into HTML templates that are by now tested with CasparCG and SPX Graphics Controller. 
+It provides a suite of tools for analyzing and customizing the converted animations, making it an essential utility for broadcasters and designers working with HTML graphics.
 
 ## Features
 
-* Lottie JSON to CasparCG Conversion: Seamlessly convert Lottie animations into HTML templates that are fully compatible with the CasparCG server, ensuring smooth integration into broadcast workflows.
-* Advanced Analysis Tools: Dive deep into your Lottie animations with detailed analysis tools. Understand every aspect of your animation to ensure optimal performance and compatibility.
-* Customization Options: Tailor your converted animations to fit your needs. Adjust colors, fonts, and other elements to match your branding or design requirements.
-* Preview and Export: Easily preview your converted animations and export them as CasparCG-ready HTML templates, complete with all necessary assets.
-
+- **Lottie JSON to HTML conversion:** Convert Lottie animations to HTML templates easily. These are fully compatible with the CasparCG server and SPX Graphics Controller, making them perfect for broadcast environments.
+- **Advanced Analysis Tools:** Explore your Lottie animations in detail with advanced tools. This helps ensure they perform well and work correctly with your systems.
+- **Customization Options:** Adjust your animations to meet your specific needs. Change fonts, texts, images and other design elements to align with your branding.
+- **Preview and Export Functionality:** Check how your animations look before finalizing them. Export them as HTML templates that are ready for use with CasparCG and SPX, including all necessary files.
 ## Contributing
 
 Contributions to this project are highly encouraged and appreciated. Whether it's bug fixes, feature enhancements, or documentation improvements, your help is welcome.
