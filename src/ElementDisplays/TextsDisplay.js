@@ -78,11 +78,13 @@ function TextsDisplay() {
                 </div>
                 {filteredTexts.map((textLayerName, i) => {
                     const index = textsLayerNames.indexOf(textLayerName);
+                    const textTitle = "Original: " + originalTexts[index];
                     return (
                         <div key={i} className="jsonText">
                             <label className="text-layer-name">{textLayerName}</label>
                             <input
                                 type="text"
+                                title={textTitle}
                                 data-index={index}
                                 value={texts[index]}
                                 onChange={(e) => updateLottieText(index, e.target.value)}

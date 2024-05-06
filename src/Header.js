@@ -1,6 +1,6 @@
 import JsonFileProcessor from "./JsonFileProcessor";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircleInfo, faCircleQuestion, faFileExport, faInfo, faQuestion} from "@fortawesome/free-solid-svg-icons";
+import {faCircleInfo, faCircleQuestion, faFileExport, faNavicon} from "@fortawesome/free-solid-svg-icons";
 import React, {useContext, useState} from "react";
 import ExportDialog from "./Export/ExportDialog";
 import ThemeSwitch from "./Theme/ThemeSwitch";
@@ -22,18 +22,37 @@ function Header() {
             <InfoDialog isOpen={isInfoDialogOpen} onClose={closeInfoDialog}/>
             <div id="headerContainer">
                 <div className="headerSide">
+                    <div className="dropdown">
+                        <FontAwesomeIcon icon={faNavicon} />
+                        <div className="dropdown-content">
+                            <div className="dropdown-item">
+                                {jsonFile && <JsonFileProcessor/>}
+                            </div>
+                            <ThemeSwitch/>
+                            <a id="question-button" className="headerButton dropdown-item"
+                               href="https://www.streamshapers.com/docs/streamshapers-converter/">
+                                <FontAwesomeIcon icon={faCircleQuestion} title="Help"/>
+                            </a>
+                            <div id="info-button" className="headerButton dropdown-item" onClick={openInfoDialog}>
+                                <FontAwesomeIcon icon={faCircleInfo} title="Export"/>
+                            </div>
+                        </div>
+                    </div>
                     {jsonFile && <JsonFileProcessor/>}
                 </div>
                 <div id="header-title">
-                    <a href="https://www.streamshapers.com/"><img id="logo-img" src={theme === 'dark' ? './logo-light.png' : './logo-dark.png'} alt="logo"/></a>
+                    <a href="https://www.streamshapers.com/"><img id="logo-img"
+                                                                  src={theme === 'dark' ? './logo-light.png' : './logo-dark.png'}
+                                                                  alt="logo"/></a>
                     <h1>Converter</h1>
                 </div>
                 <div className="headerSide">
                     <ThemeSwitch/>
-                    <a id="question-button" className="headerButton" href="https://www.streamshapers.com/docs/streamshapers-converter/">
+                    <a id="question-button" className="headerButton headerButton1"
+                       href="https://www.streamshapers.com/docs/streamshapers-converter/">
                         <FontAwesomeIcon icon={faCircleQuestion} title="Help"/>
                     </a>
-                    <div id="info-button" className="headerButton" onClick={openInfoDialog}>
+                    <div id="info-button" className="headerButton headerButton1" onClick={openInfoDialog}>
                         <FontAwesomeIcon icon={faCircleInfo} title="Export"/>
                     </div>
                     {jsonFile && <div id="downloadArea" className="headerButton" onClick={openExportDialog}>

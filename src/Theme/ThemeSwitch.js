@@ -5,7 +5,7 @@ const ThemeSwitch = () => {
     const {theme, toggleTheme} = useTheme();
 
     return (<>
-            <div className="headerButton theme-switch" onClick={toggleTheme}>
+            <div className="headerButton headerButton1 theme-switch" onClick={toggleTheme}>
                 <div><i className={`fas ${theme === 'dark' ? 'fa-moon' : 'fa-sun'}`}></i></div>
             </div>
         </>

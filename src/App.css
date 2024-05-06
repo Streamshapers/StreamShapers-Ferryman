@@ -2,30 +2,30 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
 :root {
-    --primary: #3399cc;
-    --primary-content: #f6f8fd;
-    --primary-dark: #2c4295;
-    --primary-light: #5871cf;
+    --primary: #4ba1e2;
+    --primary-content: #e8e8e8;
+    --primary-dark: #348bc1;
+    --primary-light: #6abcef;
 
-    --secondary: #c1666b;
-    --secondary-content: #fdf6fb;
-    --secondary-dark: #88494c;
-    --secondary-light: #cf58ac;
+    --secondary: #e2b06f;
+    --secondary-content: #e8e8e8;
+    --secondary-dark: #c69152;
+    --secondary-light: #f9cc95;
 
-    --background: #e4dfda;
-    --foreground: #fafafd;
-    --border: #d4d9ea;
+    --background: #e8e8e8;
+    --foreground: #ffffff;
+    --border: #cccccc;
 
-    --copy: #191e34;
-    --copy-light: #42518a;
-    --copy-lighter: #6475b4;
+    --copy: #282828;
+    --copy-light: #363636;
+    --copy-lighter: #494949;
 
-    --success: #37bd37;
-    --warning: #bdbd37;
-    --error: #bd3737;
-    --success-content: #000000;
-    --warning-content: #000000;
-    --error-content: #fdf6f6;
+    --success: #28af62;
+    --warning: #e2b06f;
+    --error: #cc5662;
+    --success-content: #282828;
+    --warning-content: #282828;
+    --error-content: #fafafa;
 }
 
 .light {
@@ -93,18 +93,30 @@
     src: url('../public/fonts/OpenSans-SemiBold.ttf');
 }
 
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html{
+    width: 100%;
+}
+
 body {
     font-family: "OpenSans-Regular", sans-serif;
     margin: 0;
     background: var(--background);
     color: var(--copy);
-    min-width: 100vw;
-    min-height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
 }
 
 #root {
-    min-width: 100vw;
-    min-height: 100vh;
+    width: 100%;
+    height: 100%;
+box-sizing: border-box;
 }
 
 a{
@@ -114,8 +126,8 @@ a{
 }
 
 #content {
-    min-width: 100vw;
-    min-height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -139,16 +151,17 @@ a{
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    gap: 20px;
     min-height: 50vh;
     justify-content: space-around;
 }
 
 #startWrapper p{
     text-align: center;
+    margin: 0;
 }
 
 #uploadWrapper {
-    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,13 +171,13 @@ a{
 
 #uploadWrapper h2 {
     padding: 20px;
+    text-align: center;
 }
 
 #uploadIcon {
     width: 10%;
     font-size: 80px;
     text-align: center;
-    padding: 10px;
     border-radius: 5px;
 }
 
@@ -173,15 +186,19 @@ a{
     align-items: center;
     justify-content: space-around;
     flex-direction: column;
-    padding-top: 20px;
+}
+
+#sampleWrapper h2 {
+    text-align: center;
 }
 
 #samples {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-around;
     width: 100%;
-    padding: 40px 0;
+    padding: 40px 0 0 0;
 }
 
 .sample {
@@ -200,16 +217,15 @@ a{
     margin: 0;
     flex-grow: 1;
     display: flex;
-    max-width: 100vw;
-    max-height: calc(100vh - 60px);
+    width: 100%;
+    height: calc(100vh - 60px);
 }
 
 #contentWrapper {
     display: flex;
     padding: 20px;
-    flex-grow: 1;
-    max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 100px);
+    width: 100%;
+    height: 100%;
 }
 
 h1 {
@@ -287,6 +303,10 @@ input[type='file']::-webkit-file-upload-button {
     transition: background-color 0.3s;
 }
 
+.dropdown{
+    display: none;
+}
+
 .theme-switch {
     margin-right: 10px;
 }
@@ -336,12 +356,17 @@ input[type='file']::-webkit-file-upload-button {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     border-radius: 5px;
     height: 100%;
-    overflow-y: auto;
     box-sizing: border-box;
 }
 
 #jsonElements > h2 {
     margin: 0 0 20px 0;
+}
+
+.accordion{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .accordion-wrapper {
@@ -350,7 +375,6 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .accordion-item {
-    margin-bottom: 20px;
     border-radius: 5px;
     border: 1px solid var(--border);
 }
@@ -360,7 +384,6 @@ input[type='file']::-webkit-file-upload-button {
     background: var(--primary);
     padding: 10px;
     border-radius: 5px 5px 0 0;
-    border: 1px solid var(--primary);
 }
 
 .accordion-body {
@@ -372,7 +395,7 @@ input[type='file']::-webkit-file-upload-button {
 .accordionInfo {
     display: flex;
     flex-wrap: wrap;
-    margin-top: -10px;
+    gap: 10px;
 }
 
 .fonts .accordion-body :last-child, .text-inputs :last-child {
@@ -383,21 +406,15 @@ input[type='file']::-webkit-file-upload-button {
     padding-bottom: 0;
 }
 
-.infos .accordion-body {
-    display: flex;
-    padding-right: 0;
-}
-
 .info-item {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: nowrap;
     padding: 5px 10px 5px 10px;
     background: var(--foreground);
     border-radius: 5px;
     flex-grow: 1;
-    margin-top: 10px;
-    margin-right: 10px;
     border: 1px solid var(--border);
 }
 
@@ -409,10 +426,15 @@ input[type='file']::-webkit-file-upload-button {
     padding-left: 5px;
 }
 
+.fonts-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .font-item {
     display: flex;
     align-items: center;
-    padding-bottom: 10px;
 }
 
 .font-item input {
@@ -446,12 +468,13 @@ input[type='file']::-webkit-file-upload-button {
 
 .control-item {
     display: flex;
+    gap: 5px;
     align-items: center;
     background: var(--background);
     border-radius: 5px;
     padding: 5px;
     border: 1px solid var(--border);
-    height: 30px
+    height: 40px
 }
 
 #image-preview {
@@ -508,6 +531,10 @@ input[type='file']::-webkit-file-upload-button {
     gap: 5px;
 }
 
+.img-input-wrapper input{
+    width: 95%;
+}
+
 .markers-wrapper {
     display: flex;
     gap: 10px;
@@ -521,7 +548,7 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .marker-input-name {
-    min-width: 100px;
+    min-width: 50px;
     max-width: 400px;
     flex-grow: 1;
 }
@@ -565,7 +592,7 @@ input[type='file']::-webkit-file-upload-button {
     background: var(--background);
     border: 1px solid var(--border);
     border-bottom: none;
-    padding: 20px;
+    padding: 10px;
     border-radius: 5px 5px 0 0;
 }
 
@@ -597,6 +624,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .control-input-images {
     margin-left: 6px;
+    width: auto;
 }
 
 .previewControlButton {
@@ -617,7 +645,7 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 #timeDisplay {
-    width: 60px;
+    width: 80px;
     font-size: 24px;
     border-radius: 5px;
     background-color: var(--primary);
@@ -1116,8 +1144,160 @@ button {
     width: 50px;
 }
 
-/* ############################## Window to Narrow ########################################### */
+/* ############################## Media Query's ########################################### */
 @media (width < 1080px) {
+    .container{
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    #contentWrapper{
+        flex-direction: column-reverse;
+        gap: 10px;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        overflow: auto;
+    }
+
+    #startScreenContainer{
+        max-height: 100%;
+        min-height: calc(100vh - 100px);
+    }
+
+    #splitBar{
+        display: none;
+    }
+
+    #jsonElements{
+        width: 100%;
+    }
+
+    #animationPreview{
+        padding: 5px;
+    }
+
+    #previewControlContainer{
+        padding: 40px 5px 5px 5px;
+        height: 130px;
+    }
+
+    #previewControls{
+        justify-content: space-around;
+        margin: 0;
+    }
+}
+
+@media (width < 681px) {
+    #headerContainer{
+        height: auto;
+        gap: 5px;
+    }
+
+    .container{
+        height: auto;
+    }
+
+    #contentWrapper{
+        padding: 5px;
+        gap: 5px;
+    }
+
+    #jsonElements{
+        padding: 5px;
+        min-width: 300px;
+    }
+
+    #jsonPreview{
+        padding: 5px;
+        min-width: 300px;
+    }
+
+    .accordion{
+        gap: 10px;
+    }
+
+    .accordion-header{
+        padding: 5px;
+    }
+
+    .accordion-body{
+        padding: 5px;
+        box-sizing: border-box;
+    }
+
+    .accordionInfo{
+        gap: 5px;
+    }
+
+    #timeDisplay{
+        font-size: 16px;
+        width: 50px;
+        padding: 1px 5px;
+        height: 26px;
+    }
+
+    .previewControlButton{
+        font-size: 16px;
+    }
+
+    #previewControlContainer{
+        padding: 40px 5px 5px 5px;
+        height: 115px;
+    }
+
+    .fonts-list{
+        gap: 5px;
+    }
+
+    #text-input-header{
+        display: none;
+    }
+
+    .jsonText{
+        padding-bottom: 5px;
+    }
+
+    .jsonText span{
+        display: none;
+    }
+
+    #exportDialogWindow{
+        min-width: 100%;
+    }
+
+    #exportFileName{
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #fileNameInputLabel{
+        min-width: 100px;
+    }
+
+    .spx-setting-header{
+        flex-direction: column;
+    }
+
+    #startScreenContainer{
+        max-height: 100%;
+    }
+
+    #startWrapper{
+        max-width: 100%;
+    }
+
+    .sample{
+        padding: 10px;
+    }
+
+    .sample .icon{
+        font-size: 30px;
+    }
+}
+
+@media (width < 360px) {
     .warning {
         position: fixed;
         top: 0;
@@ -1138,13 +1318,55 @@ button {
     }
 
     #to-narrow-img{
-        width: 40vw;
-        min-width: 400px;
+        width: calc(100vw - 5vw);
         margin-bottom: 5vh;
     }
 }
-@media (width > 1080px) {
+@media (width >= 360px) {
     .warning {
         display: none;
+    }
+}
+
+@media (max-width: 680px) {
+    .headerButton1 {
+        display: none;
+    }
+
+    #header-title h1{
+        display: none;
+    }
+
+    #downloadArea span{
+        display: none;
+    }
+
+    .dropdown-item, .dropdown-item .headerButton {
+        display: block;
+        width: 100%;
+    }
+
+    .dropdown {
+        display: flex;
+        gap: 50px;
+        background-color: var(--background);
+        font-size: 24px;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: transparent;
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block; /* Zeigt den Dropdown-Inhalt beim Hover über den Button */
     }
 }

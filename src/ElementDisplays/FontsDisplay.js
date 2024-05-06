@@ -43,7 +43,7 @@ function FontsDisplay() {
     };
 
     return (
-        <div>
+        <div className="fonts-list">
             {fonts.map(font => {
                 const isUploaded = uploadedFonts.hasOwnProperty(font);
                 const indicatorId = `indicator_${font}`;

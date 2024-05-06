@@ -80,7 +80,7 @@ function JsonFileProcessor() {
         <div>
             {/*<input type="file" id="jsonFile" accept=".json" onChange={(e) => processJsonFile(e.target.files[0])}/>
             {error && <div className="error-message">{error}</div>}*/}
-            <div id="loadArea" className="headerButton" onClick={resetJsonFile}>
+            <div id="loadArea" className="headerButton headerButton1" onClick={resetJsonFile}>
                 <span>New </span>
                 <FontAwesomeIcon icon={faFileArrowUp} title="Export"/>
             </div>
