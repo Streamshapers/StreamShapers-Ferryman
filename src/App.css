@@ -964,6 +964,10 @@ input[type='file']::-webkit-file-upload-button {
     min-width: 30vw;
 }
 
+#infoDialogWindow .accordion-wrapper {
+    margin: 20px 0 20px 0;
+}
+
 #info-title {
     display: flex;
     align-items: center;
@@ -1059,8 +1063,8 @@ input[type='file']::-webkit-file-upload-button {
 #spx-item-key {
     display: flex;
     align-items: center;
-    min-width: 100px;
-    height: 35px;
+    min-width: 120px;
+    min-height: 35px;
     background: var(--primary);
     border: 1px solid var(--border);
     color: var(--primary-content);

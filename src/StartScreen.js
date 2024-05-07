@@ -88,7 +88,7 @@ function StartScreen() {
                         </div>
                     </div>
                 </div>
-                <p>Welcome to StreamShapers Converter!
+                <p>Welcome to StreamShapers Ferryman!
                     We hope this tool will help you to create your own real time graphics.
                     It was just released in April 2024, that's why you might encounter problems. If so, we want to
                     encourage you to report issues or  missing

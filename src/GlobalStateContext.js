@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [converterVersion] = useState("v1.4.4");
+    const [ferrymanVersion] = useState("v1.5.0");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -375,7 +375,7 @@ export const GlobalStateProvider = ({children}) => {
 
     return (
         <GlobalStateContext.Provider value={{
-            converterVersion, jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
+            converterVersion: ferrymanVersion, jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
             setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
             originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
             setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,

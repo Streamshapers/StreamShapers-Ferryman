@@ -44,7 +44,7 @@ function Header() {
                     <a href="https://www.streamshapers.com/"><img id="logo-img"
                                                                   src={theme === 'dark' ? './logo-light.png' : './logo-dark.png'}
                                                                   alt="logo"/></a>
-                    <h1>Converter</h1>
+                    <h1>Ferryman</h1>
                 </div>
                 <div className="headerSide">
                     <ThemeSwitch/>

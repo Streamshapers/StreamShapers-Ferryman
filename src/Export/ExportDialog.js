@@ -4,7 +4,7 @@ import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
 
 function ExportDialog({isOpen, onClose}) {
-    const {jsonData, converterVersion, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
+    const {jsonData, ferrymanVersion, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
         markers, refImages, SPXGCTemplateDefinition, spxExport } = useContext(GlobalStateContext);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
@@ -162,7 +162,7 @@ function ExportDialog({isOpen, onClose}) {
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${jsonData}', jsonDataString)
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${version}', converterVersion)
+                        .replace('${version}', ferrymanVersion)
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
                         // eslint-disable-next-line no-template-curly-in-string
