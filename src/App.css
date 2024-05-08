@@ -597,10 +597,15 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px 5px 0 0;
 }
 
-#animationPreview svg {
+#animationPreview svg, #animationPreview canvas {
     flex-grow: 1;
     width: auto;
     background: url(../public/transparent-background.png);
+}
+
+#animationPreview canvas {
+    width: auto!important;
+    height: 100%;
 }
 
 #previewControlContainer {
