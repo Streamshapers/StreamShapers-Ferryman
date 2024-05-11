@@ -1,8 +1,7 @@
-# StreamShapers Converter
-![converter_screen](https://github.com/Streamshapers/StreamShapers-Converter/assets/96991719/a6d0a94d-6b50-40bd-ad0e-c557dde53e31)
+# StreamShapers Ferryman
+![Ferryman](https://github.com/Streamshapers/StreamShapers-Converter/assets/112416359/cc7ca388-69b7-4e7c-9a5c-f28905ac0ddb)
 
-
-### Try it out now: www.converter.streamshapers.com
+### Try it out now: www.ferryman.streamshapers.com
 ## Description
 
 This React-based web application is designed to convert Lottie JSON animations into HTML templates that are by now tested with CasparCG and SPX Graphics Controller. 
