@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "../GlobalStateContext";
 import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
+import GddExport from "./GddExport";
 
 function ExportDialog({isOpen, onClose}) {
     const {jsonData, ferrymanVersion, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
@@ -19,6 +20,8 @@ function ExportDialog({isOpen, onClose}) {
     if (isOpen) {
         setIsPlaying(false);
     }
+
+
 
     const handleTabChange = tabName => {
         setActiveTab(tabName);
@@ -303,11 +306,14 @@ function ExportDialog({isOpen, onClose}) {
                     <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`}
                             onClick={() => handleTabChange('spx')}>SPX
                     </button>
+                    {/*<button className={`tab-button ${activeTab === 'gdd' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('gdd')}>GDD
+                    </button>*/}
                 </div>
                 {activeTab === 'default' && (
                     <div className="tab-content">
                         <div id="exportFileName">
-                            <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
+                        <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                             <input type="text" id="fileNameInput" value={String(fileName)}
                                    onChange={handleFileNameChange}/>
                             <span id="fileType">.{exportFormat}</span>
@@ -332,6 +338,9 @@ function ExportDialog({isOpen, onClose}) {
                 {activeTab === 'spx' && (
                     <SpxExport/>
                 )}
+                {/*activeTab === 'gdd' && (
+                    <GddExport/>
+                )*/}
                 <div className="popupButtonArea">
                     <button id="downloadBtn" onClick={onClose}>Close</button>
                     <button id="downloadBtn" onClick={downloadFile}>Download File</button>

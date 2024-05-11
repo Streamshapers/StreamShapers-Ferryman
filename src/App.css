@@ -93,13 +93,13 @@
     src: url('../public/fonts/OpenSans-SemiBold.ttf');
 }
 
-*{
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html{
+html {
     width: 100%;
 }
 
@@ -116,13 +116,19 @@ body {
 #root {
     width: 100%;
     height: 100%;
-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
-a{
+a {
     text-decoration: none;
     color: var(--primary);
     font-weight: bold;
+}
+
+hr {
+    border-color: var(--border);
+    height: 1px;
+    margin: 10px;
 }
 
 #content {
@@ -157,7 +163,7 @@ a{
     justify-content: space-around;
 }
 
-#startWrapper p{
+#startWrapper p {
     text-align: center;
     margin: 0;
 }
@@ -304,7 +310,7 @@ input[type='file']::-webkit-file-upload-button {
     transition: background-color 0.3s;
 }
 
-.dropdown{
+.dropdown {
     display: none;
 }
 
@@ -364,7 +370,7 @@ input[type='file']::-webkit-file-upload-button {
     margin: 0 0 20px 0;
 }
 
-.accordion{
+.accordion {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -427,7 +433,7 @@ input[type='file']::-webkit-file-upload-button {
     padding-left: 5px;
 }
 
-.fonts-list{
+.fonts-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -532,7 +538,7 @@ input[type='file']::-webkit-file-upload-button {
     gap: 5px;
 }
 
-.img-input-wrapper input{
+.img-input-wrapper input {
     width: 95%;
 }
 
@@ -604,7 +610,7 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 #animationPreview canvas {
-    width: auto!important;
+    width: auto !important;
     height: 100%;
 }
 
@@ -766,7 +772,7 @@ input[type='file']::-webkit-file-upload-button {
 .jsonText .text-layer-name {
     flex-grow: 0;
     margin: 0;
-    width: 100px;
+    min-width: 100px;
 }
 
 .jsonText span {
@@ -950,7 +956,8 @@ input[type='file']::-webkit-file-upload-button {
     margin-bottom: 10px;
     transition: 2s;
 }
-.warning{
+
+.warning {
     color: var(--warning-content);
 }
 
@@ -1028,7 +1035,7 @@ input[type='file']::-webkit-file-upload-button {
     align-items: center;
 }
 
-.spx-settings {
+.spx-settings, .gdd-settings {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1054,6 +1061,7 @@ input[type='file']::-webkit-file-upload-button {
 .spx-setting-header input {
     background: var(--background);
     width: auto;
+    font-size: 1rem;
 }
 
 .spx-export-right {
@@ -1086,7 +1094,9 @@ input[type='file']::-webkit-file-upload-button {
     background: var(--background);
     border: 1px solid var(--border);
     color: var(--copy);
-    height: 25px;
+    height: 30px;
+    font-size: 1rem;
+    padding: 5px;
 }
 
 .spx-extra-settings {
@@ -1135,33 +1145,99 @@ button {
     flex-grow: 1;
 }
 
-.spx-header{
+.spx-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.spx-header h3{
+.spx-header h3 {
     margin: 0;
 }
 
-.spx-checkbox{
+.spx-checkbox {
     display: flex;
     gap: 5px;
 }
 
-#spx-logo{
+#spx-logo {
     width: 50px;
 }
 
+.spx-description input {
+    flex-grow: 1;
+}
+
+.spx-instruction textarea {
+    resize: vertical;
+    flex-grow: 1;
+    min-height: 50px;
+    height: auto;
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--copy);
+    font-family: "OpenSans-Regular", sans-serif;
+    padding: 5px;
+    font-size: 1rem;
+}
+
+label.spx-radiobutton {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.spx-radiobutton span {
+    width: 20px;
+    height: 20px;
+}
+
+label span.gra {
+    background: #7a7a7a;
+}
+
+label span.red {
+    background: #DB2828;
+}
+
+label span.ora {
+    background: #F2711C;
+}
+
+label span.gre {
+    background: #21BA45;
+}
+
+label span.blu {
+    background: #2185D0;
+}
+
+label span.pin {
+    background: #E03997;
+}
+
+label span.vio {
+    background: #8840FF;
+}
+
+label span.bla {
+    background: #000000;
+}
+
 /* ############################## Media Query's ########################################### */
+@media (width < 1600px) {
+    #exportDialogWindow {
+        width: 80vw;
+    }
+}
+
 @media (width < 1080px) {
-    .container{
+    .container {
         max-width: 100%;
         max-height: 100%;
     }
 
-    #contentWrapper{
+    #contentWrapper {
         flex-direction: column-reverse;
         gap: 10px;
         width: 100%;
@@ -1170,144 +1246,144 @@ button {
         overflow: auto;
     }
 
-    #startScreenContainer{
+    #startScreenContainer {
         max-height: 100%;
         min-height: calc(100vh - 100px);
     }
 
-    #splitBar{
+    #splitBar {
         display: none;
     }
 
-    #jsonElements{
+    #jsonElements {
         width: 100%;
         height: auto;
     }
 
-    #animationPreview{
+    #animationPreview {
         padding: 5px;
     }
 
-    #previewControlContainer{
+    #previewControlContainer {
         padding: 40px 5px 5px 5px;
         height: 130px;
     }
 
-    #previewControls{
+    #previewControls {
         justify-content: space-around;
         margin: 0;
     }
 
-    #timeDisplay{
+    #timeDisplay {
         width: 80px;
     }
 }
 
 @media (width < 681px) {
-    #headerContainer{
+    #headerContainer {
         height: auto;
         gap: 5px;
     }
 
-    .container{
+    .container {
         height: auto;
     }
 
-    #contentWrapper{
+    #contentWrapper {
         padding: 5px;
         gap: 5px;
     }
 
-    #jsonElements{
+    #jsonElements {
         padding: 5px;
         min-width: 300px;
     }
 
-    #jsonPreview{
+    #jsonPreview {
         padding: 5px;
         min-width: 300px;
     }
 
-    .accordion{
+    .accordion {
         gap: 10px;
     }
 
-    .accordion-header{
+    .accordion-header {
         padding: 5px;
     }
 
-    .accordion-body{
+    .accordion-body {
         padding: 5px;
         box-sizing: border-box;
     }
 
-    .accordionInfo{
+    .accordionInfo {
         gap: 5px;
     }
 
-    #timeDisplay{
+    #timeDisplay {
         font-size: 16px;
         width: 50px;
         padding: 1px 5px;
         height: 26px;
     }
 
-    .previewControlButton{
+    .previewControlButton {
         font-size: 16px;
     }
 
-    #previewControlContainer{
+    #previewControlContainer {
         padding: 40px 5px 5px 5px;
         height: 115px;
     }
 
-    .fonts-list{
+    .fonts-list {
         gap: 5px;
     }
 
-    #text-input-header{
+    #text-input-header {
         display: none;
     }
 
-    .jsonText{
+    .jsonText {
         padding-bottom: 5px;
     }
 
-    .jsonText span{
+    .jsonText span {
         display: none;
     }
 
-    #exportDialogWindow{
+    #exportDialogWindow {
         min-width: 100%;
     }
 
-    #exportFileName{
+    #exportFileName {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    #fileNameInputLabel{
+    #fileNameInputLabel {
         min-width: 100px;
     }
 
-    .spx-setting-header{
+    .spx-setting-header {
         flex-direction: column;
     }
 
-    #startScreenContainer{
+    #startScreenContainer {
         max-height: 100%;
     }
 
-    #startWrapper{
+    #startWrapper {
         max-width: 100%;
     }
 
-    .sample{
+    .sample {
         padding: 10px;
     }
 
-    .sample .icon{
+    .sample .icon {
         font-size: 30px;
     }
 }
@@ -1332,11 +1408,12 @@ button {
         box-sizing: border-box;
     }
 
-    #to-narrow-img{
+    #to-narrow-img {
         width: calc(100vw - 5vw);
         margin-bottom: 5vh;
     }
 }
+
 @media (width >= 360px) {
     .warning {
         display: none;
@@ -1348,11 +1425,11 @@ button {
         display: none;
     }
 
-    #header-title h1{
+    #header-title h1 {
         display: none;
     }
 
-    #downloadArea span{
+    #downloadArea span {
         display: none;
     }
 
@@ -1377,11 +1454,11 @@ button {
         display: none;
         position: absolute;
         background-color: transparent;
-        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
         z-index: 1;
     }
 
     .dropdown:hover .dropdown-content {
-        display: block; /* Zeigt den Dropdown-Inhalt beim Hover über den Button */
+        display: block;
     }
 }

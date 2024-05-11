@@ -26,11 +26,16 @@ export const GlobalStateProvider = ({children}) => {
     const [imagePath, setImagePath] = useState("images/");
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
     const [spxExport, setSpxExport] = useState(true);
+    const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
 
     useEffect(() => {
         if (!jsonData) {
             return;
         }
+
+        useEffect(() => {
+            console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
+        }, []);
 
         //################################# Infos ######################################################################
         const newInfos = {};
@@ -284,6 +289,7 @@ export const GlobalStateProvider = ({children}) => {
 
             return tempList;
         }
+
         if (jsonData) {
             const imageNames = searchForObjectsWithRefId(jsonData);
             setRefImages(imageNames);
@@ -329,58 +335,163 @@ export const GlobalStateProvider = ({children}) => {
             "webplayout": "5",
             "out": "manual",
             "dataformat": "json",
-            "uicolor": "7",
+            "uicolor": "0",
             "steps": `${markers.length - 1}`,
             "DataFields": []
         };
         let spxExportJson = {...rawSpxJson};
 
-        if(fileName){
+        if (fileName) {
             spxExportJson.description = fileName;
         }
 
         let textsWithNames = {};
 
-        if(texts && textsLayerNames){
-            for (let i = 0; i < texts.length; i++){
-                if(textsLayerNames[i] && textsLayerNames[i].startsWith('_')) {
+        if (texts && textsLayerNames) {
+            for (let i = 0; i < texts.length; i++) {
+                if (textsLayerNames[i] && textsLayerNames[i].startsWith('_')) {
                     textsWithNames[textsLayerNames[i]] = texts[i];
                 }
             }
         }
 
         if (Object.keys(textsWithNames).length > 0) {
-            spxExportJson.DataFields = Object.keys(textsWithNames).map((key, index) => ({
-                "field": key,
-                "ftype": "textfield",
-                "title": key,
-                "value": textsWithNames[key]
-            }));
+            Object.keys(textsWithNames).forEach((key, index) => {
+                spxExportJson.DataFields.push({
+                    "field": key,
+                    "ftype": "textfield",
+                    "title": key,
+                    "value": textsWithNames[key]
+                });
+            });
         }
 
-        if(refImages){
+
+        if (refImages) {
             refImages.forEach(refImage => {
                 spxExportJson.DataFields.push({
                     "field": refImage.nm,
                     "ftype": "filelist",
                     "title": "Choose Image",
-                    "assetfolder" : `/media/images/`,
-                    "extension" : "png",
+                    "assetfolder": `/media/images/`,
+                    "extension": "png",
                     "value": `/media/images/${refImage.refId}.png`
                 });
             });
         }
+        //console.log(spxExportJson);
         setSPXGCTemplateDefinition(spxExportJson);
+    }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
+
+    //############################################ GDD ################################################################
+
+    useEffect(() => {
+        const rawGddJson = {
+            "$schema": "https://superflytv.github.io/GraphicsDataDefinition/gdd-meta-schema/v1/schema.json",
+            "title": "",
+            "description": "",
+            "authorName": "",
+            "authorEmail": "",
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "gddPlayoutOptions": {}
+        };
+
+        let gddExportJson = {...rawGddJson};
+
+        if (fileName) {
+            gddExportJson.title = fileName;
+        }
+
+        let textsWithNames = {};
+
+        if (texts && textsLayerNames) {
+            for (let i = 0; i < texts.length; i++) {
+                if (textsLayerNames[i] && textsLayerNames[i].startsWith('_')) {
+                    textsWithNames[textsLayerNames[i]] = texts[i];
+                }
+            }
+        }
+
+        if (Object.keys(textsWithNames).length > 0) {
+            Object.keys(textsWithNames).forEach((key, index) => {
+                gddExportJson.properties[key] = {
+                    "type": "string",
+                    "gddType": "single-line",
+                    "default": textsWithNames[key],
+                    "maxLength": 50,
+                    "minLength": 1,
+                    "pattern": "[\\s\\S]+",
+                    "gddOptions": {}
+                };
+            });
+        }
+
+        if (refImages) {
+            refImages.forEach(refImage => {
+                gddExportJson.properties[refImage.nm] = {
+                    "type": "string",
+                    "gddType": "file-path/image-path",
+                    "gddOptions": {
+                        "extensions": ["jpg", "png"]
+                    },
+                    "default": `/media/images/${refImage.refId}.png`
+                };
+            });
+        }
+        //console.log(gddExportJson);
+        setGDDTemplateDefinition(gddExportJson);
     }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
 
     return (
         <GlobalStateContext.Provider value={{
-            converterVersion: ferrymanVersion, jsonData, setJsonData, colors, setColors, error, setError, texts, setTexts, textsLayerNames,
-            setTextsLayerNames, images, setImages, infos, setInfos, fonts, setFonts, uploadedFonts, setUploadedFonts,
-            originalTexts, setOriginalTexts, fontFaces, setFontFaces, textShowAll, setTextShowAll, markers,
-            setMarkers, currentFrame, setCurrentFrame, isPlaying, setIsPlaying, fileName, setFileName, jsonFile,
-            setJsonFile, theme, setTheme, refImages, imagePath, setImagePath, SPXGCTemplateDefinition,
-            setSPXGCTemplateDefinition, spxExport, setSpxExport
+            ferrymanVersion,
+            jsonData,
+            setJsonData,
+            colors,
+            setColors,
+            error,
+            setError,
+            texts,
+            setTexts,
+            textsLayerNames,
+            setTextsLayerNames,
+            images,
+            setImages,
+            infos,
+            setInfos,
+            fonts,
+            setFonts,
+            uploadedFonts,
+            setUploadedFonts,
+            originalTexts,
+            setOriginalTexts,
+            fontFaces,
+            setFontFaces,
+            textShowAll,
+            setTextShowAll,
+            markers,
+            setMarkers,
+            currentFrame,
+            setCurrentFrame,
+            isPlaying,
+            setIsPlaying,
+            fileName,
+            setFileName,
+            jsonFile,
+            setJsonFile,
+            theme,
+            setTheme,
+            refImages,
+            imagePath,
+            setImagePath,
+            SPXGCTemplateDefinition,
+            setSPXGCTemplateDefinition,
+            spxExport,
+            setSpxExport,
+            GDDTemplateDefinition,
+            setGDDTemplateDefinition
         }}>
             {children}
         </GlobalStateContext.Provider>

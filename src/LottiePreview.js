@@ -16,9 +16,8 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
 
     return (
         markers.map((marker, index) => (
-            <>
+            <React.Fragment key={`marker-${marker.tm}`}>
                 <div
-                    key={`marker-${marker.tm}`}
                     className="progress-bar-marker"
                     style={{
                         left: `${(marker.tm / jsonData.op) * 100}%`,
@@ -28,7 +27,6 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
                     <span className="marker-tooltip">{marker.cm}</span>
                 </div>
                 <div
-                    key={`duration-${marker.tm}`}
                     className="marker-duration"
                     style={{
                         left: `${(marker.tm / jsonData.op) * 100}%`,
@@ -36,11 +34,10 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
                         //top: index % 2 === 0 ? '25px' : '20px',
                     }}
                 ></div>
-            </>
+            </React.Fragment>
         ))
     );
 });
-
 
 function LottiePreview() {
     const {

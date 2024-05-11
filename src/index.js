@@ -7,14 +7,15 @@ import {ThemeProvider} from './Theme/ThemeContext';
 import {GlobalStateProvider} from "./GlobalStateContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
-    <React.StrictMode>
+    //<React.StrictMode>
         <GlobalStateProvider>
             <ThemeProvider>
                 <App/>
             </ThemeProvider>
         </GlobalStateProvider>
-    </React.StrictMode>
+    //</React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

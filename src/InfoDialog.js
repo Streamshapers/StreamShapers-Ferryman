@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
 
 function InfoDialog({isOpen, onClose}) {
-    const {setIsPlaying, theme, converterVersion: ferrymanVersion} = useContext(GlobalStateContext);
+    const {setIsPlaying, theme, ferrymanVersion} = useContext(GlobalStateContext);
     const [isImprintOpen, setIsImprintOpen] = useState(false);
 
     if (isOpen) {
