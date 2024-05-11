@@ -29,13 +29,13 @@ export const GlobalStateProvider = ({children}) => {
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
 
     useEffect(() => {
+        console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
+    }, []);
+
+    useEffect(() => {
         if (!jsonData) {
             return;
         }
-
-        useEffect(() => {
-            console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
-        }, []);
 
         //################################# Infos ######################################################################
         const newInfos = {};
