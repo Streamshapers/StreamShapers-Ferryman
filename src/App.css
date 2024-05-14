@@ -1,5 +1,5 @@
 /* Initialy written by Richard */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+/*@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');*/
 
 :root {
     --primary: #4ba1e2;
@@ -85,12 +85,15 @@
 
 @font-face {
     font-family: 'OpenSans-Regular';
+    font-style: normal;
     src: url('../public/fonts/OpenSans-Regular.ttf');
+    font-display: auto;
 }
 
 @font-face {
     font-family: 'OpenSans-SemiBold';
     src: url('../public/fonts/OpenSans-SemiBold.ttf');
+    font-display: auto;
 }
 
 * {
