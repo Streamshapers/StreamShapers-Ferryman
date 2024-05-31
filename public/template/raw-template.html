@@ -67,6 +67,23 @@
         document.head.appendChild(newFont);
     }
 
+    function loadFonts() {
+        return new Promise((resolve, reject) => {
+            const fonts = lottieTemplate.fonts.list;
+            let fontPromises = [];
+
+            for (const font of fonts) {
+                if (font.fPath !== '') {
+                    fontPromises.push(new FontFace(font.fFamily, `url(${font.fPath})`).load());
+                }
+            }
+
+            Promise.all(fontPromises)
+                .then(() => resolve('Fonts loaded'))
+                .catch(err => reject(err));
+        });
+    }
+
     //updates Images Assets by there Refid  //Credits to HeineFro  @https://github.com/HeineFro
     function updateAssetsByRefid(array, searchValue, newValue) {
         const foundObject = array.find(obj => obj['id'] === searchValue);
@@ -207,6 +224,7 @@
 
 
     async function play() {
+        await loadFonts();
         await animReady
         animation.goToAndPlay("start", true);
         playStatus = "play";
