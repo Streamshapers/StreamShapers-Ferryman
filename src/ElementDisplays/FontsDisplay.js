@@ -17,23 +17,37 @@ function FontsDisplay() {
         const reader = new FileReader();
         reader.onload = function (event) {
             if (typeof event.target.result === 'string') {
+                let base64Font = event.target.result;
+
+                if (base64Font.startsWith('data:application/octet-stream') && file.name.endsWith('.otf')) {
+                    base64Font = base64Font.replace('data:application/octet-stream', 'data:font/otf');
+                } else if (base64Font.startsWith('data:application/octet-stream') && file.name.endsWith('.ttf')) {
+                    base64Font = base64Font.replace('data:application/octet-stream', 'data:font/ttf');
+                }
+
+                console.log(base64Font)
+
                 setUploadedFonts(prevUploadedFonts => ({
                     ...prevUploadedFonts,
-                    [fontName]: event.target.result
+                    [fontName]: base64Font
                 }));
 
                 if (jsonData && jsonData.fonts && jsonData.fonts.list) {
                     const updatedFontsList = jsonData.fonts.list.map(font => {
-                        const name = font.fFamily + " " + font.fStyle;
-                        if (name === fontName) {
-                            return {...font, fPath: "", fFamily: name};
+                        const fullName = `${font.fFamily}`;
+                        //console.log('Comparing:', fullName, 'with', fontName);
+                        if (fullName === fontName) {
+                            //console.log('Updating font:', fullName);
+                            return {...font, fPath: base64Font, fFamily: font.fFamily};
                         }
                         return font;
                     });
+                    //console.log('Updated Fonts List:', updatedFontsList);
                     const timer = setTimeout(() => {
                         setJsonData({...jsonData, fonts: {...jsonData.fonts, list: updatedFontsList}});
-                    }, 100);//Timeout damit Font richtig dargestellt wird
+                    }, 100);
                     return () => clearTimeout(timer);
+
                 }
             } else {
                 console.error('Uploaded format is not supported.');

@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.5.1");
+    const [ferrymanVersion] = useState("v1.5.2");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -146,12 +146,18 @@ export const GlobalStateProvider = ({children}) => {
         if (!fontFaces) {
             return;
         }
-        for (const face in fontFaces) {
+
+        const oldStyleTags = document.querySelectorAll('style.fontFacesTags');
+        oldStyleTags.forEach(tag => tag.remove());
+
+
+        fontFaces.forEach(face => {
             const styleElement = document.createElement('style');
             styleElement.setAttribute('type', 'text/css');
-            styleElement.innerHTML = fontFaces[face].toString();
+            styleElement.classList.add('fontFacesTags');
+            styleElement.innerHTML = face.toString();
             document.head.appendChild(styleElement);
-        }
+        });
     }, [fontFaces]);
 
     //######################################## Texts ###############################################################

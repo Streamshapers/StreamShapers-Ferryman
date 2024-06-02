@@ -84,14 +84,14 @@
 
 
 @font-face {
-    font-family: 'OpenSans-Regular';
+    font-family: 'OpenSans-RegularS';
     font-style: normal;
     src: url('../public/fonts/OpenSans-Regular.ttf');
     font-display: auto;
 }
 
 @font-face {
-    font-family: 'OpenSans-SemiBold';
+    font-family: 'OpenSans-SemiBoldS';
     src: url('../public/fonts/OpenSans-SemiBold.ttf');
     font-display: auto;
 }
@@ -107,7 +107,7 @@ html {
 }
 
 body {
-    font-family: "OpenSans-Regular", sans-serif;
+    font-family: "OpenSans-RegularS", sans-serif;
     margin: 0;
     background: var(--background);
     color: var(--copy);
@@ -666,6 +666,7 @@ input[type='file']::-webkit-file-upload-button {
     background-color: var(--primary);
     color: var(--primary-content);
     padding: 5px 10px;
+    overflow: hidden;
 }
 
 #progressBarContainer {
