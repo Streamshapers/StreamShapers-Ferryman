@@ -1,5 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
+import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 function InfoDialog({isOpen, onClose}) {
     const {setIsPlaying, theme, ferrymanVersion} = useContext(GlobalStateContext);
@@ -34,7 +36,7 @@ function InfoDialog({isOpen, onClose}) {
                         <div className="accordion">
                             <div className="accordion-item imprint">
                                 <h3 className="accordion-header" onClick={() => setIsImprintOpen(!isImprintOpen)}>
-                                    <i className={`fas ${isImprintOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Imprint
+                                    <FontAwesomeIcon icon={isImprintOpen ? faChevronUp : faChevronDown}/> Imprint
                                 </h3>
                                 <div className="accordion-body" style={{display: isImprintOpen ? 'block' : 'none'}}>
                                     <p>StreamShapers by Jan-Philipp Peters, Nico Peters and Richard Weyer</p>

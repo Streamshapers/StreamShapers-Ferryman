@@ -6,6 +6,8 @@ import TextsDisplay from "./TextsDisplay";
 import ImagesDisplay from "./ImagesDisplay";
 import ColorsDisplay from "./ColorsDispaly";
 import MarkersDisplay from "./MarkersDisplay";
+import {faChevronDown, faChevronUp, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 
 function JsonElementsDisplay() {
@@ -27,7 +29,7 @@ function JsonElementsDisplay() {
                 {infos && Object.keys(infos).length > 0 && (
                     <div className="accordion-item infos">
                         <h3 className="accordion-header" onClick={() => setIsInfoOpen(!isInfoOpen)}>
-                            <i className={`fas ${isInfoOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Info
+                            <FontAwesomeIcon icon={isInfoOpen ? faChevronUp : faChevronDown}/> Info
                         </h3>
                         <div className="accordion-body" style={{display: isInfoOpen ? 'block' : 'none'}}>
                             <InfosDisplay/>
@@ -37,7 +39,7 @@ function JsonElementsDisplay() {
                 {fonts && fonts.length > 0 && (
                     <div className="accordion-item fonts">
                         <h3 className="accordion-header" onClick={() => setIsFontsOpen(!isFontsOpen)}>
-                            <i className={`fas ${isFontsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Fonts
+                            <FontAwesomeIcon icon={isFontsOpen ? faChevronUp : faChevronDown}/> Fonts
                         </h3>
                         <div className="accordion-body" style={{display: isFontsOpen ? 'block' : 'none'}}>
                             <FontsDisplay/>
@@ -47,7 +49,7 @@ function JsonElementsDisplay() {
                 {texts && texts.length > 0 && (
                     <div className="accordion-item texts">
                         <h3 className="accordion-header" onClick={() => setIsTextsOpen(!isTextsOpen)}>
-                            <i className={`fas ${isTextsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Texts
+                            <FontAwesomeIcon icon={isTextsOpen ? faChevronUp : faChevronDown}/> Texts
                         </h3>
                         <div className="accordion-body" style={{display: isTextsOpen ? 'block' : 'none'}}>
                             <TextsDisplay/>
@@ -57,7 +59,7 @@ function JsonElementsDisplay() {
                 {images && images.length > 0 && (
                     <div className="accordion-item images">
                         <h3 className="accordion-header" onClick={() => setIsImagesOpen(!isImagesOpen)}>
-                            <i className={`fas ${isImagesOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Images
+                            <FontAwesomeIcon icon={isImagesOpen ? faChevronUp : faChevronDown}/> Images
                         </h3>
                         <div className="accordion-body" style={{display: isImagesOpen ? 'block' : 'none'}}>
                             <ImagesDisplay/>
@@ -67,7 +69,7 @@ function JsonElementsDisplay() {
                 {/*{colors && colors.length > 0 && (
                     <div className="accordion-item colors">
                         <h3 className="accordion-header" onClick={() => setIsColorsOpen(!isColorsOpen)}>
-                            <i className={`fas ${isColorsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Colors
+                            <FontAwesomeIcon icon={isColorsOpen ? faChevronUp : faChevronDown}/> Colors
                         </h3>
                         <div className="accordion-body" style={{display: isColorsOpen ? 'block' : 'none'}}>
                             <ColorsDisplay/>
@@ -77,7 +79,7 @@ function JsonElementsDisplay() {
                 {jsonData.markers && jsonData.markers.length > 0 && (
                     <div className="accordion-item markers">
                         <h3 className="accordion-header" onClick={() => setIsMarkersOpen(!isMarkersOpen)}>
-                            <i className={`fas ${isMarkersOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i> Markers
+                            <FontAwesomeIcon icon={isMarkersOpen ? faChevronUp : faChevronDown}/> Markers
                         </h3>
                         <div className="accordion-body" style={{display: isMarkersOpen ? 'block' : 'none'}}>
                             <MarkersDisplay/>
