@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.5.2");
+    const [ferrymanVersion] = useState("v1.5.3");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -100,12 +100,12 @@ export const GlobalStateProvider = ({children}) => {
                 };
 
                 // Für normale Schriftarten, die nicht mit "data:font" beginnen
-                if (!newFonts.includes(fontName) && !path.startsWith("data:font")) {
+                if (!newFonts.includes(fontName) && !path.startsWith("data:font") || !newFonts.includes(fontName) && path.startsWith("data:font/unn")) {
                     newFonts.push(fontName);
                 }
 
                 // Für eingebettete Schriftarten, die mit "data:font" beginnen
-                if (path.startsWith("data:font")) {
+                if (path.startsWith("data:font") && !path.startsWith("data:font/unn")) {
                     if (!font.fFamily.endsWith(font.fStyle)) {
                         fontName = font.fFamily + " " + font.fStyle;
                     }

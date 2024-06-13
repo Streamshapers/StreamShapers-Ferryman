@@ -63,6 +63,7 @@ function LottiePreview() {
 
     useEffect(() => {
         if (!jsonData) return;
+        let onEnterFrame;
 
         const instance = lottie.loadAnimation({
             container: animationContainerRef.current,
@@ -72,17 +73,21 @@ function LottiePreview() {
             animationData: jsonData,
         });
 
-        instance.goToAndStop(currentFrame, true);
-        if (isPlaying) instance.play();
+        const timeoutId = setTimeout(() => {
+            instance.goToAndStop(currentFrame, true);
+            if (isPlaying) instance.play();
 
-        const onEnterFrame = (e) => {
-            setCurrentFrame(Math.round(e.currentTime));
-        };
 
-        instance.addEventListener('enterFrame', onEnterFrame);
-        setLottieInstance(instance);
+            onEnterFrame = (e) => {
+                setCurrentFrame(Math.round(e.currentTime));
+            };
+
+            instance.addEventListener('enterFrame', onEnterFrame);
+            setLottieInstance(instance);
+        }, 300);
 
         return () => {
+            clearTimeout(timeoutId);
             instance.removeEventListener('enterFrame', onEnterFrame);
             instance.destroy();
         };

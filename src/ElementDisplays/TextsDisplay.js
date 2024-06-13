@@ -2,7 +2,16 @@ import React, {useContext, useEffect} from 'react';
 import {GlobalStateContext} from '../GlobalStateContext';
 
 function TextsDisplay() {
-    const { jsonData, texts, setTexts, originalTexts, textsLayerNames, setJsonData, textShowAll, setTextShowAll } = useContext(GlobalStateContext);
+    const {
+        jsonData,
+        texts,
+        setTexts,
+        originalTexts,
+        textsLayerNames,
+        setJsonData,
+        textShowAll,
+        setTextShowAll
+    } = useContext(GlobalStateContext);
 
 
     useEffect(() => {
@@ -38,9 +47,10 @@ function TextsDisplay() {
             }
         }
 
-        if(texts) {
+        if (texts) {
             searchAndUpdateText(tempJsonData);
         }
+
         setJsonData(tempJsonData);
 
         const updatedTexts = [...texts];
