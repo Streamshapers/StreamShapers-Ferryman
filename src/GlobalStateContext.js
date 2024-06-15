@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.5.3");
+    const [ferrymanVersion] = useState("v1.5.3 api test");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -27,6 +27,7 @@ export const GlobalStateProvider = ({children}) => {
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
+    const [showApiDialog, setShowApiDialog] = useState(false);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -497,7 +498,9 @@ export const GlobalStateProvider = ({children}) => {
             spxExport,
             setSpxExport,
             GDDTemplateDefinition,
-            setGDDTemplateDefinition
+            setGDDTemplateDefinition,
+            showApiDialog,
+            setShowApiDialog
         }}>
             {children}
         </GlobalStateContext.Provider>

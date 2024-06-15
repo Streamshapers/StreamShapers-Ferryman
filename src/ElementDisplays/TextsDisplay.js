@@ -1,5 +1,6 @@
 import React, {useContext, useEffect} from 'react';
 import {GlobalStateContext} from '../GlobalStateContext';
+import ConnectApiDialog from "./ConnectApiDialog";
 
 function TextsDisplay() {
     const {
@@ -10,7 +11,9 @@ function TextsDisplay() {
         textsLayerNames,
         setJsonData,
         textShowAll,
-        setTextShowAll
+        setTextShowAll,
+        showApiDialog,
+        setShowApiDialog
     } = useContext(GlobalStateContext);
 
 
@@ -62,6 +65,10 @@ function TextsDisplay() {
         setTextShowAll(!textShowAll);
     };
 
+    const toggleShowApiDialog = () => {
+        setShowApiDialog(!showApiDialog);
+    };
+
     const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
         return textShowAll || textsLayerNames[i].startsWith('_');
     });
@@ -79,7 +86,18 @@ function TextsDisplay() {
                         onChange={toggleTextShowAll}
                     />
                 </div>
+                <div className="control-item">
+                    <label htmlFor="api-dialog-check">Connect API</label>
+                    <input
+                        type="checkbox"
+                        title="Connect API"
+                        id="api-dialog-check"
+                        checked={showApiDialog}
+                        onChange={toggleShowApiDialog}
+                    />
+                </div>
             </div>
+            <ConnectApiDialog />
             <div id="text-inputs" className="text-inputs">
                 <div id="text-input-header">
                     <span>Layername</span>
