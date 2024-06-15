@@ -74,7 +74,7 @@ function TextsDisplay() {
     });
 
     return (
-        <div>
+        <>
             <div className="controls">
                 <div className="control-item">
                     <label htmlFor="textShowAll">Show All</label>
@@ -97,7 +97,7 @@ function TextsDisplay() {
                     />
                 </div>
             </div>
-            <ConnectApiDialog />
+            <ConnectApiDialog/>
             <div id="text-inputs" className="text-inputs">
                 <div id="text-input-header">
                     <span>Layername</span>
@@ -122,7 +122,7 @@ function TextsDisplay() {
                     );
                 })}
             </div>
-        </div>
+        </>
     );
 }
 

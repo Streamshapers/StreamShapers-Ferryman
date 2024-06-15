@@ -51,7 +51,7 @@ function JsonElementsDisplay() {
                         <h3 className="accordion-header" onClick={() => setIsTextsOpen(!isTextsOpen)}>
                             <FontAwesomeIcon icon={isTextsOpen ? faChevronUp : faChevronDown}/> Texts
                         </h3>
-                        <div className="accordion-body" style={{display: isTextsOpen ? 'block' : 'none'}}>
+                        <div className="accordion-body" style={{display: isTextsOpen ? 'flex' : 'none'}}>
                             <TextsDisplay/>
                         </div>
                     </div>

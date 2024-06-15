@@ -400,6 +400,9 @@ input[type='file']::-webkit-file-upload-button {
     padding: 10px;
     background: var(--background);
     border-radius: 0 0 5px 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .accordionInfo {
@@ -1226,6 +1229,15 @@ label span.vio {
 
 label span.bla {
     background: #000000;
+}
+
+.api-dialog {
+    display: flex;
+    gap: 10px;
+    background: var(--foreground);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
 }
 
 /* ############################## Media Query's ########################################### */
