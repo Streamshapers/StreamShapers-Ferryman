@@ -1,5 +1,7 @@
 import React, {useContext} from 'react';
 import {GlobalStateContext} from "../GlobalStateContext";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 function ConnectApiDialog() {
     const {showApiDialog} = useContext(GlobalStateContext);
@@ -19,6 +21,9 @@ function ConnectApiDialog() {
                         <option value="test">Test</option>
                     </select>
                     <input name="api-link" placeholder="put your API link here..."/>
+                    <button className="spx-export-button" title="Add API">
+                        <FontAwesomeIcon icon={faPlus}/>
+                    </button>
                 </div>
             )}
         </div>

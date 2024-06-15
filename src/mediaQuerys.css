@@ -1,0 +1,239 @@
+
+/* ############################## Media Query's ########################################### */
+@media (width < 1600px) {
+    #exportDialogWindow {
+        width: 80vw;
+    }
+}
+
+@media (width < 1080px) {
+    .container {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    #contentWrapper {
+        flex-direction: column-reverse;
+        gap: 10px;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        overflow: auto;
+    }
+
+    #startScreenContainer {
+        max-height: 100%;
+        min-height: calc(100vh - 100px);
+    }
+
+    #splitBar {
+        display: none;
+    }
+
+    #jsonElements {
+        width: 100%;
+        height: auto;
+    }
+
+    #animationPreview {
+        padding: 5px;
+    }
+
+    #previewControlContainer {
+        padding: 40px 5px 5px 5px;
+        height: 130px;
+    }
+
+    #previewControls {
+        justify-content: space-around;
+        margin: 0;
+    }
+
+    #timeDisplay {
+        width: 80px;
+    }
+}
+
+@media (width < 681px) {
+    #headerContainer {
+        height: auto;
+        gap: 5px;
+    }
+
+    .container {
+        height: auto;
+    }
+
+    #contentWrapper {
+        padding: 5px;
+        gap: 5px;
+    }
+
+    #jsonElements {
+        padding: 5px;
+        min-width: 300px;
+    }
+
+    #jsonPreview {
+        padding: 5px;
+        min-width: 300px;
+    }
+
+    .accordion {
+        gap: 10px;
+    }
+
+    .accordion-header {
+        padding: 5px;
+    }
+
+    .accordion-body {
+        padding: 5px;
+        box-sizing: border-box;
+    }
+
+    .accordionInfo {
+        gap: 5px;
+    }
+
+    #timeDisplay {
+        font-size: 16px;
+        width: 50px;
+        padding: 1px 5px;
+        height: 26px;
+    }
+
+    .previewControlButton {
+        font-size: 16px;
+    }
+
+    #previewControlContainer {
+        padding: 40px 5px 5px 5px;
+        height: 115px;
+    }
+
+    .fonts-list {
+        gap: 5px;
+    }
+
+    #text-input-header {
+        display: none;
+    }
+
+    .jsonText {
+        padding-bottom: 5px;
+    }
+
+    .jsonText span {
+        display: none;
+    }
+
+    #exportDialogWindow {
+        min-width: 100%;
+    }
+
+    #exportFileName {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #fileNameInputLabel {
+        min-width: 100px;
+    }
+
+    .spx-setting-header {
+        flex-direction: column;
+    }
+
+    #startScreenContainer {
+        max-height: 100%;
+    }
+
+    #startWrapper {
+        max-width: 100%;
+    }
+
+    .sample {
+        padding: 10px;
+    }
+
+    .sample .icon {
+        font-size: 30px;
+    }
+}
+
+@media (width < 360px) {
+    .warning {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        z-index: 1000;
+        font-size: 1.6rem;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    #to-narrow-img {
+        width: calc(100vw - 5vw);
+        margin-bottom: 5vh;
+    }
+}
+
+@media (width >= 360px) {
+    .warning {
+        display: none;
+    }
+}
+
+@media (max-width: 680px) {
+    .headerButton1 {
+        display: none;
+    }
+
+    #header-title h1 {
+        display: none;
+    }
+
+    #downloadArea span {
+        display: none;
+    }
+
+    .dropdown-item, .dropdown-item .headerButton {
+        display: block;
+        width: 100%;
+    }
+
+    .dropdown {
+        display: flex;
+        gap: 50px;
+        background-color: var(--background);
+        font-size: 24px;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: transparent;
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+}

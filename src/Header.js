@@ -29,12 +29,12 @@ function Header() {
                                 {jsonFile && <JsonFileProcessor/>}
                             </div>
                             <ThemeSwitch/>
-                            <a id="question-button" className="headerButton dropdown-item"
+                            <a id="question-button" className="headerButton dropdown-item" title="Help"
                                href="https://www.streamshapers.com/docs/streamshapers-converter/">
-                                <FontAwesomeIcon icon={faCircleQuestion} title="Help"/>
+                                <FontAwesomeIcon icon={faCircleQuestion} />
                             </a>
-                            <div id="info-button" className="headerButton dropdown-item" onClick={openInfoDialog}>
-                                <FontAwesomeIcon icon={faCircleInfo} title="Export"/>
+                            <div id="info-button" className="headerButton dropdown-item" title="Info" onClick={openInfoDialog}>
+                                <FontAwesomeIcon icon={faCircleInfo} />
                             </div>
                         </div>
                     </div>
@@ -48,16 +48,16 @@ function Header() {
                 </div>
                 <div className="headerSide">
                     <ThemeSwitch/>
-                    <a id="question-button" className="headerButton headerButton1"
+                    <a id="question-button" className="headerButton headerButton1" title="Help"
                        href="https://www.streamshapers.com/docs/streamshapers-converter/">
-                        <FontAwesomeIcon icon={faCircleQuestion} title="Help"/>
+                        <FontAwesomeIcon icon={faCircleQuestion} />
                     </a>
-                    <div id="info-button" className="headerButton headerButton1" onClick={openInfoDialog}>
-                        <FontAwesomeIcon icon={faCircleInfo} title="Export"/>
+                    <div id="info-button" className="headerButton headerButton1" title="Info" onClick={openInfoDialog}>
+                        <FontAwesomeIcon icon={faCircleInfo} />
                     </div>
-                    {jsonFile && <div id="downloadArea" className="headerButton" onClick={openExportDialog}>
+                    {jsonFile && <div id="downloadArea" className="headerButton" title="Export" onClick={openExportDialog}>
                         <span>Export </span>
-                        <FontAwesomeIcon icon={faFileExport} title="Export"/>
+                        <FontAwesomeIcon icon={faFileExport} />
                     </div>}
                 </div>
             </div>

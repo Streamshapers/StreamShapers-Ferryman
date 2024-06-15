@@ -7,9 +7,9 @@ const ThemeSwitch = () => {
     const {theme, toggleTheme} = useTheme();
 
     return (<>
-            <div className="headerButton headerButton1 theme-switch" onClick={toggleTheme}>
-                {theme === 'dark' && (<FontAwesomeIcon icon={faMoon} title="Export"/>)}
-                {theme === 'light' && (<FontAwesomeIcon icon={faSun} title="Export"/>)}
+            <div className="headerButton headerButton1 theme-switch" title="Switch Theme" onClick={toggleTheme}>
+                {theme === 'dark' && (<FontAwesomeIcon icon={faMoon} />)}
+                {theme === 'light' && (<FontAwesomeIcon icon={faSun} />)}
             </div>
         </>
     );
