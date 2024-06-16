@@ -243,7 +243,7 @@ function SpxExport() {
                                                 <button onClick={() => removeItem(index, itemIndex)}>Remove</button>
                                             </div>
                                         ))}
-                                        <button onClick={() => addItem(index)} className="spx-export-button">
+                                        <button onClick={() => addItem(index)} className="add-button">
                                             <FontAwesomeIcon icon={faPlus} title="Export"/>
                                         </button>
                                     </div>

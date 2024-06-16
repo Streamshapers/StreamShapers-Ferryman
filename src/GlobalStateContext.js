@@ -28,6 +28,7 @@ export const GlobalStateProvider = ({children}) => {
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
     const [showApiDialog, setShowApiDialog] = useState(false);
+    const [apis, setApis] = useState([{ key: '', secret: '' }]);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -500,7 +501,9 @@ export const GlobalStateProvider = ({children}) => {
             GDDTemplateDefinition,
             setGDDTemplateDefinition,
             showApiDialog,
-            setShowApiDialog
+            setShowApiDialog,
+            apis,
+            setApis
         }}>
             {children}
         </GlobalStateContext.Provider>

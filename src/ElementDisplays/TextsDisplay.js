@@ -1,6 +1,8 @@
 import React, {useContext, useEffect} from 'react';
 import {GlobalStateContext} from '../GlobalStateContext';
 import ConnectApiDialog from "./ConnectApiDialog";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 
 function TextsDisplay() {
     const {
@@ -87,7 +89,7 @@ function TextsDisplay() {
                     />
                 </div>
                 <div className="control-item">
-                    <label htmlFor="api-dialog-check">Connect API</label>
+                    <label htmlFor="api-dialog-check">External Sources</label>
                     <input
                         type="checkbox"
                         title="Connect API"
@@ -99,11 +101,11 @@ function TextsDisplay() {
             </div>
             <ConnectApiDialog/>
             <div id="text-inputs" className="text-inputs">
-                <div id="text-input-header">
+                {/*<div id="text-input-header">
                     <span>Layername</span>
                     <span>Text</span>
                     <span>Original</span>
-                </div>
+                </div>*/}
                 {filteredTexts.map((textLayerName, i) => {
                     const index = textsLayerNames.indexOf(textLayerName);
                     const textTitle = "Original: " + originalTexts[index];
@@ -117,7 +119,10 @@ function TextsDisplay() {
                                 value={texts[index]}
                                 onChange={(e) => updateLottieText(index, e.target.value)}
                             />
-                            <span>{originalTexts[index]}</span>
+                            {/*<span>{originalTexts[index]}</span>*/}
+                            <button className="option-button">
+                                <FontAwesomeIcon icon={faEllipsisVertical} />
+                            </button>
                         </div>
                     );
                 })}
