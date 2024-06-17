@@ -163,12 +163,11 @@
 </script>
 <script>
     "use strict"
-    const fetchSheet = true;
-    const showInfo = false;
     let lottieTemplate = ${jsonData};
     let playStatus = "";
     let nextCount = 1;
     let nextTotal = 0;
+    let showInfo = false;
     let currentSegment;
     let currentSegmentFrames;
     let animReady = createDeferredPromise();
@@ -180,6 +179,7 @@
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
+    let fetchSheet = true;
     let lottieState = "pause";
 
     function createDeferredPromise() {
