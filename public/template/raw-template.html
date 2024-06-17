@@ -87,13 +87,36 @@
 <script>
     "use strict"
     let lottieTemplate = ${jsonData};
+    let SHEET_ID = "1Ta6xX9ZVGEQXY5K3uqpCSlqXr6r6Ixqpr91-WcAR1IA";
+    let SHEET_TITLE = "Tabellenblatt1";
+    let sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
+    let sheetApiData = [];
+    sheetApiData.push({
+        key: "_value1",
+        cell: "A1",
+        value:"default"
+    })
+
+    sheetApiData.push({
+        key: "_value2",
+        cell: "A2",
+        value:"default"
+    })
+
+    sheetApiData.push({
+        key: "_value3",
+        cell: "A3",
+        value:"default"
+    })
     let playStatus = "";
     let nextCount = 1;
     let nextTotal = 0;
-    let showInfo = false;
+    let showInfo = true;
     let currentSegment;
     let currentSegmentFrames;
-    let animReady;
+    let animReady = createDeferredPromise();
+    let animLoaded = createDeferredPromise();
+    let fetchReady;
     let animation;
     let newAnimation;
     let stopExist = false;
@@ -101,6 +124,34 @@
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
+    let fetchSheet = true;
+    let fetchInterval = 2000;
+    let lottieState = "pause";
+
+    function createDeferredPromise() {
+        let resolver, rejecter;
+        const promise = new Promise((resolve, reject) => {
+            resolver = resolve;
+            rejecter = reject;
+        });
+        return {
+            promise,
+            resolve: resolver,
+            reject: rejecter
+        };
+    }
+
+    function getCellData(cell,data) {
+        let columnName = cell.match(/[A-Z]+/g)[0];
+        let base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let rowIx = (parseInt(cell.match(/[0-9]+/g)[0]))-1; //incl. index Shift (-1)
+        let colIx = 0
+        for (var i = 0; i < columnName.length; i++) {
+            colIx= colIx * 26 + base.indexOf(columnName[i]) + 1;
+        }
+        colIx = colIx -1; //fix Index Shift
+        return data[rowIx][colIx]
+    }
 
     //add font-face from data.json  //Credits to HeineFro  @https://github.com/HeineFro
     const addFont = (fam, path) => {
@@ -113,6 +164,38 @@
             `));
         document.head.appendChild(newFont);
     }
+
+    function pause (sec) {
+        return new Promise((resolve, reject) => {
+            setTimeout(()=>{
+                resolve("Die "+ sec +" Sekunden Pause ist vorbei")
+            },sec*1000)
+        })
+    }
+
+    async function fetchDataFromGoogle(url) {
+        let response = await fetch(url)
+        let text = await response.text()
+        let parsed = await JSON.parse(text.substr(47).slice(0,-2))
+        const dataArray = []
+
+        parsed.table.rows.forEach(row => {
+            // console.log(row.c)
+            let colums = []
+            row.c.forEach(cell =>{
+                colums.push(cell.v)
+            })
+            dataArray.push(colums)
+        })
+        console.log(dataArray)
+        return dataArray
+    }
+
+    setTimeout(()=>{
+        setInterval(()=>{
+            update()
+        },2000)
+    },4000)
 
     function loadFonts() {
         return new Promise((resolve, reject) => {
@@ -184,6 +267,7 @@
                 if (key === "_templateInfo") showInfo = true;
                 if (key === "_debug") showLogs = true;
                 if (key === "epochID") imagesPathPrefix = "";
+                if (key === "_stopFetch") fetchSheet = false;
             }
             for (let key of Object.keys(parsed)) {
                 lottieTemplateNew.layers.forEach((layer) => {
@@ -193,6 +277,27 @@
                         } else {
                             layer.t.d.k[0].s.t = parsed[key];
                         }
+                    }
+                })
+            }
+        }
+
+        if(fetchSheet) {
+            let tsvArray = await fetchDataFromGoogle(sheetURL)
+            sheetApiData.forEach((element)=>{
+                element.value = getCellData(element.cell,tsvArray)
+                if (!parsed) parsed = {}
+                if (!(element.key in parsed)){
+                    parsed[element.key] = element.value
+                }
+            })
+        }
+
+        if(parsed){
+            for (let key of Object.keys(parsed)) {
+                lottieTemplateNew.layers.forEach((layer) => {
+                    if (layer.nm === key) {
+                        layer.t.d.k[0].s.t = parsed[key]
                     }
                 })
             }
@@ -221,6 +326,16 @@
                 })
             })
 
+            animation.addEventListener("_play", function () {
+                lottieState = "play"
+                console.log("LottieState - Play")
+            })
+
+            animation.addEventListener("_pause", function () {
+                lottieState = "stop"
+                console.log("LottieState - pause")
+            })
+
             animation.addEventListener("enterFrame", () => {
                 for (let marker of lottieTemplate.markers) {
                     if (marker.cm === "name:" + currentSegment) {
@@ -232,6 +347,12 @@
             })
 
             updateTimeField("animation" + updateCounter);
+
+            await animReady.promise
+            animation.goToAndStop(0, true)
+            playStatus = "loaded"
+            currentSegment = "start"
+            animLoaded.resolve("Template - Animation is Ready")
 
         }
         if (playStatus === "play") {
@@ -264,6 +385,15 @@
                     if (showLogs) console.log(`Current Frame: ${currentFrame}`);
                 })
 
+                animation.addEventListener("_play", function () {
+                    lottieState = "play"
+                    console.log("LottieState - Play")
+                })
+                animation.addEventListener("_pause", function () {
+                    lottieState = "stop"
+                    console.log("LottieState - pause")
+                })
+
                 updateTimeField("animation" + updateCounter);
 
                 newAnimation = null;
@@ -274,6 +404,7 @@
 
 
     async function play() {
+        console.log(await animLoaded.promise);
         await animReady;
         await loadFonts();
         animation.goToAndPlay("start", true);
