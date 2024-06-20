@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faXmark} from "@fortawesome/free-solid-svg-icons";
 
 function ConnectApiDialog() {
-    const {showApiDialog, apis, setApis} = useContext(GlobalStateContext);
+    const {externalSources, apis, setApis} = useContext(GlobalStateContext);
 
     const handleAddApi = () => {
         setApis([...apis, {key: '', secret: ''}]);
@@ -27,10 +27,11 @@ function ConnectApiDialog() {
 
     return (
         <>
-            {showApiDialog && (
+            {externalSources && (
                 <div className='api-dialog-wrapper'>
                     {apis.map((api, index) => (
                         <div className="api-dialog" key={index}>
+                            <div>{index.toString() + "."}</div>
                             <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
                                 <option>Google Table</option>
                                 <option>CSV</option>

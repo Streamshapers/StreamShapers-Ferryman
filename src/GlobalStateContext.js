@@ -10,6 +10,7 @@ export const GlobalStateProvider = ({children}) => {
     const [texts, setTexts] = useState([]);
     const [originalTexts, setOriginalTexts] = useState([]);
     const [textsLayerNames, setTextsLayerNames] = useState([]);
+    const [textObjects, setTextObjects] = useState([]);
     const [images, setImages] = useState([]);
     const [infos, setInfos] = useState({});
     const [fonts, setFonts] = useState([]);
@@ -27,8 +28,8 @@ export const GlobalStateProvider = ({children}) => {
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
-    const [showApiDialog, setShowApiDialog] = useState(false);
-    const [apis, setApis] = useState([{ key: '', secret: '' }]);
+    const [externalSources, setExternalSources] = useState(false);
+    const [apis, setApis] = useState([{key: '', secret: ''}]);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -169,12 +170,19 @@ export const GlobalStateProvider = ({children}) => {
             let tempTexts = [];
             let tempOriginalTexts = [];
             let tempTextsLayerNames = [];
+            let tempTextObjects = [];
 
             if (typeof obj === "object" && obj !== null) {
                 if (obj.t && obj.t.d && obj.t.d.k && Array.isArray(obj.t.d.k) && obj.t.d.k.length > 0 && obj.t.d.k[0].s && obj.t.d.k[0].s.t) {
                     tempTexts.push(obj.t.d.k[0].s.t);
                     tempOriginalTexts.push(obj.t.d.k[0].s.t);
                     tempTextsLayerNames.push(obj.nm);
+                    tempTextObjects = [...tempTextObjects, {
+                        layername: obj.nm,
+                        text: obj.t.d.k[0].s.t,
+                        oiginal: obj.t.d.k[0].s.t,
+                        type: 'text'
+                    }];
                 }
 
                 Object.keys(obj).forEach(key => {
@@ -182,21 +190,25 @@ export const GlobalStateProvider = ({children}) => {
                     tempTexts.push(...childResults.texts);
                     tempOriginalTexts.push(...childResults.originalTexts);
                     tempTextsLayerNames.push(...childResults.textsLayerNames);
+                    tempTextObjects.push(...childResults.textObjects);
                 });
             }
 
             return {
                 texts: tempTexts,
                 originalTexts: tempOriginalTexts,
-                textsLayerNames: tempTextsLayerNames
+                textsLayerNames: tempTextsLayerNames,
+                textObjects: tempTextObjects
             };
         }
 
         if (jsonData) {
-            const {texts, originalTexts, textsLayerNames} = searchForTexts(jsonData);
+            const {texts, originalTexts, textsLayerNames, textObjects} = searchForTexts(jsonData);
             setTexts(texts);
             setOriginalTexts(originalTexts);
             setTextsLayerNames(textsLayerNames);
+            setTextObjects(textObjects);
+            console.log(textObjects);
         }
 
     }, [jsonData]);
@@ -500,10 +512,12 @@ export const GlobalStateProvider = ({children}) => {
             setSpxExport,
             GDDTemplateDefinition,
             setGDDTemplateDefinition,
-            showApiDialog,
-            setShowApiDialog,
+            externalSources,
+            setExternalSources,
             apis,
-            setApis
+            setApis,
+            textObjects,
+            setTextObjects
         }}>
             {children}
         </GlobalStateContext.Provider>

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {GlobalStateContext} from '../GlobalStateContext';
 import ConnectApiDialog from "./ConnectApiDialog";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -14,14 +14,33 @@ function TextsDisplay() {
         setJsonData,
         textShowAll,
         setTextShowAll,
-        showApiDialog,
-        setShowApiDialog
+        externalSources,
+        setExternalSources,
+        textObjects,
+        setTextObjects,
+        apis, setApis
     } = useContext(GlobalStateContext);
-
+    const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
 
     useEffect(() => {
         setTexts(texts);
     }, [setTexts, texts]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.text-option-dropdown')) {
+                setShowOptionMenuIndex(null);
+            }
+        };
+
+        if (showOptionMenuIndex != null) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showOptionMenuIndex]);
 
     const updateLottieText = (index, newText) => {
         if (!jsonData) {
@@ -67,13 +86,41 @@ function TextsDisplay() {
         setTextShowAll(!textShowAll);
     };
 
-    const toggleShowApiDialog = () => {
-        setShowApiDialog(!showApiDialog);
+    const toggleExternalSources = () => {
+        setExternalSources(!externalSources);
     };
 
-    const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
+    const handleSelect = (action, textObject) => {
+        console.log("Selected Action:", action);
+
+        if (action === "external" || action === "text") {
+            const updatedTextObjects = [...textObjects];
+            const index = textObjects.findIndex(t => t === textObject);
+            if (index !== -1) {
+                updatedTextObjects[index].type = action;
+                setTextObjects(updatedTextObjects);
+            }
+        }
+
+        if (action === "change") {
+
+        }
+
+        setShowOptionMenuIndex(null);
+    };
+
+    const handleSourceChange = (value) => {
+        console.log(value);
+    }
+
+    /*const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
         return textShowAll || textsLayerNames[i].startsWith('_');
+    });*/
+
+    const filteredTexts = textObjects.filter((textObject) => {
+        return textShowAll || textObject.layername.startsWith('_');
     });
+
 
     return (
         <>
@@ -94,35 +141,62 @@ function TextsDisplay() {
                         type="checkbox"
                         title="Connect API"
                         id="api-dialog-check"
-                        checked={showApiDialog}
-                        onChange={toggleShowApiDialog}
+                        checked={externalSources}
+                        onChange={toggleExternalSources}
                     />
                 </div>
             </div>
             <ConnectApiDialog/>
             <div id="text-inputs" className="text-inputs">
-                {/*<div id="text-input-header">
-                    <span>Layername</span>
-                    <span>Text</span>
-                    <span>Original</span>
-                </div>*/}
-                {filteredTexts.map((textLayerName, i) => {
-                    const index = textsLayerNames.indexOf(textLayerName);
-                    const textTitle = "Original: " + originalTexts[index];
+                {filteredTexts.map((textObject, i) => {
+                    const index = textObjects.indexOf(textObject);
+                    const textTitle = "Original: " + textObject.original;
                     return (
                         <div key={i} className="jsonText">
-                            <label className="text-layer-name">{textLayerName}</label>
-                            <input
-                                type="text"
-                                title={textTitle}
-                                data-index={index}
-                                value={texts[index]}
-                                onChange={(e) => updateLottieText(index, e.target.value)}
-                            />
-                            {/*<span>{originalTexts[index]}</span>*/}
-                            <button className="option-button">
-                                <FontAwesomeIcon icon={faEllipsisVertical} />
-                            </button>
+                            <label className="text-layer-name">{textObject.layername}</label>
+                            {textObject.type === "text" && (
+                                <input
+                                    type="text"
+                                    title={textTitle}
+                                    data-index={index}
+                                    value={texts[index]}
+                                    onChange={(e) => updateLottieText(index, e.target.value)}
+                                />
+                            )}
+                            {textObject.type === "external" && (
+                                <select onChange={e => handleSourceChange(e.target.value)}>
+                                    {apis.map((api, i) => {
+                                        return (
+                                            <option key={i}>{i}</option>
+                                        )
+                                    })}
+                                </select>
+                            )}
+                            <div className="option-button-wrapper">
+                                <button className="option-button"
+                                        onClick={() => setShowOptionMenuIndex(showOptionMenuIndex === i ? null : i)}>
+                                    <FontAwesomeIcon icon={faEllipsisVertical}/>
+                                </button>
+                                {showOptionMenuIndex === i && (
+                                    <div className="text-option-dropdown">
+                                        <ul>
+                                            {textObject.type === "text" && externalSources && (
+                                                <li onClick={() => handleSelect("external", textObject)}
+                                                    className="text-option-item">Connect External Source
+                                                </li>
+                                            )}
+                                            {textObject.type === "external" && externalSources && (
+                                                <li onClick={() => handleSelect("text", textObject)}
+                                                    className="text-option-item">Connect Text
+                                                </li>
+                                            )}
+                                            <li onClick={() => handleSelect("change", textObject)}
+                                                className="text-option-item">Change Layer Name
+                                            </li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     );
                 })}

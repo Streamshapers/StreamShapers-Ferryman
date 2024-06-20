@@ -411,10 +411,6 @@ input[type='file']::-webkit-file-upload-button {
     gap: 10px;
 }
 
-.fonts .accordion-body :last-child, .text-inputs :last-child {
-    padding-bottom: 0;
-}
-
 .colors .accordion-body {
     padding-bottom: 0;
 }
@@ -766,9 +762,13 @@ input[type='file']::-webkit-file-upload-button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 10px;
     box-sizing: border-box;
 }
+
+.jsonText:not(:last-child) {
+    padding-bottom: 10px;
+}
+
 
 .jsonText input {
     margin: auto 10px;
@@ -1230,7 +1230,7 @@ label span.bla {
     background: #000000;
 }
 
-.api-dialog-wrapper{
+.api-dialog-wrapper {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1252,14 +1252,54 @@ label span.bla {
     width: 100%;
 }
 
-.api-dialog input{
+.api-dialog input {
     flex-grow: 1;
 }
 
-.option-button{
+.option-button-wrapper {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.option-button {
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
     padding: 0;
     height: 100%;
+}
+
+.text-option-dropdown {
+    position: absolute;
+    bottom: 0;
+    left: -201px;
+    background: var(--foreground);
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+    z-index: 2000;
+    list-style-type: none;
+    padding: 0;
+    width: 200px;
+}
+
+.text-option-dropdown ul {
+    list-style: none;
+}
+
+.text-option-item {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.text-option-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.text-option-item:hover {
+    background-color: var(--foreground);
+    color: var(--primary);
+    border-radius: 5px;
 }

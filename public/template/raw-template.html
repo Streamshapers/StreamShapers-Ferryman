@@ -86,28 +86,19 @@
 <!--Animations-Script-->
 <script>
     //Google Table integration
-    let SHEET_ID = "1Ta6xX9ZVGEQXY5K3uqpCSlqXr6r6Ixqpr91-WcAR1IA";
-    let SHEET_TITLE = "Tabellenblatt1";
-    let sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
-    let sheetApiData = [${googleTableData}];
-    sheetApiData.push({
+    // SHEET_ID = "1Ta6xX9ZVGEQXY5K3uqpCSlqXr6r6Ixqpr91-WcAR1IA";
+    // SHEET_TITLE = "Tabellenblatt1";
+    //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
+
+    const googleTableCells = [${googleTableData}];
+    googleTableCells.push({
+        url:"url",
         key: "_value1",
         cell: "A1",
         value:"default"
     })
 
-    sheetApiData.push({
-        key: "_value2",
-        cell: "A2",
-        value:"default"
-    })
-
-    sheetApiData.push({
-        key: "_value3",
-        cell: "A3",
-        value:"default"
-    })
-    const fetchInterval = 2000;
+    //const fetchInterval = 2000;
 
     async function fetchDataFromGoogle(url) {
         try {
@@ -132,8 +123,8 @@
     }
 
     function getCellData(cell,data) {
-        let columnName = cell.match(/[A-Z]+/g)[0];
-        let base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const columnName = cell.match(/[A-Z]+/g)[0];
+        const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         let rowIx = (parseInt(cell.match(/[0-9]+/g)[0]))-1; //incl. index Shift (-1)
         let colIx = 0;
         for (let i = 0; i < columnName.length; i++) {
@@ -144,15 +135,15 @@
     }
 
     async function updateGoogleTableData(parsed) {
-        let tsvArray = await fetchDataFromGoogle(sheetURL);
-        console.log("Updated Data: ", tsvArray);
-        sheetApiData.forEach((element)=>{
+        for (const element of googleTableCells) {
+            const tsvArray = await fetchDataFromGoogle(element.url);
+            //console.log("Updated Data: ", tsvArray);
             element.value = getCellData(element.cell,tsvArray);
             if (!parsed) parsed = {};
             if (!(element.key in parsed)){
                 parsed[element.key] = element.value;
             }
-        });
+        }
     }
 
     /*setTimeout(()=>{
@@ -300,9 +291,9 @@
             }
         }
 
-        if(fetchSheet && sheetApiData) {
+        if(fetchSheet && googleTableCells) {
             await updateGoogleTableData(parsed);
-            sheetApiData.forEach((element)=>{
+            googleTableCells.forEach((element)=>{
                 if (!parsed) parsed = {};
                 if (!(element.key in parsed)){
                     parsed[element.key] = element.value;
