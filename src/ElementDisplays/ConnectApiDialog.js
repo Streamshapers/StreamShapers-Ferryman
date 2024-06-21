@@ -4,32 +4,34 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faXmark} from "@fortawesome/free-solid-svg-icons";
 
 function ConnectApiDialog() {
-    const {externalSources, apis, setApis} = useContext(GlobalStateContext);
+    const {useExternalSources, externalSources, setExternalSources} = useContext(GlobalStateContext);
 
     const handleAddApi = () => {
-        setApis([...apis, {key: '', secret: ''}]);
+        setExternalSources([...externalSources, {key: 'Google Table', secret: ''}]);
+        console.log(externalSources);
     };
 
     const handleChange = (index, field, value) => {
-        const newApis = apis.map((api, idx) => {
+        const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
                 return {...api, [field]: value};
             }
             return api;
         });
-        setApis(newApis);
+        setExternalSources(newApis);
+        console.log(externalSources);
     };
 
     const handleRemoveApi = index => {
-        const newApis = apis.filter((_, idx) => idx !== index);
-        setApis(newApis);
+        const newApis = externalSources.filter((_, idx) => idx !== index);
+        setExternalSources(newApis);
     };
 
     return (
         <>
-            {externalSources && (
+            {useExternalSources && (
                 <div className='api-dialog-wrapper'>
-                    {apis.map((api, index) => (
+                    {externalSources.map((api, index) => (
                         <div className="api-dialog" key={index}>
                             <div>{index.toString() + "."}</div>
                             <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>

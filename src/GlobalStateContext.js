@@ -28,8 +28,8 @@ export const GlobalStateProvider = ({children}) => {
     const [SPXGCTemplateDefinition, setSPXGCTemplateDefinition] = useState({});
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
-    const [externalSources, setExternalSources] = useState(false);
-    const [apis, setApis] = useState([{key: '', secret: ''}]);
+    const [useExternalSources, setUseExternalSources] = useState(false);
+    const [externalSources, setExternalSources] = useState([{key: 'Google Table', secret: ''}]);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -512,10 +512,10 @@ export const GlobalStateProvider = ({children}) => {
             setSpxExport,
             GDDTemplateDefinition,
             setGDDTemplateDefinition,
+            useExternalSources,
+            setUseExternalSources,
             externalSources,
             setExternalSources,
-            apis,
-            setApis,
             textObjects,
             setTextObjects
         }}>
