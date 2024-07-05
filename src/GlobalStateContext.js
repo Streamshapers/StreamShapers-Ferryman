@@ -464,6 +464,20 @@ export const GlobalStateProvider = ({children}) => {
         setGDDTemplateDefinition(gddExportJson);
     }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
 
+    //############################################ External Sources ################################################################
+
+    useEffect(() => {
+        if (!useExternalSources) {
+            const updatedTextObjects = textObjects.map(textObject => {
+                if (textObject.type !== "text") {
+                    return {...textObject, type: "text"};
+                }
+                return textObject;
+            })
+            setTextObjects(updatedTextObjects);
+        }
+    }, [useExternalSources]);
+
     return (
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
