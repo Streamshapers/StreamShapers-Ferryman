@@ -98,6 +98,11 @@ function TextsDisplay() {
             const updatedTextObjects = [...textObjects];
             const index = textObjects.findIndex(t => t === textObject);
             if (index !== -1) {
+                if (action === "text") {
+                    updatedTextObjects[index].source = "none";
+                } else if (action === "external") {
+                    updatedTextObjects[index].source = externalSources[0].index.toString();
+                }
                 updatedTextObjects[index].type = action;
                 setTextObjects(updatedTextObjects);
             }
@@ -111,12 +116,14 @@ function TextsDisplay() {
     };
 
     const handleSourceChange = (index, object) => {
-        console.log(parseInt(index))
-        const type = externalSources[parseInt(index)].key;
+        const source = externalSources.find(obj => obj.index === parseInt(index, 10));
+        console.log("Source", source);
+        const type = source.key;
         const updatedTextObjects = [...textObjects];
         const objectIndex = textObjects.findIndex(t => t === object);
         if (objectIndex !== -1) {
             updatedTextObjects[objectIndex].type = type;
+            updatedTextObjects[objectIndex].source = index;
             setTextObjects(updatedTextObjects);
         }
         console.log(textObjects);
@@ -176,10 +183,14 @@ function TextsDisplay() {
                             {textObject.type !== "text" && (
                                 <div className="source-select">
                                     <div>Source:</div>
-                                    <select onChange={e => handleSourceChange(e.target.value, textObject)}>
+                                    <select value={textObject.source}
+                                            onChange={e => handleSourceChange(e.target.value, textObject)}>
                                         {externalSources.map((api, i) => {
                                             return (
-                                                <option key={i}>{i}</option>
+                                                <option
+                                                    key={i} value={api.index.toString()}>
+                                                    {api.index.toString()}
+                                                </option>
                                             )
                                         })}
                                     </select>

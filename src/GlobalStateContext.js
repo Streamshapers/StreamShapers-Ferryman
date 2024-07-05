@@ -29,7 +29,8 @@ export const GlobalStateProvider = ({children}) => {
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
     const [useExternalSources, setUseExternalSources] = useState(false);
-    const [externalSources, setExternalSources] = useState([{key: 'Google Table', secret: ''}]);
+    const [externalSources, setExternalSources] = useState([{key: 'Google Table', secret: '', index: 1}]);
+    const [deleteExternalSource, setDeleteExternalSource] = useState(null);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -181,7 +182,8 @@ export const GlobalStateProvider = ({children}) => {
                         layername: obj.nm,
                         text: obj.t.d.k[0].s.t,
                         oiginal: obj.t.d.k[0].s.t,
-                        type: 'text'
+                        type: 'text',
+                        source: 'none'
                     }];
                 }
 
@@ -478,6 +480,19 @@ export const GlobalStateProvider = ({children}) => {
         }
     }, [useExternalSources]);
 
+    useEffect(() => {
+        console.log("Delete:", deleteExternalSource);
+        if (deleteExternalSource) {
+            const updatedTextObjects = textObjects.map(textObject => {
+                if (textObject.source === deleteExternalSource.toString()) {
+                    return {...textObject, type: "text"};
+                }
+                return textObject;
+            })
+            setTextObjects(updatedTextObjects);
+        }
+    }, [deleteExternalSource]);
+
     return (
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
@@ -531,7 +546,9 @@ export const GlobalStateProvider = ({children}) => {
             externalSources,
             setExternalSources,
             textObjects,
-            setTextObjects
+            setTextObjects,
+            deleteExternalSource,
+            setDeleteExternalSource
         }}>
             {children}
         </GlobalStateContext.Provider>
