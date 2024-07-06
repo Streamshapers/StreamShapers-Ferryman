@@ -183,7 +183,9 @@ export const GlobalStateProvider = ({children}) => {
                         text: obj.t.d.k[0].s.t,
                         oiginal: obj.t.d.k[0].s.t,
                         type: 'text',
-                        source: 'none'
+                        source: 'none',
+                        col: "",
+                        row: ""
                     }];
                 }
 

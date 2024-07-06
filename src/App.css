@@ -763,6 +763,7 @@ input[type='file']::-webkit-file-upload-button {
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
+    gap: 10px;
 }
 
 .jsonText:not(:last-child) {
@@ -771,7 +772,6 @@ input[type='file']::-webkit-file-upload-button {
 
 
 .jsonText input {
-    margin: auto 10px;
     flex-grow: 1;
 }
 
@@ -1308,4 +1308,25 @@ label span.bla {
     display: flex;
     gap: 5px;
     align-items: center;
+}
+
+.google-table-input {
+    min-width: 35px;
+    width: 100%;
+    margin-right: 0;
+}
+
+.external-source-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.external-source-form label {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }

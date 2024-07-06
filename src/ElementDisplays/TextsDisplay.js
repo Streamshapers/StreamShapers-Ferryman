@@ -129,6 +129,17 @@ function TextsDisplay() {
         console.log(textObjects);
     }
 
+    const handleGoogleCoordinates = (object, type, value) => {
+        const textObject = textObjects.find(t => t === object);
+        if (type === "col") {
+            textObject.col = value;
+        } else if (type === "row") {
+            textObject.row = value;
+        } else {
+            console.log("Error saving Google Table coordinates!")
+        }
+    }
+
     /*const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
         return textShowAll || textsLayerNames[i].startsWith('_');
     });*/
@@ -181,21 +192,38 @@ function TextsDisplay() {
                                 />
                             )}
                             {textObject.type !== "text" && (
-                                <div className="source-select">
-                                    <div>Source:</div>
-                                    <select value={textObject.source}
-                                            onChange={e => handleSourceChange(e.target.value, textObject)}>
-                                        {externalSources.map((api, i) => {
-                                            return (
-                                                <option
-                                                    key={i} value={api.index.toString()}>
-                                                    {api.index.toString()}
-                                                </option>
-                                            )
-                                        })}
-                                    </select>
+                                <div className="external-source-form">
+                                    <div className="source-select">
+                                        <div>Source:</div>
+                                        <select value={textObject.source}
+                                                onChange={e => handleSourceChange(e.target.value, textObject)}>
+                                            {externalSources.map((api, i) => {
+                                                return (
+                                                    <option
+                                                        key={i} value={api.index.toString()}>
+                                                        {api.index.toString()}
+                                                    </option>
+                                                )
+                                            })}
+                                        </select>
+                                    </div>
+                                    {textObject.type === "Google Table" && (
+                                        <>
+                                            <label>Column:
+                                                <input className="google-table-input"
+                                                       type="text"
+                                                       onChange={(e) => handleGoogleCoordinates(textObject, "col", e.target.value)}/>
+                                            </label>
+                                            <label>Row:
+                                                <input className="google-table-input"
+                                                       type="number"
+                                                       onChange={(e) => handleGoogleCoordinates(textObject, "row", e.target.value)}/>
+                                            </label>
+                                        </>
+                                    )}
                                 </div>
                             )}
+
                             {useExternalSources}
                             <div className="option-button-wrapper">
                                 <button className="option-button"
