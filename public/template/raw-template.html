@@ -90,31 +90,34 @@
     // SHEET_TITLE = "Tabellenblatt1";
     //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
 
-    const googleTableCells = [${googleTableData}];
-    googleTableCells.push({
+    const googleTableCells = ${googleTableData};
+    /*googleTableCells.push({
         url:"url",
         key: "_value1",
         cell: "A1",
         value:"default"
-    })
+    })*/
 
-    //const fetchInterval = 2000;
+    async function parseGoogleTable(){
+        return JSON.parse(googleTableCells);
+    }
 
     async function fetchDataFromGoogle(url) {
         try {
             let response = await fetch(url);
             let text = await response.text();
-            let parsed = await JSON.parse(text.substr(47).slice(0, -2));
+            let jsonString = text.substr(47).slice(0, -2);
+            let parsed = JSON.parse(jsonString);
             const dataArray = [];
 
             parsed.table.rows.forEach(row => {
-                let colums = [];
+                let columns = [];
                 row.c.forEach(cell => {
-                    colums.push(cell.v);
-                })
-                dataArray.push(colums);
+                    columns.push(cell ? cell.v : null); // Check if cell is not null
+                });
+                dataArray.push(columns);
             });
-            console.log(dataArray);
+            //console.log(dataArray);
             return dataArray;
         }catch (error) {
             console.error("Error collecting data from Google: ", error);
@@ -131,26 +134,33 @@
             colIx= colIx * 26 + base.indexOf(columnName[i]) + 1;
         }
         colIx = colIx -1; //fix Index Shift
-        return data[rowIx][colIx];
+        return data[rowIx] ? data[rowIx][colIx] : undefined;
     }
 
     async function updateGoogleTableData(parsed) {
-        for (const element of googleTableCells) {
+        const tableData = await parseGoogleTable();
+        for (const element of tableData) {
             const tsvArray = await fetchDataFromGoogle(element.url);
             //console.log("Updated Data: ", tsvArray);
-            element.value = getCellData(element.cell,tsvArray);
-            if (!parsed) parsed = {};
-            if (!(element.key in parsed)){
-                parsed[element.key] = element.value;
+            if (tsvArray.length > 0) {
+                element.value = getCellData(element.cell, tsvArray);
+                if (!parsed) parsed = {};
+                if (!(element.key in parsed)) {
+                    parsed[element.key] = element.value;
+                }
             }
         }
     }
 
-    /*setTimeout(()=>{
-        setInterval(()=>{
-            update()
-        },fetchInterval)
-    },4000)*/
+    // Uncomment the following lines to periodically update data
+    /*
+        const fetchInterval = 2000;
+        setTimeout(() => {
+            setInterval(() => {
+                updateGoogleTableData()
+            }, fetchInterval)
+        }, 4000);
+        */
 </script>
 <script>
     "use strict"
@@ -293,7 +303,8 @@
 
         if(fetchSheet && googleTableCells) {
             await updateGoogleTableData(parsed);
-            googleTableCells.forEach((element)=>{
+            const tableData = await parseGoogleTable();
+            tableData.forEach((element)=>{
                 if (!parsed) parsed = {};
                 if (!(element.key in parsed)){
                     parsed[element.key] = element.value;

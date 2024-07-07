@@ -31,6 +31,7 @@ export const GlobalStateProvider = ({children}) => {
     const [useExternalSources, setUseExternalSources] = useState(false);
     const [externalSources, setExternalSources] = useState([{key: 'Google Table', secret: '', index: 1}]);
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
+    const [googleTableCells, setGoogleTableCells] = useState([]);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -212,7 +213,7 @@ export const GlobalStateProvider = ({children}) => {
             setOriginalTexts(originalTexts);
             setTextsLayerNames(textsLayerNames);
             setTextObjects(textObjects);
-            console.log(textObjects);
+            //console.log(textObjects);
         }
 
     }, [jsonData]);
@@ -483,7 +484,7 @@ export const GlobalStateProvider = ({children}) => {
     }, [useExternalSources]);
 
     useEffect(() => {
-        console.log("Delete:", deleteExternalSource);
+        //console.log("Delete:", deleteExternalSource);
         if (deleteExternalSource) {
             const updatedTextObjects = textObjects.map(textObject => {
                 if (textObject.source === deleteExternalSource.toString()) {
@@ -494,6 +495,24 @@ export const GlobalStateProvider = ({children}) => {
             setTextObjects(updatedTextObjects);
         }
     }, [deleteExternalSource]);
+
+    useEffect(() => {
+        const updatedGoogleTableCells = [];
+        textObjects.map(textObject => {
+            if (textObject.type === 'Google Table') {
+                const index = textObject.source;
+                const source = externalSources.find(obj => obj.index === parseInt(index, 10));
+                updatedGoogleTableCells.push({
+                    url: source.secret,
+                    key: textObject.layername,
+                    cell: textObject.col + textObject.row,
+                    value: textObject.oiginal
+                })
+            }
+        })
+        console.log(updatedGoogleTableCells);
+        setGoogleTableCells(updatedGoogleTableCells);
+    }, [textObjects, externalSources]);
 
     return (
         <GlobalStateContext.Provider value={{
@@ -550,7 +569,9 @@ export const GlobalStateProvider = ({children}) => {
             textObjects,
             setTextObjects,
             deleteExternalSource,
-            setDeleteExternalSource
+            setDeleteExternalSource,
+            googleTableCells,
+            setGoogleTableCells
         }}>
             {children}
         </GlobalStateContext.Provider>

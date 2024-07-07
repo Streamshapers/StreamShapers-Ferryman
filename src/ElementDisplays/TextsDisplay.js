@@ -22,6 +22,7 @@ function TextsDisplay() {
         setExternalSources
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
+    const [colValue, setColValue] = useState('');
 
     useEffect(() => {
         setTexts(texts);
@@ -92,7 +93,7 @@ function TextsDisplay() {
     };
 
     const handleSelect = (action, textObject) => {
-        console.log("Selected Action:", action);
+        //console.log("Selected Action:", action);
 
         if (action === "external" || action === "text") {
             const updatedTextObjects = [...textObjects];
@@ -100,10 +101,11 @@ function TextsDisplay() {
             if (index !== -1) {
                 if (action === "text") {
                     updatedTextObjects[index].source = "none";
+                    updatedTextObjects[index].type = "text";
                 } else if (action === "external") {
                     updatedTextObjects[index].source = externalSources[0].index.toString();
+                    updatedTextObjects[index].type = externalSources[0].key.toString();
                 }
-                updatedTextObjects[index].type = action;
                 setTextObjects(updatedTextObjects);
             }
         }
@@ -117,7 +119,7 @@ function TextsDisplay() {
 
     const handleSourceChange = (index, object) => {
         const source = externalSources.find(obj => obj.index === parseInt(index, 10));
-        console.log("Source", source);
+        //console.log("Source", source);
         const type = source.key;
         const updatedTextObjects = [...textObjects];
         const objectIndex = textObjects.findIndex(t => t === object);
@@ -126,18 +128,21 @@ function TextsDisplay() {
             updatedTextObjects[objectIndex].source = index;
             setTextObjects(updatedTextObjects);
         }
-        console.log(textObjects);
+        //console.log(textObjects);
     }
 
     const handleGoogleCoordinates = (object, type, value) => {
-        const textObject = textObjects.find(t => t === object);
-        if (type === "col") {
+        const updatedTextObjects = [...textObjects];
+        const textObject = updatedTextObjects.find(t => t === object);
+        if (type === "col" && /^[a-zA-Z]*$/.test(value)) {
+            setColValue(value);
             textObject.col = value;
         } else if (type === "row") {
             textObject.row = value;
         } else {
             console.log("Error saving Google Table coordinates!")
         }
+        setTextObjects(updatedTextObjects);
     }
 
     /*const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
@@ -212,6 +217,8 @@ function TextsDisplay() {
                                             <label>Column:
                                                 <input className="google-table-input"
                                                        type="text"
+                                                       
+                                                       pattern="[a-zA-Z]*"
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "col", e.target.value)}/>
                                             </label>
                                             <label>Row:

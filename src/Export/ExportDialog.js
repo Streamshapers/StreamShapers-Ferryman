@@ -5,8 +5,23 @@ import SpxExport from "./SpxExport";
 import GddExport from "./GddExport";
 
 function ExportDialog({isOpen, onClose}) {
-    const {jsonData, ferrymanVersion, fileName, setFileName, setIsPlaying, fontFaces, uploadedFonts, fonts, imagePath, setImagePath,
-        markers, refImages, SPXGCTemplateDefinition, spxExport } = useContext(GlobalStateContext);
+    const {
+        jsonData,
+        ferrymanVersion,
+        fileName,
+        setFileName,
+        setIsPlaying,
+        fontFaces,
+        uploadedFonts,
+        fonts,
+        imagePath,
+        setImagePath,
+        markers,
+        refImages,
+        SPXGCTemplateDefinition,
+        spxExport,
+        googleTableCells
+    } = useContext(GlobalStateContext);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
@@ -20,7 +35,6 @@ function ExportDialog({isOpen, onClose}) {
     if (isOpen) {
         setIsPlaying(false);
     }
-
 
 
     const handleTabChange = tabName => {
@@ -98,7 +112,7 @@ function ExportDialog({isOpen, onClose}) {
         if (imagePath != null && !imagePath.endsWith("/")) {
             setImagePath(`${imagePath}/`);
             correctPath = `${imagePath}/`;
-        }else {
+        } else {
             correctPath = imagePath;
         }
 
@@ -157,7 +171,7 @@ function ExportDialog({isOpen, onClose}) {
                     }
                     const path = `"${correctPath}"`
                     let spxTag = " ";
-                    if(spxExport){
+                    if (spxExport) {
                         spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
                     }
 
@@ -173,7 +187,9 @@ function ExportDialog({isOpen, onClose}) {
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${imagePath}', path)
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${spx}', spxTag);
+                        .replace('${spx}', spxTag)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${googleTableData}', JSON.stringify(googleTableCells));
 
                 } catch (error) {
                     console.error('Error loading the template:', error);
@@ -313,7 +329,7 @@ function ExportDialog({isOpen, onClose}) {
                 {activeTab === 'default' && (
                     <div className="tab-content">
                         <div id="exportFileName">
-                        <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
+                            <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                             <input type="text" id="fileNameInput" value={String(fileName)}
                                    onChange={handleFileNameChange}/>
                             <span id="fileType">.{exportFormat}</span>

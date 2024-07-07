@@ -15,7 +15,7 @@ function ConnectApiDialog() {
     const handleAddApi = () => {
         setExternalSources([...externalSources, {key: 'Google Table', secret: '', index: externalSourceIndex}]);
         setExternalSourceIndex(externalSourceIndex + 1);
-        console.log(externalSources);
+        //console.log(externalSources);
     };
 
     const handleChange = (index, field, value) => {
@@ -26,7 +26,7 @@ function ConnectApiDialog() {
             return api;
         });
         setExternalSources(newApis);
-        console.log(externalSources);
+        //console.log(externalSources);
     };
 
     const handleRemoveApi = index => {
