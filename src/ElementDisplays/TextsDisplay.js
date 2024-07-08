@@ -19,14 +19,15 @@ function TextsDisplay() {
         textObjects,
         setTextObjects,
         externalSources,
-        setExternalSources
+        setExternalSources,
+        updateLottieText
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [colValue, setColValue] = useState('');
 
-    useEffect(() => {
+    /*useEffect(() => {
         setTexts(texts);
-    }, [setTexts, texts]);
+    }, [setTexts, texts]);*/
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -43,46 +44,6 @@ function TextsDisplay() {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showOptionMenuIndex]);
-
-    const updateLottieText = (index, newText) => {
-        if (!jsonData) {
-            console.error("No valid Lottie or Data.");
-            return;
-        }
-
-        const tempJsonData = jsonData;
-        let currentTextIndex = 0;
-
-        function searchAndUpdateText(obj) {
-            if (typeof obj === "object" && obj !== null) {
-                if (obj.t && obj.t.d && obj.t.d.k) {
-                    obj.t.d.k.forEach((item) => {
-                        if (item.s && currentTextIndex === index) {
-                            //console.log("Updating text at index:", currentTextIndex);
-                            item.s.t = newText;
-                        }
-                        currentTextIndex++;
-                    });
-                }
-
-                for (const key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        searchAndUpdateText(obj[key]);
-                    }
-                }
-            }
-        }
-
-        if (texts) {
-            searchAndUpdateText(tempJsonData);
-        }
-
-        setJsonData(tempJsonData);
-
-        const updatedTexts = [...texts];
-        updatedTexts[index] = newText;
-        setTexts(updatedTexts);
-    };
 
     const toggleTextShowAll = () => {
         setTextShowAll(!textShowAll);
@@ -126,6 +87,9 @@ function TextsDisplay() {
         if (objectIndex !== -1) {
             updatedTextObjects[objectIndex].type = type;
             updatedTextObjects[objectIndex].source = index;
+            if (type === "Digital Clock") {
+                updateLottieText(textObjects.findIndex(t => t === object), source.secret);
+            }
             setTextObjects(updatedTextObjects);
         }
         //console.log(textObjects);
@@ -200,7 +164,7 @@ function TextsDisplay() {
                                     type="text"
                                     title={textTitle}
                                     data-index={index}
-                                    value={texts[index]}
+                                    value={textObject.text}
                                     onChange={(e) => updateLottieText(index, e.target.value)}
                                 />
                             )}
@@ -235,7 +199,7 @@ function TextsDisplay() {
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "row", e.target.value)}/>
                                             </label>
                                             <label>Sheet:
-                                                <input className="google-table-input"
+                                                <input className=""
                                                        onChange={(e) => setSheetName(e.target.value, textObject)}/>
                                             </label>
                                         </>

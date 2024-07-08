@@ -756,6 +756,7 @@ input[type='file']::-webkit-file-upload-button {
     justify-content: space-between;
     padding: 0;
     box-sizing: border-box;
+    gap: 10px;
 }
 
 .jsonText {
@@ -764,12 +765,10 @@ input[type='file']::-webkit-file-upload-button {
     align-items: center;
     box-sizing: border-box;
     gap: 10px;
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 5px;
 }
-
-.jsonText:not(:last-child) {
-    padding-bottom: 10px;
-}
-
 
 .jsonText input {
     flex-grow: 1;
@@ -1252,6 +1251,14 @@ label span.bla {
     width: 100%;
 }
 
+.external-source-fields {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
 .api-dialog input {
     flex-grow: 1;
 }
@@ -1322,6 +1329,7 @@ label span.bla {
     align-items: center;
     gap: 10px;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .external-source-form label {

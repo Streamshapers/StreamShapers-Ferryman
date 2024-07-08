@@ -10,6 +10,7 @@ import {
     faPlay
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {external} from "jszip";
 
 const MarkersContainer = React.memo(({markers, goToMarker}) => {
     const {jsonData} = useContext(GlobalStateContext);
@@ -49,7 +50,9 @@ function LottiePreview() {
         setCurrentFrame,
         isPlaying,
         setIsPlaying,
-        fileName
+        fileName,
+        textObjects,
+        externalSources
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const [lottieInstance, setLottieInstance] = useState(null);
@@ -90,9 +93,10 @@ function LottiePreview() {
             clearTimeout(timeoutId);
             instance.removeEventListener('enterFrame', onEnterFrame);
             instance.destroy();
+            setTimeout(updateTimeFields, 500);
         };
 
-    }, [jsonData, texts]);
+    }, [jsonData, texts, textObjects]);
 
     const adjustSvgWidth = () => {
         if (animationContainerRef.current) {
@@ -102,6 +106,70 @@ function LottiePreview() {
             }
         }
     };
+
+    function updateTimeFields() {
+        try {
+            const animationPreviewElement = document.getElementById('animationPreview');
+            if (!animationPreviewElement) {
+                console.log("Error updating Clock: animationPreview element not found.");
+                return;
+            }
+
+            const svgElement = animationPreviewElement.querySelector('svg');
+            if (!svgElement) {
+                console.log("Error updating Clock: SVG element not found.");
+                return;
+            }
+
+            const gElements = svgElement.getElementsByTagName('g');
+            const formatMap = {
+                'cc:cc:cc': 'HH:mm:ss',
+                'cc:cc': 'HH:mm',
+            };
+
+            for (let g of gElements) {
+                const ariaLabel = g.getAttribute('aria-label');
+                const format = formatMap[ariaLabel];
+
+                if (format) {
+                    const textElements = Array.from(g.getElementsByTagName('text'));
+
+                    function updateTime() {
+                        const now = new Date();
+                        let formattedTime;
+
+                        if (format === 'HH:mm:ss') {
+                            formattedTime = now.toLocaleTimeString();
+                        } else if (format === 'HH:mm') {
+                            formattedTime = now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                        }
+
+                        const timeParts = formattedTime.split(':');
+
+                        if (timeParts.length >= 2) {
+                            textElements[0].textContent = timeParts[0][0];
+                            textElements[1].textContent = timeParts[0][1];
+                            textElements[2].textContent = ':';
+                            textElements[3].textContent = timeParts[1][0];
+                            textElements[4].textContent = timeParts[1][1];
+
+                            if (timeParts.length === 3 && format === 'HH:mm:ss') {
+                                textElements[5].textContent = ':';
+                                textElements[6].textContent = timeParts[2][0];
+                                textElements[7].textContent = timeParts[2][1];
+                            }
+                        }
+                    }
+
+                    setInterval(updateTime, 1000);
+                    updateTime();
+                }
+            }
+        } catch (e) {
+            console.log("Error updating Clock: ", e);
+        }
+    }
+
 
     useEffect(() => {
         if (!lottieInstance) return;

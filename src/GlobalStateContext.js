@@ -219,6 +219,50 @@ export const GlobalStateProvider = ({children}) => {
 
     }, [jsonData]);
 
+    const updateLottieText = (index, newText) => {
+        if (!jsonData) {
+            console.error("No valid Lottie or Data.");
+            return;
+        }
+
+        const tempJsonData = jsonData;
+        let currentTextIndex = 0;
+
+        function searchAndUpdateText(obj) {
+            if (typeof obj === "object" && obj !== null) {
+                if (obj.t && obj.t.d && obj.t.d.k) {
+                    obj.t.d.k.forEach((item) => {
+                        if (item.s && currentTextIndex === index) {
+                            //console.log("Updating text at index:", currentTextIndex);
+                            item.s.t = newText;
+                        }
+                        currentTextIndex++;
+                    });
+                }
+
+                for (const key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        searchAndUpdateText(obj[key]);
+                    }
+                }
+            }
+        }
+
+        if (textObjects) {
+            searchAndUpdateText(tempJsonData);
+        }
+
+        setJsonData(tempJsonData);
+
+        /*const updatedTexts = [...texts];
+        updatedTexts[index] = newText;
+        setTexts(updatedTexts);*/
+
+        const updatedTextObjects = [...textObjects];
+        updatedTextObjects[index].text = newText;
+        setTextObjects(updatedTextObjects);
+    };
+
     //############################### Colors ###########################################################################
 
     useEffect(() => {
@@ -476,6 +520,9 @@ export const GlobalStateProvider = ({children}) => {
         if (!useExternalSources) {
             const updatedTextObjects = textObjects.map(textObject => {
                 if (textObject.type !== "text") {
+                    if (textObject.type === "Digital Clock") {
+                        textObject.text = textObject.oiginal;
+                    }
                     return {...textObject, type: "text"};
                 }
                 return textObject;
@@ -489,6 +536,9 @@ export const GlobalStateProvider = ({children}) => {
         if (deleteExternalSource) {
             const updatedTextObjects = textObjects.map(textObject => {
                 if (textObject.source === deleteExternalSource.toString()) {
+                    if (textObject.type === "Digital Clock") {
+                        textObject.text = textObject.oiginal;
+                    }
                     return {...textObject, type: "text"};
                 }
                 return textObject;
@@ -512,9 +562,28 @@ export const GlobalStateProvider = ({children}) => {
                 })
             }
         })
-        console.log(updatedGoogleTableCells);
+        //console.log(updatedGoogleTableCells);
         setGoogleTableCells(updatedGoogleTableCells);
     }, [textObjects, externalSources]);
+
+    useEffect(() => {
+        //console.log("before: ", externalSources);
+        //console.log("before: ", textObjects);
+        const updatedTextObjects = [...textObjects];
+        updatedTextObjects.map(textObject => {
+            const source = externalSources.find(obj => obj.index === parseInt(textObject.source, 10));
+            if (source) {
+                textObject.type = source.key;
+            }
+            if (textObject.type === "Digital Clock") {
+                textObject.text = source.secret;
+                updateLottieText(textObjects.findIndex(t => t === textObject), source.secret);
+            }
+        })
+        setTextObjects(updatedTextObjects);
+        //console.log("after: ", externalSources);
+        //console.log("after: ", textObjects);
+    }, [externalSources]);
 
     return (
         <GlobalStateContext.Provider value={{
@@ -573,7 +642,8 @@ export const GlobalStateProvider = ({children}) => {
             deleteExternalSource,
             setDeleteExternalSource,
             googleTableCells,
-            setGoogleTableCells
+            setGoogleTableCells,
+            updateLottieText
         }}>
             {children}
         </GlobalStateContext.Provider>

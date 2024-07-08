@@ -21,7 +21,12 @@ function ConnectApiDialog() {
     const handleChange = (index, field, value) => {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
-                return {...api, [field]: value};
+                if (field === "key" && value === "Digital Clock") {
+                    const newSecret = api.secret === "" ? "hh:mm:ss" : api.secret;
+                    return {...api, [field]: value, secret: newSecret};
+                } else {
+                    return {...api, [field]: value};
+                }
             }
             return api;
         });
@@ -45,16 +50,26 @@ function ConnectApiDialog() {
                             <div>{api.index.toString() + "."}</div>
                             <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
                                 <option>Google Table</option>
-                                <option>Google Table</option>
+                                <option>Digital Clock</option>
                             </select>
-                            <input
-                                type="text"
-                                onChange={e => handleChange(index, 'secret', e.target.value)}
-                                placeholder="put your spreadsheet id here..."
-                            />
-                            <button className="remove-button" onClick={() => handleRemoveApi(index)}>
-                                <FontAwesomeIcon icon={faXmark}/>
-                            </button>
+                            <div className="external-source-fields">
+                                {api.key === "Google Table" && (
+                                    <input
+                                        type="text"
+                                        onChange={e => handleChange(index, 'secret', e.target.value)}
+                                        placeholder="put your spreadsheet id here..."/>
+                                )}
+                                {api.key === "Digital Clock" && (
+                                    <select onChange={e => handleChange(index, 'secret', e.target.value)}>
+                                        <option>cc:cc:cc</option>
+                                        <option>cc:cc</option>
+                                    </select>
+                                )}
+
+                                <button className="remove-button" onClick={() => handleRemoveApi(index)}>
+                                    <FontAwesomeIcon icon={faXmark}/>
+                                </button>
+                            </div>
                         </div>
                     ))}
                     <button className="add-button" title="Add External Source" onClick={handleAddApi}>
