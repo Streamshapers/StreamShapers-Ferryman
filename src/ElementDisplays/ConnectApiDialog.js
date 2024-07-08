@@ -22,7 +22,7 @@ function ConnectApiDialog() {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
                 if (field === "key" && value === "Digital Clock") {
-                    const newSecret = api.secret === "" ? "hh:mm:ss" : api.secret;
+                    const newSecret = api.secret === "" ? "cc:cc:cc" : api.secret;
                     return {...api, [field]: value, secret: newSecret};
                 } else {
                     return {...api, [field]: value};
@@ -45,6 +45,7 @@ function ConnectApiDialog() {
         <>
             {useExternalSources && (
                 <div className='api-dialog-wrapper'>
+                    <h4>Sources</h4>
                     {externalSources.map((api, index) => (
                         <div className="api-dialog" key={index}>
                             <div>{api.index.toString() + "."}</div>

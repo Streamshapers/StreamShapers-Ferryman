@@ -553,6 +553,7 @@ export const GlobalStateProvider = ({children}) => {
             if (textObject.type === 'Google Table') {
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
+                textObject.text = textObject.oiginal;
                 updatedGoogleTableCells.push({
                     id: source.secret,
                     key: textObject.layername,
@@ -578,6 +579,9 @@ export const GlobalStateProvider = ({children}) => {
             if (textObject.type === "Digital Clock") {
                 textObject.text = source.secret;
                 updateLottieText(textObjects.findIndex(t => t === textObject), source.secret);
+            }
+            if (textObject.type === "Google Table") {
+                textObject.text = textObject.oiginal;
             }
         })
         setTextObjects(updatedTextObjects);
