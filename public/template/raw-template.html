@@ -90,9 +90,9 @@
     // SHEET_TITLE = "Tabellenblatt1";
     //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
 
-    const googleTableCells = ${googleTableData};
+    const googleTableCells = '${googleTableData}';
     /*googleTableCells.push({
-        url:"url",
+        id:"id",
         key: "_value1",
         cell: "A1",
         value:"default"
@@ -140,7 +140,8 @@
     async function updateGoogleTableData(parsed) {
         const tableData = await parseGoogleTable();
         for (const element of tableData) {
-            const tsvArray = await fetchDataFromGoogle(element.url);
+            const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?sheet=' + element.sheet;
+            const tsvArray = await fetchDataFromGoogle(sheetURL);
             //console.log("Updated Data: ", tsvArray);
             if (tsvArray.length > 0) {
                 element.value = getCellData(element.cell, tsvArray);

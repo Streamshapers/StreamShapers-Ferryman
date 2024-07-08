@@ -45,12 +45,12 @@ function ConnectApiDialog() {
                             <div>{api.index.toString() + "."}</div>
                             <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
                                 <option>Google Table</option>
-                                <option>CSV</option>
+                                <option>Google Table</option>
                             </select>
                             <input
                                 type="text"
                                 onChange={e => handleChange(index, 'secret', e.target.value)}
-                                placeholder="put your link here..."
+                                placeholder="put your spreadsheet id here..."
                             />
                             <button className="remove-button" onClick={() => handleRemoveApi(index)}>
                                 <FontAwesomeIcon icon={faXmark}/>

@@ -145,6 +145,14 @@ function TextsDisplay() {
         setTextObjects(updatedTextObjects);
     }
 
+    const setSheetName = (name, object) => {
+        const updatedTextObjects = [...textObjects];
+        const textObject = updatedTextObjects.find(t => t === object);
+
+        textObject.sheet = name;
+        setTextObjects(updatedTextObjects);
+    }
+
     /*const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
         return textShowAll || textsLayerNames[i].startsWith('_');
     });*/
@@ -217,7 +225,7 @@ function TextsDisplay() {
                                             <label>Column:
                                                 <input className="google-table-input"
                                                        type="text"
-                                                       
+
                                                        pattern="[a-zA-Z]*"
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "col", e.target.value)}/>
                                             </label>
@@ -225,6 +233,10 @@ function TextsDisplay() {
                                                 <input className="google-table-input"
                                                        type="number"
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "row", e.target.value)}/>
+                                            </label>
+                                            <label>Sheet:
+                                                <input className="google-table-input"
+                                                       onChange={(e) => setSheetName(e.target.value, textObject)}/>
                                             </label>
                                         </>
                                     )}

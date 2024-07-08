@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.5.3 api test");
+    const [ferrymanVersion] = useState("v1.5.3 externalSources demo");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -185,6 +185,7 @@ export const GlobalStateProvider = ({children}) => {
                         oiginal: obj.t.d.k[0].s.t,
                         type: 'text',
                         source: 'none',
+                        sheet: "",
                         col: "",
                         row: ""
                     }];
@@ -503,9 +504,10 @@ export const GlobalStateProvider = ({children}) => {
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
                 updatedGoogleTableCells.push({
-                    url: source.secret,
+                    id: source.secret,
                     key: textObject.layername,
                     cell: textObject.col + textObject.row,
+                    sheet: textObject.sheet,
                     value: textObject.oiginal
                 })
             }
