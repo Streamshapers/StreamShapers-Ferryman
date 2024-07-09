@@ -274,10 +274,10 @@ input[type="color"] {
 }
 
 input[type='file']::-webkit-file-upload-button {
-    background: var(--background);
+    background: var(--foreground);
     color: var(--copy-light);
     padding: 5px 10px;
-    border: none;
+    border: 1px solid var(--border);
     border-radius: 5px;
     cursor: pointer;
     margin-right: 10px;
@@ -444,17 +444,29 @@ input[type='file']::-webkit-file-upload-button {
 .font-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    background: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px;
+    width: 100%;
+}
+
+.font-item-text {
+    min-width: 160px;
 }
 
 .font-item input {
     margin-left: 10px;
-    flex-grow: 5;
+    flex-grow: 1;
     padding: 5px !important;
+    background: var(--background);
 }
 
 .font-item span {
-    margin-right: 5px;
-    background: var(--foreground);
+    font-size: 1.4rem;
+    margin-right: 10px;
+    background: var(--background);
     padding: 0 4px;
     border-radius: 5px;
 }
@@ -553,11 +565,19 @@ input[type='file']::-webkit-file-upload-button {
     display: flex;
     flex-direction: row;
     gap: 10px;
+    background: var(--foreground);
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+}
+
+.marker-inputs input {
+    background: var(--background);
 }
 
 .marker-input-name {
     min-width: 50px;
-    max-width: 400px;
+    
     flex-grow: 1;
 }
 
