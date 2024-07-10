@@ -115,6 +115,23 @@
         return null;
     }
 
+    function triggerPlayStack(){
+        if (showLogs) console.log(`LottieState: ${lottieState}`)
+        if (currentSegment === "stop") {
+            animation.destroy()
+        }
+        console.log("Stack: "+playStack[0])
+        if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment)
+        if (playStack[0]) {
+            let nextSegment = playStack[0]
+            animation.goToAndPlay(nextSegment,true)
+            if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`)
+            currentSegment = nextSegment
+            playStack.shift()
+        } 
+    }
+
+
     function addEvents(animation){
         animation.addEventListener("enterFrame", () => {
             for (let marker of lottieTemplate.markers) {
@@ -131,12 +148,13 @@
         })
         animation.addEventListener("_pause",()=>{
             lottieState="pause"
-            if (showLogs) console.log(`LottieState: ${lottieState}`)
-            //trigger playStack 
-
+            setTimeout(()=>{
+                triggerPlayStack()
+            },0)
         })
         animation.addEventListener("_idle", ()=>{
             lottieState="idle"
+            /*
             if (showLogs) console.log(`LottieState: ${lottieState}`)
             if (currentSegment === "stop") {
                 animation.destroy()
@@ -150,6 +168,7 @@
                 currentSegment = nextSegment
                 playStack.shift()
             } 
+            */
             
         })
 
