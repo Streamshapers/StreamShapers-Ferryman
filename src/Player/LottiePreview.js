@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {GlobalStateContext} from "./GlobalStateContext";
+import {GlobalStateContext} from "../GlobalStateContext";
 import lottie from 'lottie-web';
 import {
     faBackwardStep,

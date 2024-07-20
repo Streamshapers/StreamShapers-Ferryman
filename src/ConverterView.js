@@ -1,11 +1,11 @@
 import JsonElementsDisplay from "./ElementDisplays/JsonElementsDisplay";
 import Splitter from "./Splitter";
-import LottiePreview from "./LottiePreview";
-import { useContext } from "react";
-import { GlobalStateContext } from "./GlobalStateContext";
+import {useContext} from "react";
+import {GlobalStateContext} from "./GlobalStateContext";
+import Player from "./Player/Player";
 
 function ConverterView() {
-    const { jsonData } = useContext(GlobalStateContext);
+    const {jsonData} = useContext(GlobalStateContext);
 
     if (!jsonData) {
         return null;
@@ -16,7 +16,7 @@ function ConverterView() {
             <div id="contentWrapper">
                 <div id="jsonElements"><JsonElementsDisplay/></div>
                 <Splitter/>
-                <div id="jsonPreview"><LottiePreview/></div>
+                <div id="jsonPreview"><Player/></div>
             </div>
         </div>
     );
