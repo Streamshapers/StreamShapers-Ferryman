@@ -1,6 +1,6 @@
-import SpxExport from "../Export/SpxExport";
 import React, {useState} from "react";
 import LottiePreview from "./LottiePreview";
+import LottieDemo from "./LottieDemo";
 
 function Player() {
     const [activeTab, setActiveTab] = useState('standard');
@@ -23,7 +23,7 @@ function Player() {
                 <LottiePreview/>
             )}
             {activeTab === 'demo' && (
-                <SpxExport/>
+                <LottieDemo/>
             )}
         </>
     )
