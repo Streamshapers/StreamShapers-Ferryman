@@ -53,6 +53,12 @@ function LottieDemo() {
         return `${seconds.toString().padStart(2, '0')}:${frames.toString().padStart(2, '0')}`;
     }, []);
 
+    useEffect(() => {
+        if (lottieInstance === null){
+            updateLottie();
+        }
+    }, []);
+
     function updateLottie() {
         if (!jsonData) return;
         let onEnterFrame;
