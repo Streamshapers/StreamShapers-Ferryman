@@ -7,7 +7,7 @@ import {
     faFileArrowUp,
     faHashtag,
     faImage,
-    faList,
+    faList, faRotate,
     faUser
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -86,6 +86,10 @@ function StartScreen() {
                              onClick={() => handleSampleFile("Photodisplay_Ver05_fontsEmbedded.json")}>
                             <FontAwesomeIcon className="icon" icon={faImage}/>
                             <h4>Images</h4>
+                        </div>
+                        <div className="sample" onClick={() => handleSampleFile("Balls_Rolling_Loop_Ver01.json")}>
+                            <FontAwesomeIcon className="icon" icon={faRotate}/>
+                            <h4>Loop</h4>
                         </div>
                     </div>
                 </div>
