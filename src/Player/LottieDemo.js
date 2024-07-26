@@ -32,21 +32,18 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
 function LottieDemo() {
     const {
         jsonData,
-        fontFaces,
-        texts,
         markers,
-        currentFrame,
-        setCurrentFrame,
         isPlaying,
         setIsPlaying,
-        fileName,
-        textObjects,
-        externalSources
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
-    const [lottieInstance, setLottieInstance] = useState(null);
+    const lottieInstanceRef = useRef(null);
     const progressBarRef = useRef(null);
-    const [playLoop, setPlayLoop] = useState(false);
+    const nextPlayRef = useRef(null);
+    const currentLoopMarkerRef = useRef(null);
+    const [clickedPlay, setClickedPlay] = useState(false);
+    const toPlayRef = useRef([]);
+    const [currentFrame, setCurrentFrame] = useState(0);
 
     const formatTimeFromFrames = useCallback((frame, frameRate) => {
         const seconds = Math.floor(frame / frameRate);
@@ -55,19 +52,29 @@ function LottieDemo() {
     }, []);
 
     useEffect(() => {
-        if (lottieInstance === null){
+        if (lottieInstanceRef.current === null) {
             updateLottie();
         }
+
+        return () => {
+            if (lottieInstanceRef.current) {
+                lottieInstanceRef.current.destroy();
+            }
+        };
     }, []);
 
     function updateLottie() {
+        if (lottieInstanceRef.current) {
+            lottieInstanceRef.current.destroy();
+        }
+
         if (!jsonData) return;
         let onEnterFrame;
 
         const instance = lottie.loadAnimation({
             container: animationContainerRef.current,
             renderer: 'svg',
-            loop: true,
+            loop: false,
             autoplay: isPlaying,
             animationData: jsonData,
         });
@@ -76,22 +83,20 @@ function LottieDemo() {
             instance.goToAndStop(currentFrame, true);
             if (isPlaying) instance.play();
 
-
             onEnterFrame = (e) => {
                 setCurrentFrame(Math.round(e.currentTime));
             };
 
             instance.addEventListener('enterFrame', onEnterFrame);
-            setLottieInstance(instance);
+
+            lottieInstanceRef.current = instance;
         }, 300);
 
         return () => {
             clearTimeout(timeoutId);
             instance.removeEventListener('enterFrame', onEnterFrame);
             instance.destroy();
-            setTimeout(updateTimeFields, 500);
         };
-
     }
 
     const adjustSvgWidth = () => {
@@ -166,104 +171,139 @@ function LottieDemo() {
         }
     }
 
-
     useEffect(() => {
-        if (!lottieInstance) return;
-        isPlaying ? lottieInstance.play() : lottieInstance.pause();
+        if (!lottieInstanceRef.current) return;
+        isPlaying ? lottieInstanceRef.current.play() : lottieInstanceRef.current.pause();
         adjustSvgWidth();
-    }, [isPlaying, lottieInstance]);
+    }, [isPlaying, lottieInstanceRef.current]);
 
     const togglePlayPause = () => {
         setIsPlaying((prevIsPlaying) => {
             const shouldPlay = !prevIsPlaying;
-            if (lottieInstance) {
-                shouldPlay ? lottieInstance.play() : lottieInstance.pause();
+            if (lottieInstanceRef.current) {
+                shouldPlay ? lottieInstanceRef.current.play() : lottieInstanceRef.current.pause();
             }
             return shouldPlay;
         });
     };
 
-    const stepFrame = (direction) => {
-        if (!lottieInstance) return;
-        if (isPlaying) {
-            togglePlayPause();
-        }
-        const newFrame = Math.max(0, Math.min(currentFrame + direction, jsonData.op - 1));
-        lottieInstance.goToAndStop(newFrame, true);
-        setCurrentFrame(newFrame);
-    };
-
     const goToMarker = useCallback((markerFrame) => {
-        if (lottieInstance) {
+        if (lottieInstanceRef.current) {
             setIsPlaying(false);
-            lottieInstance.goToAndStop(markerFrame, true);
+            lottieInstanceRef.current.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
         }
-    }, [lottieInstance, setCurrentFrame]);
-
-    const playCurrentMarker = () => {
-        const currentMarker = markers.find(marker => currentFrame >= marker.tm && currentFrame < marker.tm + marker.dr);
-        const nextMarker = markers.find(marker => marker.tm === currentMarker.tm + currentMarker.dr);
-
-        if (currentMarker) {
-            setIsPlaying(true);
-
-            const checkInterval = setInterval(() => {
-                const currentFrame = Math.round(lottieInstance.currentFrame);
-                if (currentFrame >= currentMarker.tm + currentMarker.dr) {
-                    clearInterval(checkInterval);
-                    setIsPlaying(false);
-                    lottieInstance.goToAndStop(currentMarker.tm + currentMarker.dr, true);
-                    setCurrentFrame(currentMarker.tm + currentMarker.dr);
-                }
-            }, 1000 / jsonData.fr);
-        } else {
-
-        }
-
-        if (nextMarker.cm.endsWith("loop")) {
-            playLoopMarker(nextMarker).then();
-        }
-    };
-
-    async function playLoopMarker (marker) {
-        console.log("loop")
-        const checkInterval = setInterval(() => {
-            const currentFrame = Math.round(lottieInstance.currentFrame);
-            if (currentFrame >= marker.tm + marker.dr && playLoop) {
-                //clearInterval(checkInterval);
-                lottieInstance.goToAndStop(marker.tm, true);
-                setCurrentFrame(marker.tm);
-            }
-        }, 1000 / jsonData.fr);
-    }
+    }, [lottieInstanceRef.current, setCurrentFrame, setIsPlaying]);
 
     const playMarker = (markerName) => {
+        currentLoopMarkerRef.current = null;
         const marker = markers.find(obj => obj.cm === markerName);
-        const nextMarker = markers.find(m => m.tm === marker.tm + marker.dr);
         if (marker) {
-            console.log(marker);
-            setCurrentFrame(marker.tm);
-            lottieInstance.goToAndStop(marker.tm, true);
+            if (markerName === "start") {
+                setClickedPlay(true);
+                toPlayRef.current = [];
+            } else if (markerName === "stop") {
+                setClickedPlay(false);
+                toPlayRef.current = [];
+            }
+            const nextMarker = markers.find(m => m.tm === marker.tm + marker.dr);
 
+            setCurrentFrame(marker.tm);
+            lottieInstanceRef.current.goToAndPlay(marker.tm, true);
             setIsPlaying(true);
 
             const checkInterval = setInterval(() => {
-                const currentFrame = Math.round(lottieInstance.currentFrame);
-                if (currentFrame >= marker.tm + marker.dr) {
-                    clearInterval(checkInterval);
-                    setIsPlaying(false);
+                const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
 
-                    setCurrentFrame(marker.tm + marker.dr);
+                if (currentFrame >= marker.tm + marker.dr - 1) {
+                    clearInterval(checkInterval);
+
+                    if (currentFrame === marker.tm + marker.dr - 1) {
+                        lottieInstanceRef.current.goToAndStop(marker.tm + marker.dr, true);
+                        setCurrentFrame(marker.tm + marker.dr);
+                    }
+
+                    if (nextMarker && nextMarker.cm.endsWith("_loop")) {
+                        currentLoopMarkerRef.current = nextMarker;
+                    }
+
+                    if (nextMarker) {
+                        setIsPlaying(false);
+                        setCurrentFrame(marker.tm + marker.dr);
+
+                        if (nextMarker === toPlayRef.current[0]) {
+                            playMarker(toPlayRef.current[0].cm);
+                            toPlayRef.current.splice(0, 1);
+                        }
+                    }
                 }
             }, 1000 / jsonData.fr);
+            return () => clearInterval(checkInterval);
         } else {
             console.log(markerName + " Marker not found!");
         }
-        if (nextMarker.cm.endsWith("loop")) {
-            playLoopMarker(nextMarker).then();
+    };
+
+
+    useEffect(() => {
+        if (currentLoopMarkerRef.current) {
+            setCurrentFrame(currentLoopMarkerRef.current.tm);
+            playLoopMarker();
+        }
+    }, [currentLoopMarkerRef.current]);
+
+    const playLoopMarker = () => {
+        if (currentLoopMarkerRef.current) {
+            setIsPlaying(true);
+            const loopInterval = setInterval(() => {
+                const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
+
+                if (currentLoopMarkerRef.current) {
+                    if (currentFrame >= currentLoopMarkerRef.current.tm + currentLoopMarkerRef.current.dr) {
+                        if (toPlayRef.current.length > 0) {
+                            currentLoopMarkerRef.current = null;
+                            playMarker(toPlayRef.current[0].cm);
+                            toPlayRef.current.splice(0, 1);
+                        } else {
+                            lottieInstanceRef.current.goToAndPlay(currentLoopMarkerRef.current.tm, true);
+                            setCurrentFrame(currentLoopMarkerRef.current.tm);
+                        }
+                    }
+                }
+            }, 1000 / jsonData.fr);
+            return () => clearInterval(loopInterval);
         }
     }
+
+    const handleNext = () => {
+        if (clickedPlay) {
+            const currentMarker = markers.find(marker => marker.tm <= currentFrame && marker.tm + marker.dr >= currentFrame);
+            let nextMarker;
+
+            if (toPlayRef.current.length > 0) {
+                const lastMarker = toPlayRef.current[toPlayRef.current.length - 1];
+                nextMarker = findNextMarker(lastMarker.tm);
+            } else {
+                nextMarker = markers.find(marker => marker.tm === currentMarker.tm + currentMarker.dr);
+            }
+
+            if (nextMarker) {
+                toPlayRef.current = [...toPlayRef.current, nextMarker];
+                if (!currentLoopMarkerRef.current && toPlayRef.current.length === 1 && !isPlaying) {
+                    playMarker(toPlayRef.current[0].cm);
+                    toPlayRef.current.splice(0, 1);
+                }
+            }
+        }
+    }
+
+    const findNextMarker = (frame) => {
+        const filteredMarkers = markers
+            .filter(marker => marker.tm > frame && !marker.cm.endsWith('_loop'))
+            .sort((a, b) => a.tm - b.tm);
+
+        return filteredMarkers.length > 0 ? filteredMarkers[0] : null;
+    };
 
     useEffect(() => {
         if (!jsonData) return;
@@ -293,7 +333,7 @@ function LottieDemo() {
     return (
         <>
             {jsonData.markers && jsonData.markers.length > 0 &&
-                <div id="previewWrapper">
+                <>
                     <div id="animationPreview" style={style} ref={animationContainerRef}/>
                     <div id="previewControlContainer">
                         <div id="progressBarContainer">
@@ -304,21 +344,22 @@ function LottieDemo() {
                             <div id="timeDisplay" title="Time (seconds:frame)">
                                 {formatTimeFromFrames(currentFrame, jsonData.fr)}
                             </div>
-                            <div className="previewControlButton" title="Frame back" onClick={() => playMarker("start")}>
+                            <div className="previewControlButton demo" title="Play" onClick={() => playMarker("start")}>
                                 Play
                             </div>
-                            <div className="previewControlButton" title="Frame back" onClick={playCurrentMarker}>
+                            <div className={`previewControlButton demo ${clickedPlay ? 'blue' : 'grey'}`} title="Next"
+                                 onClick={handleNext}>
                                 Next
                             </div>
-                            <div className="previewControlButton" title="Frame back" onClick={updateLottie}>
+                            <div className="previewControlButton demo" title="Update" onClick={updateLottie}>
                                 Update
                             </div>
-                            <div className="previewControlButton" title="Frame back" onClick={() => playMarker("stop")}>
+                            <div className="previewControlButton demo" title="Stop" onClick={() => playMarker("stop")}>
                                 Stop
                             </div>
                         </div>
                     </div>
-                </div>
+                </>
             }
         </>
     );

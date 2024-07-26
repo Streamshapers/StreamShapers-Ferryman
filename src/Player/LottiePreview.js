@@ -286,32 +286,30 @@ function LottiePreview() {
 
     return (
         <>
-            <div id="previewWrapper">
-                <div id="animationPreview" style={style} ref={animationContainerRef}/>
-                <div id="previewControlContainer">
-                    <div id="progressBarContainer">
-                        <div id="progressBar" ref={progressBarRef}/>
-                        <MarkersContainer markers={markers} goToMarker={goToMarker}/>
+            <div id="animationPreview" style={style} ref={animationContainerRef}/>
+            <div id="previewControlContainer">
+                <div id="progressBarContainer">
+                    <div id="progressBar" ref={progressBarRef}/>
+                    <MarkersContainer markers={markers} goToMarker={goToMarker}/>
+                </div>
+                <div id="previewControls">
+                    <div id="timeDisplay" title="Time (seconds:frame)">
+                        {formatTimeFromFrames(currentFrame, jsonData.fr)}
                     </div>
-                    <div id="previewControls">
-                        <div id="timeDisplay" title="Time (seconds:frame)">
-                            {formatTimeFromFrames(currentFrame, jsonData.fr)}
-                        </div>
-                        <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame back"
-                                         onClick={() => stepFrame(-1)}/>
-                        <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
-                                         title="Play/Pause" onClick={togglePlayPause}/>
-                        <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame next"
-                                         onClick={() => stepFrame(1)}/>
-                        {jsonData.markers && jsonData.markers.length > 0 &&
-                            <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
-                                             title="Play to next Marker"
-                                             onClick={playCurrenMarker}/>}
+                    <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame back"
+                                     onClick={() => stepFrame(-1)}/>
+                    <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
+                                     title="Play/Pause" onClick={togglePlayPause}/>
+                    <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame next"
+                                     onClick={() => stepFrame(1)}/>
+                    {jsonData.markers && jsonData.markers.length > 0 &&
+                        <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
+                                         title="Play to next Marker"
+                                         onClick={playCurrenMarker}/>}
 
-                        <FontAwesomeIcon icon={faCamera} className="previewControlButton"
-                                         title="<Save current Frame>"
-                                         onClick={downloadCurrentFrame}/>
-                    </div>
+                    <FontAwesomeIcon icon={faCamera} className="previewControlButton"
+                                     title="<Save current Frame>"
+                                     onClick={downloadCurrentFrame}/>
                 </div>
             </div>
         </>

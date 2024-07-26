@@ -577,7 +577,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .marker-input-name {
     min-width: 50px;
-    
+
     flex-grow: 1;
 }
 
@@ -595,6 +595,36 @@ input[type='file']::-webkit-file-upload-button {
     max-width: 100%;
     display: flex;
     flex-direction: column;
+    padding: 10px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+
+.player-mode {
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.player-mode button {
+    padding: 10px 20px;
+    margin-right: 0;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    color: var(--copy);
+    cursor: pointer;
+    border-radius: 5px 0 0 5px;
+}
+
+.player-mode button:last-child {
+    border-radius: 0 5px 5px 0;
+}
+
+.player-mode-button.active {
+    background-color: var(--foreground);
+    border: 1px solid var(--primary);
+    font-weight: bold;
 }
 
 #jsonPreview {
@@ -618,10 +648,6 @@ input[type='file']::-webkit-file-upload-button {
     overflow: hidden;
     text-align: center;
     background: var(--background);
-    border: 1px solid var(--border);
-    border-bottom: none;
-    padding: 10px;
-    border-radius: 5px 5px 0 0;
 }
 
 #animationPreview svg, #animationPreview canvas {
@@ -640,10 +666,8 @@ input[type='file']::-webkit-file-upload-button {
     width: 100%;
     box-sizing: border-box;
     background: var(--background);
-    border: 1px solid var(--border);
-    padding: 50px 20px 20px 20px;
-    border-radius: 0 0 5px 5px;
-    height: 160px;
+    padding: 50px 0 0 0;
+    height: auto;
     border-top: none;
 }
 
@@ -652,7 +676,7 @@ input[type='file']::-webkit-file-upload-button {
     justify-content: space-between;
     align-items: center;
     padding: 20px 0 0 0;
-    margin-top: 10px;
+    height: auto;
 }
 
 .control-input-images {
@@ -672,18 +696,33 @@ input[type='file']::-webkit-file-upload-button {
     min-width: 20px;
 }
 
+.previewControlButton.grey {
+    background-color: var(--foreground);
+}
+
+.previewControlButton.grey:hover {
+    background-color: var(--foreground);
+    cursor: default;
+}
+
+.previewControlButton.demo {
+    height: 37px;
+    padding: 0 10px;
+}
+
 .previewControlButton:hover {
     background-color: var(--secondary);
     color: var(--secondary-content);
 }
 
 #timeDisplay {
-    width: 80px;
+    width: 82px;
     font-size: 24px;
+    border: 1px solid var(--border);
     border-radius: 5px;
     background-color: var(--primary);
     color: var(--primary-content);
-    padding: 5px 10px;
+    padding: 1px 10px;
     overflow: hidden;
 }
 
