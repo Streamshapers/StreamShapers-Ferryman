@@ -166,6 +166,7 @@
 <script>
     "use strict"
     let lottieTemplate = ${jsonData};
+    let lottieTemplateUpdate;
     let playStatus = "";
     let nextCount = 1;
     let nextTotal = 0;
@@ -176,13 +177,19 @@
     let animLoaded = createDeferredPromise();
     let animation;
     let newAnimation;
+    let updateAnimation;
     let stopExist = false;
     let showLogs = false;
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
+    let updateExist = false
+    let lottieState = "stop"
+    let markers = []
+
+    let playStack = []
     let fetchSheet = true;
-    let lottieState = "pause";
+
 
     function createDeferredPromise() {
         let resolver, rejecter;
@@ -248,22 +255,83 @@
         return null;
     }
 
+    function triggerPlayStack(){
+        if (showLogs) console.log(`LottieState: ${lottieState}`)
+        if (currentSegment === "stop") {
+            animation.destroy()
+        }
+        console.log("Stack: "+playStack[0])
+        if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment)
+        if (playStack[0]) {
+            let nextSegment = playStack[0]
+            animation.goToAndPlay(nextSegment,true)
+            if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`)
+            currentSegment = nextSegment
+            playStack.shift()
+        } 
+    }
+
+
+    function addEvents(animation){
+        animation.addEventListener("enterFrame", () => {
+            for (let marker of lottieTemplate.markers) {
+                if (marker.cm === "name:" + currentSegment) {
+                    currentSegmentFrames = marker.tm
+                }
+            }
+            currentFrame = animation.currentFrame + currentSegmentFrames
+            if (showLogs) console.log(`Current Frame: ${currentFrame}`);
+        })
+        animation.addEventListener("_play",()=>{
+            lottieState="play"
+            if (showLogs) console.log(`LottieState: ${lottieState}`)
+        })
+        animation.addEventListener("_pause",()=>{
+            lottieState="pause"
+            setTimeout(()=>{
+                triggerPlayStack()
+            },0)
+        })
+        animation.addEventListener("_idle", ()=>{
+            lottieState="idle"
+            /*
+            if (showLogs) console.log(`LottieState: ${lottieState}`)
+            if (currentSegment === "stop") {
+                animation.destroy()
+            }
+            console.log("Stack: "+playStack[0])
+            if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment)
+            if (playStack[0]) {
+                let nextSegment = playStack[0]
+                animation.goToAndPlay(nextSegment,true)
+                if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`)
+                currentSegment = nextSegment
+                playStack.shift()
+            } 
+            */
+            
+        })
+
+
+    }
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
         let name = marker.cm;
+        markers.push(name)
         marker.cm = "name:" + name.toLowerCase();
 
-        if (name.includes("next")) {
+        if (name.includes("next")&& !name.includes("loop")) {
             nextTotal++
         }
-        if (name == "stop") {
-            stopExist = true;
-        }
+        if (name == "stop") stopExist = true
+        if (name == "update") updateExist = true
     })
-    let lottieTemplateNew = {...lottieTemplate};
+    let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
+  
 
     async function update(rawData) {
-        lottieTemplateNew = {...lottieTemplate};
+        lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)) //copy the "old" updated template for the update Animation
+        lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
         let parsed;
 
         if (rawData) {
@@ -323,6 +391,7 @@
             }
         }*/
 
+        //first Update and create Lottie for the first time
         if (playStatus === "") {
             animation = bodymovin.loadAnimation({
                 container: document.getElementById("animation1"),
@@ -346,25 +415,8 @@
                 })
             })
 
-            animation.addEventListener("_play", function () {
-                lottieState = "play"
-                console.log("LottieState - Play")
-            })
+            addEvents(animation);
 
-            animation.addEventListener("_pause", function () {
-                lottieState = "stop"
-                console.log("LottieState - pause")
-            })
-
-            animation.addEventListener("enterFrame", () => {
-                for (let marker of lottieTemplate.markers) {
-                    if (marker.cm === "name:" + currentSegment) {
-                        currentSegmentFrames = marker.tm;
-                    }
-                }
-                currentFrame = animation.currentFrame + currentSegmentFrames;
-                if (showLogs) console.log(`Template - Current Frame: ${currentFrame}`);
-            })
 
             updateTimeField("animation" + updateCounter);
 
@@ -375,13 +427,90 @@
             animLoaded.resolve("Template - Animation is Ready");
 
         }
+        //Update when tamplate is playing
         if (playStatus === "play") {
             updateCounter++;
+
+            //Only for UpdateAnimations
+            if (updateExist && rawData) {     
+                let updateValues = []       
+                for (let key of Object.keys(parsed)) {
+                    lottieTemplateUpdate.layers.forEach((layer)=>{
+                        if (layer.nm == `${key}_update`) {
+                            console.log(`${key} has Update layer`)
+                            parsed[`${key}_update`] = parsed[key]
+                            delete parsed[key]
+                            console.log(parsed)
+                        }
+                    })
+                }
+                for (let key of Object.keys(parsed)) {
+                    lottieTemplateUpdate.layers.forEach((layer) => {
+                        if (layer.nm === key) {
+                            if ('refId' in layer) {
+                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, parsed[key])
+                            } else {
+                                layer.t.d.k[0].s.t = parsed[key]
+                            }
+                        }
+                    })
+                }
+                let newDiv = document.createElement("div");
+                newDiv.id = "animation" + updateCounter;
+                document.body.appendChild(newDiv);
+
+                let updateAnimation = bodymovin.loadAnimation({
+                    container: document.getElementById("animation" + updateCounter),
+                    renderer: "svg",
+                    loop: false,
+                    autoplay: false,
+                    animationData: lottieTemplateUpdate,
+                })
+                updateAnimation.addEventListener("DOMLoaded", async function () {
+                    if (showInfo) console.log("Template - updated Animation Ready")
+                    updateAnimation.goToAndPlay("update", true)
+                    animation.destroy()
+                    document.getElementById("animation" + (updateCounter - 1)).remove()
+                    animation = updateAnimation
+                    updateAnimation = null
+                    console.log("Upadte Animation läuft")
+                    animation.addEventListener("_pause",()=>{
+                        lottieState="pause"
+                        console.log(`LottieState: "${lottieState}`)
+
+                        updateCounter++
+                        let newDiv = document.createElement("div");
+                        newDiv.id = "animation" + updateCounter;
+                        document.body.appendChild(newDiv);
+
+                        let newAnimation = bodymovin.loadAnimation({
+                            container: document.getElementById("animation" + updateCounter),
+                            renderer: "svg",
+                            loop: false,
+                            autoplay: false,
+                            animationData: lottieTemplateNew,
+                        })
+                        newAnimation.addEventListener("DOMLoaded", function () {
+                            if (showInfo) console.log("Template - updated Animation Ready")
+                            newAnimation.goToAndStop(currentFrame, true)
+                            animation.destroy()
+                            document.getElementById("animation" + (updateCounter - 1)).remove()
+                            animation = newAnimation
+                            addEvents(animation)
+                            newAnimation = null
+                        })
+
+
+                    })
+                })
+            }
+        //only without update animation
+        if (!updateExist){  
             let newDiv = document.createElement("div");
             newDiv.id = "animation" + updateCounter;
             document.body.appendChild(newDiv);
 
-            newAnimation = bodymovin.loadAnimation({
+            let newAnimation = bodymovin.loadAnimation({
                 container: document.getElementById("animation" + updateCounter),
                 renderer: "svg",
                 loop: false,
@@ -405,22 +534,16 @@
                     if (showLogs) console.log(`Current Frame: ${currentFrame}`);
                 })
 
-                animation.addEventListener("_play", function () {
-                    lottieState = "play"
-                    console.log("LottieState - Play")
-                })
-                animation.addEventListener("_pause", function () {
-                    lottieState = "stop"
-                    console.log("LottieState - pause")
-                })
+                addEvents(animation);
 
                 updateTimeField("animation" + updateCounter);
 
                 newAnimation = null;
             })
         }
-        if (showInfo) info();
     }
+    if (showInfo) info();
+}
 
 
     async function play() {
@@ -431,14 +554,20 @@
         playStatus = "play";
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
+        if (markers.includes("start_loop")) playStack.push("start_loop");
         updateTimeField("animation" + updateCounter);
     }
 
 
     function stop() {
         if (stopExist) {
-            animation.goToAndPlay("stop", true);
-            if (showLogs) console.log("Template - Play 'stop' Marker");
+            if (lottieState==="idle") {
+                animation.goToAndPlay("stop", true) 
+                if (showLogs) console.log("Template - Play 'stop' Marker")
+            } else {
+                //playStack.length=0
+                playStack.push("stop")
+            }
         } else {
             if (showLogs) console.log("Template - No 'stop' marker - destroy Animation");
             animation.destroy();
@@ -448,13 +577,19 @@
 
     function next() {
         if (nextCount > nextTotal && stopExist) {
-            animation.goToAndPlay("stop", true);
+            stop()
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
         } else {
-            if (showLogs) console.log("Template - Play 'next" + nextCount + "' Marker");
-            animation.goToAndPlay("next" + nextCount, true);
-            currentSegment = "next" + nextCount;
-            nextCount++;
+            if (lottieState==="idle") {
+                animation.goToAndPlay("next" + nextCount, true)
+                currentSegment="next" + nextCount
+                if (showLogs) console.log("Template - Play 'next" + nextCount + "' Marker")
+            } else {
+                //playStack.shift()
+                playStack.push("next" + nextCount)
+                if(markers.includes("next" + nextCount+"_loop"))  playStack.push("next" + nextCount+"_loop")
+            }
+            nextCount++
         }
     }
 

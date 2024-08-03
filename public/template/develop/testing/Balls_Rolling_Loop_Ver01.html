@@ -200,6 +200,7 @@
     let playStack = []
     let fetchSheet = true;
 
+
     function createDeferredPromise() {
         let resolver, rejecter;
         const promise = new Promise((resolve, reject) => {
@@ -348,12 +349,11 @@
                 let parser = new DOMParser();
                 let xmlDoc = parser.parseFromString(rawData, "text/xml");
 
-                // JSON-Objekt initialisieren
                 let json = {};
 
                 let components = xmlDoc.getElementsByTagName("componentData");
                 for (let component of components) {
-                    let id = component.getAttribute("id"); // 'id' des componentData Elements
+                    let id = component.getAttribute("id");
                     let dataElement = component.getElementsByTagName("data")[0];
                     json[id] = dataElement.getAttribute("value");
                 }
