@@ -15,6 +15,10 @@ import {external} from "jszip";
 const MarkersContainer = React.memo(({markers, goToMarker}) => {
     const {jsonData} = useContext(GlobalStateContext);
 
+    if (!markers) {
+        return null;
+    }
+
     return (
         markers.map((marker, index) => (
             <React.Fragment key={`marker-${marker.tm}`}>

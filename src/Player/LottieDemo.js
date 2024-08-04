@@ -5,6 +5,10 @@ import lottie from 'lottie-web';
 const MarkersContainer = React.memo(({markers, goToMarker}) => {
     const {jsonData} = useContext(GlobalStateContext);
 
+    if (!markers) {
+        return null;
+    }
+
     return (
         markers.map((marker, index) => (
             <React.Fragment key={`marker-${marker.tm}`}>
@@ -35,6 +39,8 @@ function LottieDemo() {
         markers,
         isPlaying,
         setIsPlaying,
+        jsonFile,
+        fileName
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const lottieInstanceRef = useRef(null);

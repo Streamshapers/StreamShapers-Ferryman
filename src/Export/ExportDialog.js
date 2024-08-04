@@ -270,10 +270,12 @@ function ExportDialog({isOpen, onClose}) {
     };
 
     useEffect(() => {
-        const startExists = markers.some(event => event.cm === 'start');
-        const stopExists = markers.some(event => event.cm === 'stop');
-        setStartMarkerCheck(startExists);
-        setStopMarkerCheck(stopExists);
+        if (markers) {
+            const startExists = markers.some(event => event.cm === 'start');
+            const stopExists = markers.some(event => event.cm === 'stop');
+            setStartMarkerCheck(startExists);
+            setStopMarkerCheck(stopExists);
+        }
     }, [markers]);
 
     if (!isOpen) return null;
@@ -307,12 +309,20 @@ function ExportDialog({isOpen, onClose}) {
                 </div>}
                 {!startMarkerCheck && <div className="alert-wrapper">
                     <div className="alert">
-                        Your animation has no start marker and might not play correctly in CasparCG.
+                        Your animation has no start marker and might not play correctly in CasparCG. (Start marker needs
+                        to be named "start".)
+                    </div>
+                    <div className="alert">
+                        Please close this dialog and rename the start marker to "start" in the markers section.
                     </div>
                 </div>}
                 {!stopMarkerCheck && <div className="alert-wrapper">
                     <div className="alert">
-                        Your animation has no stop marker and might not play correctly in CasparCG.
+                        Your animation has no stop marker and might not play correctly in CasparCG. (Stop marker needs
+                        to be named "stop".)
+                    </div>
+                    <div className="alert">
+                        Please close this dialog and rename the stop marker to "stop" in the markers section.
                     </div>
                 </div>}
                 <div className="tab-navigation">

@@ -38,6 +38,11 @@ export const GlobalStateProvider = ({children}) => {
     }, []);
 
     useEffect(() => {
+        setMarkers(null);
+        setCurrentFrame(0);
+    }, [jsonFile]);
+
+    useEffect(() => {
         if (!jsonData) {
             return;
         }
@@ -397,6 +402,7 @@ export const GlobalStateProvider = ({children}) => {
     //############################################ SPX ############################################################
 
     useEffect(() => {
+        const steps = markers ? markers.length - 1 : 0;
         const rawSpxJson = {
             "description": "",
             "playserver": "OVERLAY",
@@ -406,7 +412,7 @@ export const GlobalStateProvider = ({children}) => {
             "out": "manual",
             "dataformat": "json",
             "uicolor": "0",
-            "steps": `${markers.length - 1}`,
+            "steps": `${steps}`,
             "DataFields": []
         };
         let spxExportJson = {...rawSpxJson};

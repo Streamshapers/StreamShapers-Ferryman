@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
-import { GlobalStateContext } from '../GlobalStateContext';
+import React, {useContext} from 'react';
+import {GlobalStateContext} from '../GlobalStateContext';
 
 function ImagePreview() {
-    const { jsonData, setJsonData } = useContext(GlobalStateContext);
+    const {jsonData, setJsonData, markers, setMarkers} = useContext(GlobalStateContext);
 
     const handleInputChange = (index, key, value) => {
         const updatedMarkers = [...jsonData.markers];
@@ -14,8 +14,16 @@ function ImagePreview() {
             updatedMarkers[index][key] = value;
         }
 
-        setJsonData({ ...jsonData, markers: updatedMarkers });
+        setMarkers(updatedMarkers);
+        setJsonData({...jsonData, markers: updatedMarkers});
+
+        console.log("jsonMarker: ", jsonData.markers);
+        console.log("Markermarker: ", markers);
     };
+
+    if (!jsonData.markers) {
+        return null;
+    }
 
     return (
         <div className="markers-wrapper">

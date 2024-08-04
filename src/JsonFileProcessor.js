@@ -65,7 +65,9 @@ function JsonFileProcessor() {
             resetState();
             const jsonData = JSON.parse(content);
             setJsonData(jsonData);
-            setMarkers(jsonData.markers);
+            if (jsonData.markers && jsonData.markers.length > 0) {
+                setMarkers(jsonData.markers);
+            }
         } catch (error) {
             setError(`Error reading the JSON file. Please make sure it is a valid JSON file. Error: ${error.message}`);
         }
