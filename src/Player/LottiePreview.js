@@ -115,7 +115,7 @@ function LottiePreview() {
         try {
             const animationPreviewElement = document.getElementById('animationPreview');
             if (!animationPreviewElement) {
-                console.log("Error updating Clock: animationPreview element not found.");
+                //console.log("Error updating Clock: animationPreview element not found.");
                 return;
             }
 
@@ -216,11 +216,11 @@ function LottiePreview() {
 
             const checkInterval = setInterval(() => {
                 const currentFrame = Math.round(lottieInstance.currentFrame);
-                if (currentFrame >= currentMarker.tm + currentMarker.dr) {
+                if (currentFrame >= currentMarker.tm + currentMarker.dr - 1) {
                     clearInterval(checkInterval);
                     setIsPlaying(false);
-                    lottieInstance.goToAndStop(currentMarker.tm + currentMarker.dr, true);
-                    setCurrentFrame(currentMarker.tm + currentMarker.dr);
+                    lottieInstance.goToAndStop(currentMarker.tm + currentMarker.dr - 1, true);
+                    setCurrentFrame(currentMarker.tm + currentMarker.dr - 1);
                 }
             }, 1000 / jsonData.fr);
         } else {

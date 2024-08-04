@@ -265,7 +265,7 @@ function LottieDemo() {
                 const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
 
                 if (currentLoopMarkerRef.current) {
-                    if (currentFrame >= currentLoopMarkerRef.current.tm + currentLoopMarkerRef.current.dr) {
+                    if (currentFrame >= currentLoopMarkerRef.current.tm + currentLoopMarkerRef.current.dr - 1) {
                         if (toPlayRef.current.length > 0) {
                             currentLoopMarkerRef.current = null;
                             playMarker(toPlayRef.current[0].cm);
