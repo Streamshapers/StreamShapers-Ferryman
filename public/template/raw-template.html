@@ -91,6 +91,7 @@
     //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
 
     const googleTableCells = '${googleTableData}';
+
     /*googleTableCells.push({
         id:"id",
         key: "_value1",
@@ -98,65 +99,58 @@
         value:"default"
     })*/
 
-    async function parseGoogleTable(){
+    async function parseGoogleTable() {
         return JSON.parse(googleTableCells);
     }
 
     async function fetchDataFromGoogle(url) {
         try {
             let response = await fetch(url);
-            let text = await response.text();
-            let jsonString = text.substr(47).slice(0, -2);
-            let parsed = JSON.parse(jsonString);
-            const dataArray = [];
-
-            parsed.table.rows.forEach(row => {
-                let columns = [];
-                row.c.forEach(cell => {
-                    columns.push(cell ? cell.v : null); // Check if cell is not null
-                });
-                dataArray.push(columns);
-            });
-            //console.log("Google raw data: ", dataArray);
-            return dataArray;
-        }catch (error) {
-            console.error("Error collecting data from Google: ", error);
-            return [];
+            let csvText = await response.text();
+            return csvText.split('\n').map(row => row.split(','));
+        } catch (error) {
+            console.error("Error collecting data from Google:", error);
+            return null;
         }
     }
 
-    function getCellData(cell,data) {
+    function getCellData(cell, data) {
         const columnName = cell.match(/[A-Z]+/g)[0];
         const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let rowIx = (parseInt(cell.match(/[0-9]+/g)[0]))-1; //incl. index Shift (-1)
+        let rowIx = (parseInt(cell.match(/[0-9]+/g)[0])) - 1; // Row index (0-based)
         let colIx = 0;
+
         for (let i = 0; i < columnName.length; i++) {
-            colIx= colIx * 26 + base.indexOf(columnName[i]) + 1;
+            colIx = colIx * 26 + base.indexOf(columnName[i]) + 1;
         }
-        colIx = colIx -1; //fix Index Shift
-        return data[rowIx] ? data[rowIx][colIx] : undefined;
+        colIx = colIx - 1; // Column index (0-based)
+
+        let cellValue = data[rowIx] ? data[rowIx][colIx] : undefined;
+
+        if (cellValue && cellValue.startsWith('"') && cellValue.endsWith('"')) {
+            cellValue = cellValue.slice(1, -1);
+        }
+
+        return cellValue;
     }
 
+
     async function updateGoogleTableData(templateJSON) {
-        //console.log("template Json for google update: ", JSON.stringify(templateJSON));
         const tableData = await parseGoogleTable();
+
         for (const element of tableData) {
-            const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?sheet=' + element.sheet;
-            const tsvArray = await fetchDataFromGoogle(sheetURL);
-            //console.log("Updated Data: ", tsvArray);
-            if (tsvArray.length > 0) {
-                element.value = getCellData(element.cell, tsvArray);
-                //console.log("Extracted value for cell " + element.key + ": " + element.cell + ": " + element.value);
-                for(const layer of templateJSON.layers) {
-                    //console.log(JSON.stringify(layer.nm));
+            const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
+            const csvArray = await fetchDataFromGoogle(sheetURL);
+
+            if (csvArray.length > 0) {
+                const value = getCellData(element.cell, csvArray);
+                for (const layer of templateJSON.layers) {
                     if (layer.nm === element.key) {
-                        layer.t.d.k[0].s.t = element.value.toString();
-                        //console.log("new value: ", layer.t.d.k[0].s.t);
+                        layer.t.d.k[0].s.t = value != null ? value.toString() : "";
                     }
                 }
             }
         }
-        //console.log("finished GoogleUpdate")
         return templateJSON;
     }
 
@@ -190,13 +184,25 @@
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
-    let updateExist = false
-    let lottieState = "stop"
-    let markers = []
-
-    let playStack = []
+    let updateExist = false;
+    let lottieState = "stop";
+    let markers = [];
+    let playStack = [];
     let fetchSheet = true;
+    let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
+    //fix and check markers
+    lottieTemplate.markers.forEach((marker) => {
+        let name = marker.cm;
+        markers.push(name);
+        marker.cm = "name:" + name.toLowerCase();
+
+        if (name.includes("next") && !name.includes("loop")) {
+            nextTotal++;
+        }
+        if (name == "stop") stopExist = true;
+        if (name == "update") updateExist = true;
+    })
 
     function createDeferredPromise() {
         let resolver, rejecter;
@@ -223,12 +229,12 @@
         document.head.appendChild(newFont);
     }
 
-    function pause (sec) {
+    function pause(sec) {
         return new Promise((resolve, reject) => {
-            setTimeout(()=>{
-                resolve("Die "+ sec +" Sekunden Pause ist vorbei")
-            },sec*1000)
-        })
+            setTimeout(() => {
+                resolve("Die " + sec + " Sekunden Pause ist vorbei");
+            }, sec * 1000);
+        });
     }
 
     function loadFonts() {
@@ -253,54 +259,53 @@
         const foundObject = array.find(obj => obj['id'] === searchValue);
 
         if (foundObject) {
-            foundObject['u'] = imagesPathPrefix
+            foundObject['u'] = imagesPathPrefix;
             foundObject['p'] = newValue;
-            foundObject['e'] = 0
+            foundObject['e'] = 0;
             return foundObject;
         }
 
         return null;
     }
 
-    function triggerPlayStack(){
-        if (showLogs) console.log(`LottieState: ${lottieState}`)
+    function triggerPlayStack() {
+        if (showLogs) console.log(`LottieState: ${lottieState}`);
         if (currentSegment === "stop") {
-            animation.destroy()
+            animation.destroy();
         }
-        console.log("Stack: "+playStack[0])
-        if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment)
+        console.log("Stack: " + playStack[0]);
+        if (playStack.length === 0 && currentSegment.includes("loop")) playStack.push(currentSegment)
         if (playStack[0]) {
-            let nextSegment = playStack[0]
-            animation.goToAndPlay(nextSegment,true)
-            if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`)
-            currentSegment = nextSegment
-            playStack.shift()
-        } 
+            let nextSegment = playStack[0];
+            animation.goToAndPlay(nextSegment, true);
+            if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`);
+            currentSegment = nextSegment;
+            playStack.shift();
+        }
     }
 
-
-    function addEvents(animation){
+    function addEvents(animation) {
         animation.addEventListener("enterFrame", () => {
             for (let marker of lottieTemplate.markers) {
                 if (marker.cm === "name:" + currentSegment) {
-                    currentSegmentFrames = marker.tm
+                    currentSegmentFrames = marker.tm;
                 }
             }
-            currentFrame = animation.currentFrame + currentSegmentFrames
+            currentFrame = animation.currentFrame + currentSegmentFrames;
             if (showLogs) console.log(`Current Frame: ${currentFrame}`);
-        })
-        animation.addEventListener("_play",()=>{
-            lottieState="play"
-            if (showLogs) console.log(`LottieState: ${lottieState}`)
-        })
-        animation.addEventListener("_pause",()=>{
-            lottieState="pause"
-            setTimeout(()=>{
-                triggerPlayStack()
-            },0)
-        })
-        animation.addEventListener("_idle", ()=>{
-            lottieState="idle"
+        });
+        animation.addEventListener("_play", () => {
+            lottieState = "play";
+            if (showLogs) console.log(`LottieState: ${lottieState}`);
+        });
+        animation.addEventListener("_pause", () => {
+            lottieState = "pause";
+            setTimeout(() => {
+                triggerPlayStack();
+            }, 0)
+        });
+        animation.addEventListener("_idle", () => {
+            lottieState = "idle";
             /*
             if (showLogs) console.log(`LottieState: ${lottieState}`)
             if (currentSegment === "stop") {
@@ -316,27 +321,12 @@
                 playStack.shift()
             } 
             */
-            
-        })
 
-
+        });
     }
-    //fix and check markers
-    lottieTemplate.markers.forEach((marker) => {
-        let name = marker.cm;
-        markers.push(name)
-        marker.cm = "name:" + name.toLowerCase();
-
-        if (name.includes("next")&& !name.includes("loop")) {
-            nextTotal++
-        }
-        if (name == "stop") stopExist = true
-        if (name == "update") updateExist = true
-    })
-    let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
-        if(fetchSheet && googleTableCells) {
+        if (fetchSheet && googleTableCells) {
             lottieTemplateNew = await updateGoogleTableData(lottieTemplate);
         }
 
@@ -348,10 +338,9 @@
             if (rawData.startsWith("<templateData>")) {
                 let parser = new DOMParser();
                 let xmlDoc = parser.parseFromString(rawData, "text/xml");
-
                 let json = {};
-
                 let components = xmlDoc.getElementsByTagName("componentData");
+
                 for (let component of components) {
                     let id = component.getAttribute("id");
                     let dataElement = component.getElementsByTagName("data")[0];
@@ -398,7 +387,7 @@
                 loop: false,
                 autoplay: false,
                 animationData: lottieTemplateNew,
-            })
+            });
             let fonts = animation.renderer.data.fonts.list;
             for (const font in fonts) {
                 let family = fonts[font].fFamily;
@@ -411,8 +400,8 @@
                 animation.addEventListener("DOMLoaded", function () {
                     if (showLogs) console.log("Template - Ready");
                     resolve("ready");
-                })
-            })
+                });
+            });
 
             addEvents(animation);
 
@@ -431,25 +420,25 @@
             updateCounter++;
 
             //Only for UpdateAnimations
-            if (updateExist && rawData) {     
-                let updateValues = []       
+            if (updateExist && rawData) {
+                let updateValues = [];
                 for (let key of Object.keys(parsed)) {
-                    lottieTemplateUpdate.layers.forEach((layer)=>{
+                    lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm == `${key}_update`) {
-                            console.log(`${key} has Update layer`)
-                            parsed[`${key}_update`] = parsed[key]
-                            delete parsed[key]
-                            console.log(parsed)
+                            console.log(`${key} has Update layer`);
+                            parsed[`${key}_update`] = parsed[key];
+                            delete parsed[key];
+                            console.log(parsed);
                         }
-                    })
+                    });
                 }
                 for (let key of Object.keys(parsed)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm === key) {
                             if ('refId' in layer) {
-                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, parsed[key])
+                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, parsed[key]);
                             } else {
-                                layer.t.d.k[0].s.t = parsed[key]
+                                layer.t.d.k[0].s.t = parsed[key];
                             }
                         }
                     })
@@ -466,18 +455,18 @@
                     animationData: lottieTemplateUpdate,
                 })
                 updateAnimation.addEventListener("DOMLoaded", async function () {
-                    if (showInfo) console.log("Template - updated Animation Ready")
-                    updateAnimation.goToAndPlay("update", true)
-                    animation.destroy()
-                    document.getElementById("animation" + (updateCounter - 1)).remove()
-                    animation = updateAnimation
-                    updateAnimation = null
-                    console.log("Upadte Animation läuft")
-                    animation.addEventListener("_pause",()=>{
-                        lottieState="pause"
-                        console.log(`LottieState: "${lottieState}`)
+                    if (showInfo) console.log("Template - updated Animation Ready");
+                    updateAnimation.goToAndPlay("update", true);
+                    animation.destroy();
+                    document.getElementById("animation" + (updateCounter - 1)).remove();
+                    animation = updateAnimation;
+                    updateAnimation = null;
+                    console.log("Upadte Animation läuft");
+                    animation.addEventListener("_pause", () => {
+                        lottieState = "pause";
+                        console.log(`LottieState: "${lottieState}`);
 
-                        updateCounter++
+                        updateCounter++;
                         let newDiv = document.createElement("div");
                         newDiv.id = "animation" + updateCounter;
                         document.body.appendChild(newDiv);
@@ -488,61 +477,58 @@
                             loop: false,
                             autoplay: false,
                             animationData: lottieTemplateNew,
-                        })
+                        });
+
                         newAnimation.addEventListener("DOMLoaded", function () {
-                            if (showInfo) console.log("Template - updated Animation Ready")
-                            newAnimation.goToAndStop(currentFrame, true)
-                            animation.destroy()
-                            document.getElementById("animation" + (updateCounter - 1)).remove()
-                            animation = newAnimation
-                            addEvents(animation)
-                            newAnimation = null
-                        })
-
-
-                    })
-                })
+                            if (showInfo) console.log("Template - updated Animation Ready");
+                            newAnimation.goToAndStop(currentFrame, true);
+                            animation.destroy();
+                            document.getElementById("animation" + (updateCounter - 1)).remove();
+                            animation = newAnimation;
+                            addEvents(animation);
+                            newAnimation = null;
+                        });
+                    });
+                });
             }
-        //only without update animation
-        if (!updateExist){  
-            let newDiv = document.createElement("div");
-            newDiv.id = "animation" + updateCounter;
-            document.body.appendChild(newDiv);
+            //only without update animation
+            if (!updateExist) {
+                let newDiv = document.createElement("div");
+                newDiv.id = "animation" + updateCounter;
+                document.body.appendChild(newDiv);
 
-            let newAnimation = bodymovin.loadAnimation({
-                container: document.getElementById("animation" + updateCounter),
-                renderer: "svg",
-                loop: false,
-                autoplay: false,
-                animationData: lottieTemplateNew,
-            })
-
-            newAnimation.addEventListener("DOMLoaded", function () {
-                if (showInfo) console.log("Template - updated Animation Ready");
-                newAnimation.goToAndStop(currentFrame, true);
-                animation.destroy();
-                document.getElementById("animation" + (updateCounter - 1)).remove();
-                animation = newAnimation;
-                animation.addEventListener("enterFrame", () => {
-                    for (let marker of lottieTemplate.markers) {
-                        if (marker.cm === "name:" + currentSegment) {
-                            currentSegmentFrames = marker.tm;
-                        }
-                    }
-                    currentFrame = animation.currentFrame + currentSegmentFrames;
-                    if (showLogs) console.log(`Current Frame: ${currentFrame}`);
+                let newAnimation = bodymovin.loadAnimation({
+                    container: document.getElementById("animation" + updateCounter),
+                    renderer: "svg",
+                    loop: false,
+                    autoplay: false,
+                    animationData: lottieTemplateNew,
                 })
 
-                addEvents(animation);
+                newAnimation.addEventListener("DOMLoaded", function () {
+                    if (showInfo) console.log("Template - updated Animation Ready");
+                    newAnimation.goToAndStop(currentFrame, true);
+                    animation.destroy();
+                    document.getElementById("animation" + (updateCounter - 1)).remove();
+                    animation = newAnimation;
+                    animation.addEventListener("enterFrame", () => {
+                        for (let marker of lottieTemplate.markers) {
+                            if (marker.cm === "name:" + currentSegment) {
+                                currentSegmentFrames = marker.tm;
+                            }
+                        }
+                        currentFrame = animation.currentFrame + currentSegmentFrames;
+                        if (showLogs) console.log(`Current Frame: ${currentFrame}`);
+                    });
 
-                updateTimeField("animation" + updateCounter);
-
-                newAnimation = null;
-            })
+                    addEvents(animation);
+                    updateTimeField("animation" + updateCounter);
+                    newAnimation = null;
+                });
+            }
         }
+        if (showInfo) info();
     }
-    if (showInfo) info();
-}
 
 
     async function play() {
@@ -560,12 +546,12 @@
 
     function stop() {
         if (stopExist) {
-            if (lottieState==="idle") {
-                animation.goToAndPlay("stop", true) 
-                if (showLogs) console.log("Template - Play 'stop' Marker")
+            if (lottieState === "idle") {
+                animation.goToAndPlay("stop", true);
+                if (showLogs) console.log("Template - Play 'stop' Marker");
             } else {
                 //playStack.length=0
-                playStack.push("stop")
+                playStack.push("stop");
             }
         } else {
             if (showLogs) console.log("Template - No 'stop' marker - destroy Animation");
@@ -576,19 +562,19 @@
 
     function next() {
         if (nextCount > nextTotal && stopExist) {
-            stop()
+            stop();
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
         } else {
-            if (lottieState==="idle") {
-                animation.goToAndPlay("next" + nextCount, true)
-                currentSegment="next" + nextCount
-                if (showLogs) console.log("Template - Play 'next" + nextCount + "' Marker")
+            if (lottieState === "idle") {
+                animation.goToAndPlay("next" + nextCount, true);
+                currentSegment = "next" + nextCount;
+                if (showLogs) console.log("Template - Play 'next" + nextCount + "' Marker");
             } else {
                 //playStack.shift()
-                playStack.push("next" + nextCount)
-                if(markers.includes("next" + nextCount+"_loop"))  playStack.push("next" + nextCount+"_loop")
+                playStack.push("next" + nextCount);
+                if (markers.includes("next" + nextCount + "_loop")) playStack.push("next" + nextCount + "_loop");
             }
-            nextCount++
+            nextCount++;
         }
     }
 
