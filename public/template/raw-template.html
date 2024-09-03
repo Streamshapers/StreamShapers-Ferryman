@@ -117,7 +117,7 @@
                 });
                 dataArray.push(columns);
             });
-            //console.log(dataArray);
+            //console.log("Google raw data: ", dataArray);
             return dataArray;
         }catch (error) {
             console.error("Error collecting data from Google: ", error);
@@ -137,7 +137,8 @@
         return data[rowIx] ? data[rowIx][colIx] : undefined;
     }
 
-    async function updateGoogleTableData(parsed) {
+    async function updateGoogleTableData(templateJSON) {
+        //console.log("template Json for google update: ", JSON.stringify(templateJSON));
         const tableData = await parseGoogleTable();
         for (const element of tableData) {
             const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?sheet=' + element.sheet;
@@ -145,12 +146,18 @@
             //console.log("Updated Data: ", tsvArray);
             if (tsvArray.length > 0) {
                 element.value = getCellData(element.cell, tsvArray);
-                if (!parsed) parsed = {};
-                if (!(element.key in parsed)) {
-                    parsed[element.key] = element.value;
+                //console.log("Extracted value for cell " + element.key + ": " + element.cell + ": " + element.value);
+                for(const layer of templateJSON.layers) {
+                    //console.log(JSON.stringify(layer.nm));
+                    if (layer.nm === element.key) {
+                        layer.t.d.k[0].s.t = element.value.toString();
+                        //console.log("new value: ", layer.t.d.k[0].s.t);
+                    }
                 }
             }
         }
+        //console.log("finished GoogleUpdate")
+        return templateJSON;
     }
 
     // Uncomment the following lines to periodically update data
@@ -327,9 +334,12 @@
         if (name == "update") updateExist = true
     })
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
-  
 
     async function update(rawData) {
+        if(fetchSheet && googleTableCells) {
+            lottieTemplateNew = await updateGoogleTableData(lottieTemplate);
+        }
+
         lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)) //copy the "old" updated template for the update Animation
         lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
         let parsed;
@@ -368,17 +378,6 @@
                     }
                 })
             }
-        }
-
-        if(fetchSheet && googleTableCells) {
-            await updateGoogleTableData(parsed);
-            const tableData = await parseGoogleTable();
-            tableData.forEach((element)=>{
-                if (!parsed) parsed = {};
-                if (!(element.key in parsed)){
-                    parsed[element.key] = element.value;
-                }
-            });
         }
 
         /*if(parsed){
