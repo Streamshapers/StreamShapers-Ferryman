@@ -20,7 +20,8 @@ function TextsDisplay() {
         setTextObjects,
         externalSources,
         setExternalSources,
-        updateLottieText
+        updateLottieText,
+        setUpdateGoogle
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [colValue, setColValue] = useState('');
@@ -98,6 +99,7 @@ function TextsDisplay() {
     const handleGoogleCoordinates = (object, type, value) => {
         const updatedTextObjects = [...textObjects];
         const textObject = updatedTextObjects.find(t => t === object);
+
         if (type === "col" && /^[a-zA-Z]*$/.test(value)) {
             setColValue(value);
             textObject.col = value;
@@ -186,18 +188,18 @@ function TextsDisplay() {
                                     </div>
                                     {textObject.type === "Google Table" && (
                                         <>
-                                            <label>Column:
+                                            <label>Cell:
                                                 <input className="google-table-input"
                                                        type="text"
 
                                                        pattern="[a-zA-Z]*"
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "col", e.target.value)}/>
                                             </label>
-                                            <label>Row:
+                                            {/*<label>Row:
                                                 <input className="google-table-input"
                                                        type="number"
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "row", e.target.value)}/>
-                                            </label>
+                                            </label>*/}
                                             <label>Sheet:
                                                 <input className=""
                                                        onChange={(e) => setSheetName(e.target.value, textObject)}/>

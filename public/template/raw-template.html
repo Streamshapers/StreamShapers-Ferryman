@@ -139,7 +139,8 @@
         const tableData = await parseGoogleTable();
 
         for (const element of tableData) {
-            const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
+            //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
+            const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/export?format=csv&gid=' + element.sheet;
             const csvArray = await fetchDataFromGoogle(sheetURL);
 
             if (csvArray.length > 0) {

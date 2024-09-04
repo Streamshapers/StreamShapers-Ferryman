@@ -1,4 +1,4 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 export const GlobalStateContext = createContext();
 
@@ -32,6 +32,9 @@ export const GlobalStateProvider = ({children}) => {
     const [externalSources, setExternalSources] = useState([{key: 'Google Table', secret: '', index: 1}]);
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
     const [googleTableCells, setGoogleTableCells] = useState([]);
+    const [updateGoogle, setUpdateGoogle] = useState(false);
+
+    const googleCellSnapshot = useRef([]);
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
@@ -114,7 +117,7 @@ export const GlobalStateProvider = ({children}) => {
                     if (!newFonts.includes(fontName) && !path.startsWith("data:font") || !newFonts.includes(fontName) && path.startsWith("data:font/unn")) {
                         newFonts.push(fontName);
                     }
-                    
+
                     // Für eingebettete Schriftarten, die mit "data:font" beginnen
                     if (path.startsWith("data:font") && !path.startsWith("data:font/unn")) {
                         if (!font.fFamily.endsWith(font.fStyle)) {
@@ -561,19 +564,45 @@ export const GlobalStateProvider = ({children}) => {
             if (textObject.type === 'Google Table') {
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
-                textObject.text = textObject.oiginal;
+                //textObject.text = textObject.oiginal;
                 updatedGoogleTableCells.push({
                     id: source.secret,
                     key: textObject.layername,
                     cell: textObject.col + textObject.row,
                     sheet: textObject.sheet,
-                    value: textObject.oiginal
+                    value: textObject.text
                 })
             }
         })
         //console.log(updatedGoogleTableCells);
-        setGoogleTableCells(updatedGoogleTableCells);
+        const currentSnapshotString = JSON.stringify(googleCellSnapshot.current);
+        const updatedCellsString = JSON.stringify(updatedGoogleTableCells);
+
+        if (currentSnapshotString !== updatedCellsString) {
+            //console.log("Zellen haben sich geändert");
+            googleCellSnapshot.current = [...updatedGoogleTableCells];
+            setGoogleTableCells(updatedGoogleTableCells);
+            setUpdateGoogle(true);
+        } else {
+            //console.log("Keine Änderung in den Zellen");
+        }
+
     }, [textObjects, externalSources]);
+
+    function arraysAreEqual(arr1, arr2) {
+        // Check if both arrays are null or undefined
+        if (!arr1 && !arr2) return true;
+        // Check if one of them is null or undefined
+        if (!arr1 || !arr2) return false;
+        // Compare lengths
+        if (arr1.length !== arr2.length) return false;
+        // Compare elements
+        for (let i = 0; i < arr1.length; i++) {
+            if (arr1[i] !== arr2[i]) return false;
+        }
+        return true;
+    }
+
 
     useEffect(() => {
         //console.log("before: ", externalSources);
@@ -596,6 +625,101 @@ export const GlobalStateProvider = ({children}) => {
         //console.log("after: ", externalSources);
         //console.log("after: ", textObjects);
     }, [externalSources]);
+
+    async function fetchDataFromGoogle(url) {
+        try {
+            let response = await fetch(url);
+
+            if (!response.ok) {
+                //console.warn(`Fehler beim Abrufen der Daten. Status: ${response.status}`);
+                return null;
+            }
+
+            let csvText = await response.text();
+            //console.log("CSVRaw", csvText);
+            return csvText.split('\n').map(row => row.split(','));
+        } catch (error) {
+            console.warn("Error collecting data from Google:", error);
+            return null;
+        }
+    }
+
+    function getCellData(cell, data) {
+        try {
+            const columnName = cell.match(/[A-Z]+/g)[0];
+            const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let rowIx = (parseInt(cell.match(/[0-9]+/g)[0])) - 1; // Row index (0-based)
+            let colIx = 0;
+
+            for (let i = 0; i < columnName.length; i++) {
+                colIx = colIx * 26 + base.indexOf(columnName[i]) + 1;
+            }
+            colIx = colIx - 1; // Column index (0-based)
+
+            let cellValue = data[rowIx] ? data[rowIx][colIx] : undefined;
+
+            if (cellValue && cellValue.startsWith('"') && cellValue.endsWith('"')) {
+                cellValue = cellValue.slice(1, -1);
+            }
+
+            if (cellValue) {
+                cellValue = cellValue.replace(/\r/g, '').replace(/\n/g, '');
+            }
+
+            console.log("CellValue = ", cellValue);
+            return cellValue;
+
+        } catch (error) {
+            console.log("Error getCellData from GoogleSheet:", error);
+        }
+    }
+
+    const updateGoogleData = async () => {
+        let sources = [];
+        for (let i = 0; i < googleTableCells.length; i++) {
+            const object = googleTableCells[i];
+            //console.log("Layer: ", object.key);
+
+            if (object.id && object.sheet && object.cell) {
+                const cell = object.cell;
+                const sheetURL = `https://docs.google.com/spreadsheets/d/${object.id}/export?format=csv&gid=${object.sheet}`;
+
+                let csvArray;
+                if (!sources[sheetURL]) {
+                    csvArray = await fetchDataFromGoogle(sheetURL);
+                    sources[sheetURL] = csvArray;
+                    console.log("Sources updated:", sources);
+                } else {
+                    csvArray = sources[sheetURL];
+                    console.log("Sheet URL already exists in sources. Using cached value:", csvArray);
+                }
+
+                if (csvArray && csvArray.length > 0) {
+                    const value = getCellData(cell, csvArray);
+                    if (value !== undefined && value !== object.value) {
+                        //console.log(`Extracted value for ${cell}: ${value}`);
+                        let copiedJsonData = {...jsonData};
+                        for (const layer of copiedJsonData.layers) {
+                            if (layer.nm === object.key) {
+                                const textObject = textObjects.find(obj => obj.layername === object.key);
+                                const textIndex = textObjects.findIndex(t => t === textObject);
+                                updateLottieText(textIndex, value.toString());
+                            }
+                        }
+                        object.value = value;
+
+                        //setJsonData(copiedJsonData);
+                    }
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (updateGoogle) {
+            updateGoogleData().then(() => setUpdateGoogle(false));
+        }
+    }, [googleTableCells, updateGoogle]);
 
     return (
         <GlobalStateContext.Provider value={{
@@ -655,6 +779,8 @@ export const GlobalStateProvider = ({children}) => {
             setDeleteExternalSource,
             googleTableCells,
             setGoogleTableCells,
+            updateGoogle,
+            setUpdateGoogle,
             updateLottieText
         }}>
             {children}

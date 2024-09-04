@@ -40,7 +40,9 @@ function LottieDemo() {
         isPlaying,
         setIsPlaying,
         jsonFile,
-        fileName
+        fileName,
+        updateGoogle,
+        setUpdateGoogle
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const lottieInstanceRef = useRef(null);
@@ -72,6 +74,10 @@ function LottieDemo() {
     function updateLottie() {
         if (lottieInstanceRef.current) {
             lottieInstanceRef.current.destroy();
+        }
+
+        if (!updateGoogle) {
+            setUpdateGoogle(true);
         }
 
         if (!jsonData) return;
