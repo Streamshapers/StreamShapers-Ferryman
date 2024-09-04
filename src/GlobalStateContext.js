@@ -195,9 +195,9 @@ export const GlobalStateProvider = ({children}) => {
                         oiginal: obj.t.d.k[0].s.t,
                         type: 'text',
                         source: 'none',
-                        sheet: "",
-                        col: "",
-                        row: ""
+                        sheet: "0",
+                        cell: "",
+                        errors: [],
                     }];
                 }
 
@@ -228,6 +228,48 @@ export const GlobalStateProvider = ({children}) => {
         }
 
     }, [jsonData]);
+
+    const setTextError = (obj, err) => {
+        const updatedTexts = [...textObjects];
+        const textObject = updatedTexts.find(t => t === obj);
+
+        if (textObject) {
+            if (!Array.isArray(textObject.errors)) {
+                textObject.errors = [];
+            }
+
+            const errorExists = textObject.errors.some(e => e.type === err.type);
+
+            if (!errorExists) {
+                textObject.errors.push(err);
+            } else {
+                console.warn(`Error with type "${err.type}" already exists`);
+            }
+
+            console.log("Text Errors", textObject.errors);
+        } else {
+            console.warn("textObject is undefined");
+        }
+
+        setTextObjects(updatedTexts);
+    };
+
+
+    const removeTextError = (obj, errType) => {
+        const updatedTexts = [...textObjects];
+        const textObject = updatedTexts.find(t => t === obj);
+
+        if (textObject && Array.isArray(textObject.errors)) {
+            textObject.errors = textObject.errors.filter(e => e.type !== errType);
+
+            console.log("Remaining Text Errors", textObject.errors);
+        } else {
+            console.warn("textObject or textObject.errors is undefined");
+        }
+
+        setTextObjects(updatedTexts);
+    };
+
 
     const updateLottieText = (index, newText) => {
         if (!jsonData) {
@@ -568,7 +610,7 @@ export const GlobalStateProvider = ({children}) => {
                 updatedGoogleTableCells.push({
                     id: source.secret,
                     key: textObject.layername,
-                    cell: textObject.col + textObject.row,
+                    cell: textObject.cell,
                     sheet: textObject.sheet,
                     value: textObject.text
                 })
@@ -644,7 +686,9 @@ export const GlobalStateProvider = ({children}) => {
         }
     }
 
-    function getCellData(cell, data) {
+    function getCellData(key, cell, data) {
+        const obj = textObjects.find(obj => obj.layername === key);
+
         try {
             const columnName = cell.match(/[A-Z]+/g)[0];
             const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -666,16 +710,25 @@ export const GlobalStateProvider = ({children}) => {
                 cellValue = cellValue.replace(/\r/g, '').replace(/\n/g, '');
             }
 
-            console.log("CellValue = ", cellValue);
+            //console.log("CellValue = ", cellValue);
+            if (obj) {
+                removeTextError(obj, "Cell Error");
+            }
             return cellValue;
 
         } catch (error) {
-            console.log("Error getCellData from GoogleSheet:", error);
+            //console.log("Error getCellData from GoogleSheet:", error); HIER FEHLERMELDUNG
+            if (obj) {
+                setTextError(obj, {
+                    type: "Cell Error",
+                    text: "The cell value is not valid, must be in format [A-Za-z]+[0-9]+!"
+                });
+            }
         }
     }
 
     const updateGoogleData = async () => {
-        let sources = [];
+        let sources = {};
         for (let i = 0; i < googleTableCells.length; i++) {
             const object = googleTableCells[i];
             //console.log("Layer: ", object.key);
@@ -688,14 +741,14 @@ export const GlobalStateProvider = ({children}) => {
                 if (!sources[sheetURL]) {
                     csvArray = await fetchDataFromGoogle(sheetURL);
                     sources[sheetURL] = csvArray;
-                    console.log("Sources updated:", sources);
+                    //console.log("Sources updated:", sources);
                 } else {
                     csvArray = sources[sheetURL];
-                    console.log("Sheet URL already exists in sources. Using cached value:", csvArray);
+                    //console.log("Sheet URL already exists in sources. Using cached value:", csvArray);
                 }
 
                 if (csvArray && csvArray.length > 0) {
-                    const value = getCellData(cell, csvArray);
+                    const value = getCellData(object.key, cell, csvArray);
                     if (value !== undefined && value !== object.value) {
                         //console.log(`Extracted value for ${cell}: ${value}`);
                         let copiedJsonData = {...jsonData};

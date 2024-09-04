@@ -27,10 +27,8 @@ function ConnectApiDialog() {
                 } else if (field === "secret") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
                     const match = value.match(regex);
-
                     const id = match ? match[1] : null;
-
-                    console.log(id);
+                    //console.log(id);
                     return {...api, [field]: id};
                 } else {
                     return {...api, [field]: value};

@@ -818,7 +818,31 @@ input[type='file']::-webkit-file-upload-button {
     gap: 10px;
 }
 
+.textForm {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    gap: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.textFieldErrors {
+    width: 100%;
+}
+
+.textError {
+    color: var(--error-content);
+    background-color: var(--error);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px;
+}
+
 .jsonText {
+    flex-direction: column;
     display: flex;
     justify-content: space-between;
     align-items: center;

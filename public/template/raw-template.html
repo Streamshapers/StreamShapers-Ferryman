@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
-<!--######## HTML-Template - StreamShapers #######-->
+<!--######## HTML-Template by StreamShapers #######-->
 <!--########### visit streamshapers.com ##########-->
 <!-- made with StreamShapers Ferryman ${version} -->
 <head>
@@ -106,6 +106,10 @@
     async function fetchDataFromGoogle(url) {
         try {
             let response = await fetch(url);
+            if (!response.ok) {
+                console.warn(`Fehler beim Abrufen der Daten. Status: ${response.status}`);
+                return null;
+            }
             let csvText = await response.text();
             return csvText.split('\n').map(row => row.split(','));
         } catch (error) {
@@ -115,35 +119,53 @@
     }
 
     function getCellData(cell, data) {
-        const columnName = cell.match(/[A-Z]+/g)[0];
-        const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let rowIx = (parseInt(cell.match(/[0-9]+/g)[0])) - 1; // Row index (0-based)
-        let colIx = 0;
+        try {
+            const columnName = cell.match(/[A-Z]+/g)[0];
+            const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let rowIx = (parseInt(cell.match(/[0-9]+/g)[0])) - 1; // Row index (0-based)
+            let colIx = 0;
 
-        for (let i = 0; i < columnName.length; i++) {
-            colIx = colIx * 26 + base.indexOf(columnName[i]) + 1;
+            for (let i = 0; i < columnName.length; i++) {
+                colIx = colIx * 26 + base.indexOf(columnName[i]) + 1;
+            }
+            colIx = colIx - 1; // Column index (0-based)
+
+            let cellValue = data[rowIx] ? data[rowIx][colIx] : undefined;
+
+            if (cellValue && cellValue.startsWith('"') && cellValue.endsWith('"')) {
+                cellValue = cellValue.slice(1, -1);
+            }
+
+            if (cellValue) {
+                cellValue = cellValue.replace(/\r/g, '').replace(/\n/g, '');
+            }
+
+            return cellValue;
+        } catch (error) {
+            console.log("Error getCellData from GoogleSheet:", error);
         }
-        colIx = colIx - 1; // Column index (0-based)
-
-        let cellValue = data[rowIx] ? data[rowIx][colIx] : undefined;
-
-        if (cellValue && cellValue.startsWith('"') && cellValue.endsWith('"')) {
-            cellValue = cellValue.slice(1, -1);
-        }
-
-        return cellValue;
     }
 
 
     async function updateGoogleTableData(templateJSON) {
         const tableData = await parseGoogleTable();
+        let sources = {};
 
         for (const element of tableData) {
             //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
             const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/export?format=csv&gid=' + element.sheet;
-            const csvArray = await fetchDataFromGoogle(sheetURL);
+            let csvArray;
 
-            if (csvArray.length > 0) {
+            if (!sources[sheetURL]) {
+                csvArray = await fetchDataFromGoogle(sheetURL);
+                sources[sheetURL] = csvArray;
+                //console.log("Sources updated:", sources);
+            } else {
+                csvArray = sources[sheetURL];
+                //console.log("Sheet URL already exists in sources. Using cached value:", csvArray);
+            }
+
+            if (csvArray && csvArray.length > 0) {
                 const value = getCellData(element.cell, csvArray);
                 for (const layer of templateJSON.layers) {
                     if (layer.nm === element.key) {

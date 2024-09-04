@@ -96,15 +96,12 @@ function TextsDisplay() {
         //console.log(textObjects);
     }
 
-    const handleGoogleCoordinates = (object, type, value) => {
+    const handleGoogleCoordinates = (object, value) => {
         const updatedTextObjects = [...textObjects];
         const textObject = updatedTextObjects.find(t => t === object);
 
-        if (type === "col" && /^[a-zA-Z]*$/.test(value)) {
-            setColValue(value);
-            textObject.col = value;
-        } else if (type === "row") {
-            textObject.row = value;
+        if (value) {
+            textObject.cell = value.toUpperCase();
         } else {
             console.log("Error saving Google Table coordinates!")
         }
@@ -160,80 +157,100 @@ function TextsDisplay() {
                     let externalSourceSelect;
                     return (
                         <div key={i} className="jsonText">
-                            <label className="text-layer-name">{textObject.layername}</label>
-                            {textObject.type === "text" && (
-                                <input
-                                    type="text"
-                                    title={textTitle}
-                                    data-index={index}
-                                    value={textObject.text}
-                                    onChange={(e) => updateLottieText(index, e.target.value)}
-                                />
-                            )}
-                            {textObject.type !== "text" && (
-                                <div className="external-source-form">
-                                    <div className="source-select">
-                                        <div>Source:</div>
-                                        <select value={textObject.source}
-                                                onChange={e => handleSourceChange(e.target.value, textObject)}>
-                                            {externalSources.map((api, i) => {
-                                                return (
-                                                    <option
-                                                        key={i} value={api.index.toString()}>
-                                                        {api.index.toString()}
-                                                    </option>
-                                                )
-                                            })}
-                                        </select>
-                                    </div>
-                                    {textObject.type === "Google Table" && (
-                                        <>
-                                            <label>Cell:
-                                                <input className="google-table-input"
-                                                       type="text"
+                            {textObject.errors.length > 0 && (
+                                <div className="textFieldErrors">
+                                    {textObject.errors.map((error, i) => {
+                                        const errorType = typeof error === 'object' ? Object.values(error)[0] : error;
+                                        const errorMassage = typeof error === 'object' ? Object.values(error)[1] : error;
 
-                                                       pattern="[a-zA-Z]*"
-                                                       onChange={(e) => handleGoogleCoordinates(textObject, "col", e.target.value)}/>
-                                            </label>
-                                            {/*<label>Row:
+                                        return (
+                                            <div key={i} className="textError">
+                                                <p>
+                                                    <b>{errorType}</b> - {errorMassage}</p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            <div className="textForm">
+                                <label className="text-layer-name">{textObject.layername}</label>
+                                {textObject.type === "text" && (
+                                    <input
+                                        type="text"
+                                        title={textTitle}
+                                        data-index={index}
+                                        value={textObject.text}
+                                        onChange={(e) => updateLottieText(index, e.target.value)}
+                                    />
+                                )}
+                                {textObject.type !== "text" && (
+                                    <div className="external-source-form">
+                                        <div className="source-select">
+                                            <div>Source:</div>
+                                            <select value={textObject.source}
+                                                    onChange={e => handleSourceChange(e.target.value, textObject)}>
+                                                {externalSources.map((api, i) => {
+                                                    return (
+                                                        <option
+                                                            key={i} value={api.index.toString()}>
+                                                            {api.index.toString()}
+                                                        </option>
+                                                    )
+                                                })}
+                                            </select>
+                                        </div>
+                                        {textObject.type === "Google Table" && (
+                                            <>
+                                                <label>Cell:
+                                                    <input className="google-table-input"
+                                                           type="text"
+
+                                                           pattern="[A-Za-z]+[0-9]+"
+                                                           onChange={(e) => handleGoogleCoordinates(textObject, e.target.value)}/>
+                                                </label>
+                                                {/*<label>Row:
                                                 <input className="google-table-input"
                                                        type="number"
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "row", e.target.value)}/>
                                             </label>*/}
-                                            <label>Sheet:
-                                                <input className=""
-                                                       onChange={(e) => setSheetName(e.target.value, textObject)}/>
-                                            </label>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-
-                            {useExternalSources}
-                            <div className="option-button-wrapper">
-                                <button className="option-button"
-                                        onClick={() => setShowOptionMenuIndex(showOptionMenuIndex === i ? null : i)}>
-                                    <FontAwesomeIcon icon={faEllipsisVertical}/>
-                                </button>
-                                {showOptionMenuIndex === i && (
-                                    <div className="text-option-dropdown">
-                                        <ul>
-                                            {textObject.type === "text" && useExternalSources && (
-                                                <li onClick={() => handleSelect("external", textObject)}
-                                                    className="text-option-item">Connect External Source
-                                                </li>
-                                            )}
-                                            {textObject.type !== "text" && useExternalSources && (
-                                                <li onClick={() => handleSelect("text", textObject)}
-                                                    className="text-option-item">Connect Text
-                                                </li>
-                                            )}
-                                            <li onClick={() => handleSelect("change", textObject)}
-                                                className="text-option-item">Change Layer Name
-                                            </li>
-                                        </ul>
+                                                <label>Sheet (gid):
+                                                    <input className=""
+                                                           onChange={(e) => setSheetName(e.target.value, textObject)}
+                                                           placeholder="leave blank for first sheet..."
+                                                    />
+                                                </label>
+                                            </>
+                                        )}
                                     </div>
                                 )}
+
+                                {useExternalSources}
+                                <div className="option-button-wrapper">
+                                    <button className="option-button"
+                                            onClick={() => setShowOptionMenuIndex(showOptionMenuIndex === i ? null : i)}>
+                                        <FontAwesomeIcon icon={faEllipsisVertical}/>
+                                    </button>
+                                    {showOptionMenuIndex === i && (
+                                        <div className="text-option-dropdown">
+                                            <ul>
+                                                {textObject.type === "text" && useExternalSources && (
+                                                    <li onClick={() => handleSelect("external", textObject)}
+                                                        className="text-option-item">Connect External Source
+                                                    </li>
+                                                )}
+                                                {textObject.type !== "text" && useExternalSources && (
+                                                    <li onClick={() => handleSelect("text", textObject)}
+                                                        className="text-option-item">Connect Text
+                                                    </li>
+                                                )}
+                                                <li onClick={() => handleSelect("change", textObject)}
+                                                    className="text-option-item">Change Layer Name
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
