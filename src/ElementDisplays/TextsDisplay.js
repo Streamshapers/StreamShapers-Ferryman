@@ -14,6 +14,7 @@ function TextsDisplay() {
         setTextObjects,
         externalSources,
         updateLottieText,
+        updateTextRef
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [colValue, setColValue] = useState('');
@@ -71,6 +72,10 @@ function TextsDisplay() {
         setShowOptionMenuIndex(null);
     };
 
+    useEffect(() => {
+
+    }, [textObjects]);
+
     const handleSourceChange = (index, object) => {
         const source = externalSources.find(obj => obj.index === parseInt(index, 10));
         //console.log("Source", source);
@@ -108,8 +113,27 @@ function TextsDisplay() {
         setTextObjects(updatedTextObjects);
     }
 
+    const updateTextObject = (index, newText) => {
+        const updateIndex = textObjects.findIndex(t => t.layername === textObjects[index].layername + "_update");
+        //console.log(updateIndex);
+        if (updateIndex && updateIndex !== -1) {
+            if (textObjects[updateIndex].text !== newText) {
+                updateLottieText(updateIndex, newText);
+                const updateObject = textObjects[index];
+                updateObject.text = newText;
+                updateTextRef.current = updateObject;
+                console.log("updateTextObject");
+            }
+        } else {
+            updateLottieText(index, newText);
+        }
+    }
+
     const filteredTexts = textObjects.filter((textObject) => {
-        return textShowAll || textObject.layername.startsWith('_');
+        return (
+            textShowAll ||
+            (textObject.layername.startsWith('_') && !textObject.layername.endsWith('_update'))
+        );
     });
 
 
@@ -169,7 +193,7 @@ function TextsDisplay() {
                                         title={textTitle}
                                         data-index={index}
                                         value={textObject.text}
-                                        onChange={(e) => updateLottieText(index, e.target.value)}
+                                        onChange={(e) => updateTextObject(index, e.target.value)}
                                     />
                                 )}
                                 {textObject.type !== "text" && (

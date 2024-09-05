@@ -39,10 +39,14 @@ function LottieDemo() {
         markers,
         isPlaying,
         setIsPlaying,
-        jsonFile,
-        fileName,
         updateGoogle,
-        setUpdateGoogle
+        setUpdateGoogle,
+        textObjects,
+        setTextObjects,
+        updateTextRef,
+        updateMarkerReady,
+        updateLottieText,
+        setUpdateMarkerReady
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const lottieInstanceRef = useRef(null);
@@ -52,6 +56,9 @@ function LottieDemo() {
     const [clickedPlay, setClickedPlay] = useState(false);
     const toPlayRef = useRef([]);
     const [currentFrame, setCurrentFrame] = useState(0);
+    const [nextMarkers, setNextMarkers] = useState([]);
+    const nextCountRef = useRef(1);
+    const updateExistRef = useRef(false);
 
     const formatTimeFromFrames = useCallback((frame, frameRate) => {
         const seconds = Math.floor(frame / frameRate);
@@ -61,8 +68,20 @@ function LottieDemo() {
 
     useEffect(() => {
         if (lottieInstanceRef.current === null) {
-            updateLottie();
+            updateLottie(false);
         }
+
+        const updatedNextMarkers = [];
+        markers.forEach((marker, index) => {
+            if (marker.cm.includes("next") && !marker.cm.includes("loop")) {
+                updatedNextMarkers.push(marker);
+            }
+
+            if (marker.cm.toLowerCase() === "update") {
+                updateExistRef.current = true;
+            }
+        });
+        setNextMarkers(updatedNextMarkers);
 
         return () => {
             if (lottieInstanceRef.current) {
@@ -71,7 +90,7 @@ function LottieDemo() {
         };
     }, []);
 
-    function updateLottie() {
+    function updateLottie(update) {
         if (lottieInstanceRef.current) {
             lottieInstanceRef.current.destroy();
         }
@@ -87,13 +106,20 @@ function LottieDemo() {
             container: animationContainerRef.current,
             renderer: 'svg',
             loop: false,
-            autoplay: isPlaying,
+            autoplay: false,
             animationData: jsonData,
         });
 
         const timeoutId = setTimeout(() => {
-            instance.goToAndStop(currentFrame, true);
-            if (isPlaying) instance.play();
+            if (updateExistRef.current && update) {
+                const updateMarker = markers.find(m => m.cm.toLowerCase() === "update");
+                instance.goToAndStop(updateMarker.tm, true);
+                setCurrentFrame(updateMarker.tm);
+                setUpdateMarkerReady(false);
+            } else {
+                instance.goToAndStop(currentFrame, true);
+                if (isPlaying) instance.play();
+            }
 
             onEnterFrame = (e) => {
                 setCurrentFrame(Math.round(e.currentTime));
@@ -102,6 +128,7 @@ function LottieDemo() {
             instance.addEventListener('enterFrame', onEnterFrame);
 
             lottieInstanceRef.current = instance;
+            if (updateExistRef.current && update) playMarker("update", true);
         }, 300);
 
         return () => {
@@ -204,21 +231,49 @@ function LottieDemo() {
             setIsPlaying(false);
             lottieInstanceRef.current.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
+            const marker = markers.find(obj => obj.tm === markerFrame)
+            if (marker.cm.includes("next") && !marker.cm.includes("loop")) {
+                const match = marker.cm.match(/\d$/);
+                if (match) {
+                    nextCountRef.current = parseInt(match[0], 10);
+                }
+            }
         }
     }, [lottieInstanceRef.current, setCurrentFrame, setIsPlaying]);
 
+    const playNext = () => {
+        if (!isPlaying && toPlayRef.current.length > 0) {
+            //console.log("started to play next marker! ", toPlayRef.current[0].cm);
+            playMarker(toPlayRef.current[0].cm);
+        }
+        //console.log("toPlay:", toPlayRef.current);
+    }
+
     const playMarker = (markerName) => {
         currentLoopMarkerRef.current = null;
+        const backFrame = currentFrame;
+        //console.log(backFrame)
         const marker = markers.find(obj => obj.cm === markerName);
         if (marker) {
-            if (markerName === "start") {
+            if (markerName.toLowerCase() === "start") {
                 setClickedPlay(true);
                 toPlayRef.current = [];
-            } else if (markerName === "stop") {
+                nextCountRef.current = 1;
+            } else if (markerName.toLowerCase() === "stop") {
                 setClickedPlay(false);
                 toPlayRef.current = [];
+                nextCountRef.current = 1;
             }
-            const nextMarker = markers.find(m => m.tm === marker.tm + marker.dr);
+            let nextMarker = markers.find(m => m.tm === marker.tm + marker.dr);
+
+            if (markers.find(m => m.cm === marker.cm + "_loop")) {
+                nextMarker = markers.find(m => m.cm === marker.cm + "_loop");
+            } else if (marker.cm.includes("next")) {
+                const nextCount = nextCountRef.current;
+                nextMarker = markers.find(m => m.cm === "next" + nextCount);
+            } else {
+                nextMarker = markers.find(m => m.cm.toLowerCase() === "stop");
+            }
 
             setCurrentFrame(marker.tm);
             lottieInstanceRef.current.goToAndPlay(marker.tm, true);
@@ -226,22 +281,38 @@ function LottieDemo() {
 
             const checkInterval = setInterval(() => {
                 const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
+                const markerEnd = marker.tm + marker.dr - 1;
 
-                if (currentFrame >= marker.tm + marker.dr - 1) {
+                if (currentFrame >= markerEnd) {
                     clearInterval(checkInterval);
 
-                    if (currentFrame === marker.tm + marker.dr - 1) {
-                        lottieInstanceRef.current.goToAndStop(marker.tm + marker.dr, true);
-                        setCurrentFrame(marker.tm + marker.dr);
+                    if (currentFrame === markerEnd) {
+                        if (marker.cm === "update" && updateTextRef.current) {
+                            if (updateTextRef.current) {
+                                setUpdateMarkerReady(true);
+                                const textObjectIndex = textObjects.findIndex(obj => obj.layername === updateTextRef.current.layername);
+                                updateLottieText(textObjectIndex, updateTextRef.current.text);
+                                updateTextRef.current = null;
+                                //updateLottie();
+                            }
+                            //console.log("back", backFrame);
+                            lottieInstanceRef.current.goToAndStop(backFrame, true);
+                            setCurrentFrame(backFrame);
+                            //console.log("nextMarker: ", nextMarker);
+                            console.log("update Played", marker)
+                        } else {
+                            lottieInstanceRef.current.goToAndStop(markerEnd, true);
+                            setCurrentFrame(marker.tm + marker.dr - 1);
+                        }
                     }
 
                     if (nextMarker && nextMarker.cm.endsWith("_loop")) {
                         currentLoopMarkerRef.current = nextMarker;
                     }
 
-                    if (nextMarker) {
+                    if (nextMarker && marker.cm !== "update") {
                         setIsPlaying(false);
-                        setCurrentFrame(marker.tm + marker.dr);
+                        setCurrentFrame(markerEnd);
 
                         if (nextMarker === toPlayRef.current[0]) {
                             playMarker(toPlayRef.current[0].cm);
@@ -289,21 +360,21 @@ function LottieDemo() {
 
     const handleNext = () => {
         if (clickedPlay) {
-            const currentMarker = markers.find(marker => marker.tm <= currentFrame && marker.tm + marker.dr >= currentFrame);
-            let nextMarker;
-
-            if (toPlayRef.current.length > 0) {
-                const lastMarker = toPlayRef.current[toPlayRef.current.length - 1];
-                nextMarker = findNextMarker(lastMarker.tm);
+            if (nextCountRef.current > nextMarkers.length) {
+                playMarker("stop")
             } else {
-                nextMarker = markers.find(marker => marker.tm === currentMarker.tm + currentMarker.dr);
-            }
-
-            if (nextMarker) {
-                toPlayRef.current = [...toPlayRef.current, nextMarker];
-                if (!currentLoopMarkerRef.current && toPlayRef.current.length === 1 && !isPlaying) {
-                    playMarker(toPlayRef.current[0].cm);
-                    toPlayRef.current.splice(0, 1);
+                //console.log("next" + nextCountRef.current);
+                let nextMarker = markers.find(m => m.cm === "next" + nextCountRef.current);
+                //console.log(nextMarker);
+                if (nextMarker) {
+                    nextCountRef.current++;
+                    toPlayRef.current = [...toPlayRef.current, nextMarker];
+                    if (!currentLoopMarkerRef.current && toPlayRef.current.length === 1 && !isPlaying) {
+                        playMarker(toPlayRef.current[0].cm);
+                        toPlayRef.current.splice(0, 1);
+                    }
+                } else {
+                    console.log("no next marker found!")
                 }
             }
         }
@@ -363,7 +434,8 @@ function LottieDemo() {
                                  onClick={handleNext}>
                                 Next
                             </div>
-                            <div className="previewControlButton demo" title="Update" onClick={updateLottie}>
+                            <div className="previewControlButton demo" title="Update"
+                                 onClick={() => updateLottie(true)}>
                                 Update
                             </div>
                             <div className="previewControlButton demo" title="Stop" onClick={() => playMarker("stop")}>

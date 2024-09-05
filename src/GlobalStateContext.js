@@ -30,6 +30,8 @@ export const GlobalStateProvider = ({children}) => {
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
+    const updateTextRef = useRef(null);
+    const [updateMarkerReady, setUpdateMarkerReady] = useState(false);
 
     const googleCellSnapshot = useRef([]);
 
@@ -183,7 +185,7 @@ export const GlobalStateProvider = ({children}) => {
                     tempTextObjects = [...tempTextObjects, {
                         layername: obj.nm,
                         text: obj.t.d.k[0].s.t,
-                        oiginal: obj.t.d.k[0].s.t,
+                        original: obj.t.d.k[0].s.t,
                         type: 'text',
                         source: 'none',
                         sheet: "0",
@@ -553,7 +555,7 @@ export const GlobalStateProvider = ({children}) => {
             const updatedTextObjects = textObjects.map(textObject => {
                 if (textObject.type !== "text") {
                     if (textObject.type === "Digital Clock") {
-                        textObject.text = textObject.oiginal;
+                        textObject.text = textObject.original;
                     }
                     return {...textObject, type: "text"};
                 }
@@ -566,23 +568,23 @@ export const GlobalStateProvider = ({children}) => {
     useEffect(() => {
         //console.log("Delete:", deleteExternalSource);
         if (deleteExternalSource) {
-            const updatedTextObjects = textObjects.map(textObject => {
-                if (textObject.source === deleteExternalSource.toString()) {
-                    if (textObject.type === "Digital Clock") {
-                        textObject.text = textObject.oiginal;
-                    }
-                    return {...textObject, type: "text"};
+            const updatedTextObjects = [...textObjects];
+            for (let i = 0; i < textObjects.length; i++) {
+                if (updatedTextObjects[i].source === deleteExternalSource.toString()) {
+                    updatedTextObjects[i].source = "";
+                    updatedTextObjects[i].type = "text";
+                    updatedTextObjects[i].text = updatedTextObjects[i].original;
                 }
-                return textObject;
-            })
+            }
             setTextObjects(updatedTextObjects);
+
         }
     }, [deleteExternalSource]);
 
     useEffect(() => {
         const updatedGoogleTableCells = [];
         textObjects.map(textObject => {
-            if (textObject.type === 'Google Sheet') {
+            if (textObject.type === 'Google Sheet' && externalSources.length > 0) {
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
                 //textObject.text = textObject.oiginal;
@@ -753,6 +755,16 @@ export const GlobalStateProvider = ({children}) => {
         }
     }, [googleTableCells, updateGoogle]);
 
+
+    /*useEffect(() => {
+        if(updateMarkerReady){
+            const textObjectIndex = textObjects.findIndex(obj => obj.layername === updateTextValue.layername);
+            setUpdateTextValue(null);
+            console.log("inde: " + textObjectIndex + "value: " + updateTextValue.text);
+            updateLottie(textObjectIndex, updateTextValue.text);
+        }
+    }, [updateMarkerReady]);*/
+
     return (
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
@@ -807,7 +819,10 @@ export const GlobalStateProvider = ({children}) => {
             setGoogleTableCells,
             updateGoogle,
             setUpdateGoogle,
-            updateLottieText
+            updateLottieText,
+            updateTextRef,
+            updateMarkerReady,
+            setUpdateMarkerReady
         }}>
             {children}
         </GlobalStateContext.Provider>

@@ -305,7 +305,7 @@ function LottiePreview() {
                                      onClick={() => stepFrame(1)}/>
                     {jsonData.markers && jsonData.markers.length > 0 &&
                         <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
-                                         title="Play to next Marker"
+                                         title="Play current Marker and stop"
                                          onClick={playCurrenMarker}/>}
 
                     <FontAwesomeIcon icon={faCamera} className="previewControlButton"
