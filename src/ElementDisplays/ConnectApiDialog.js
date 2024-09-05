@@ -1,19 +1,20 @@
 import React, {useContext, useState} from 'react';
 import {GlobalStateContext} from "../GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {faPlus, faRotateRight, faXmark} from "@fortawesome/free-solid-svg-icons";
 
 function ConnectApiDialog() {
     const {
         useExternalSources,
         externalSources,
         setExternalSources,
-        setDeleteExternalSource
+        setDeleteExternalSource,
+        setUpdateGoogle
     } = useContext(GlobalStateContext);
     const [externalSourceIndex, setExternalSourceIndex] = useState(2)
 
     const handleAddApi = () => {
-        setExternalSources([...externalSources, {key: 'Google Table', secret: '', index: externalSourceIndex}]);
+        setExternalSources([...externalSources, {key: 'Google Sheet', secret: '', index: externalSourceIndex}]);
         setExternalSourceIndex(externalSourceIndex + 1);
         //console.log(externalSources);
     };
@@ -47,20 +48,30 @@ function ConnectApiDialog() {
         setExternalSources(newApis);
     };
 
+    const handleSourceUpdate = () => {
+        setUpdateGoogle(true);
+    }
+
     return (
         <>
             {useExternalSources && (
                 <div className='api-dialog-wrapper'>
-                    <h4>Sources</h4>
+                    <div className="external-sources-header">
+                        <div className="sources-placeholder"></div>
+                        <h4>Sources</h4>
+                        <div className="div-button" title="refresh sources" onClick={() => handleSourceUpdate()}>
+                            <FontAwesomeIcon icon={faRotateRight}/>
+                        </div>
+                    </div>
                     {externalSources.map((api, index) => (
                         <div className="api-dialog" key={index}>
                             <div>{api.index.toString() + "."}</div>
                             <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
-                                <option>Google Table</option>
+                                <option>Google Sheet</option>
                                 <option>Digital Clock</option>
                             </select>
                             <div className="external-source-fields">
-                                {api.key === "Google Table" && (
+                                {api.key === "Google Sheet" && (
                                     <input
                                         type="text"
                                         onChange={e => handleChange(index, 'secret', e.target.value)}
@@ -73,15 +84,15 @@ function ConnectApiDialog() {
                                     </select>
                                 )}
 
-                                <button className="remove-button" onClick={() => handleRemoveApi(index)}>
+                                <div className="div-button remove-button" onClick={() => handleRemoveApi(index)}>
                                     <FontAwesomeIcon icon={faXmark}/>
-                                </button>
+                                </div>
                             </div>
                         </div>
                     ))}
-                    <button className="add-button" title="Add External Source" onClick={handleAddApi}>
+                    <div className="div-button add-button" title="Add External Source" onClick={handleAddApi}>
                         <FontAwesomeIcon icon={faPlus}/>
-                    </button>
+                    </div>
                 </div>
             )}
         </>

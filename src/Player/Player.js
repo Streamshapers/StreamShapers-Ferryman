@@ -27,7 +27,8 @@ function Player() {
                             onClick={() => handleTabChange('standard')}>Analyze
                     </button>
                     <button className={`player-mode-button ${activeTab === 'demo' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('demo')}>Demo Player
+                            onClick={() => handleTabChange('demo')}
+                            title="Play your Template just like in CasparCG">Demo Player
                     </button>
                 </div>
             )}

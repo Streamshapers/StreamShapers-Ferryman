@@ -6,12 +6,6 @@ import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 
 function TextsDisplay() {
     const {
-        jsonData,
-        texts,
-        setTexts,
-        originalTexts,
-        textsLayerNames,
-        setJsonData,
         textShowAll,
         setTextShowAll,
         useExternalSources,
@@ -19,9 +13,7 @@ function TextsDisplay() {
         textObjects,
         setTextObjects,
         externalSources,
-        setExternalSources,
         updateLottieText,
-        setUpdateGoogle
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [colValue, setColValue] = useState('');
@@ -116,10 +108,6 @@ function TextsDisplay() {
         setTextObjects(updatedTextObjects);
     }
 
-    /*const filteredTexts = texts && textsLayerNames && textsLayerNames.filter((textLayerName, i) => {
-        return textShowAll || textsLayerNames[i].startsWith('_');
-    });*/
-
     const filteredTexts = textObjects.filter((textObject) => {
         return textShowAll || textObject.layername.startsWith('_');
     });
@@ -200,7 +188,7 @@ function TextsDisplay() {
                                                 })}
                                             </select>
                                         </div>
-                                        {textObject.type === "Google Table" && (
+                                        {textObject.type === "Google Sheet" && (
                                             <>
                                                 <label>Cell:
                                                     <input className="google-table-input"

@@ -1,15 +1,14 @@
 import React, {useContext, useEffect} from 'react';
 import {GlobalStateContext} from "./GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFile, faFileArrowUp, faFileExport} from "@fortawesome/free-solid-svg-icons";
+import {faFileArrowUp} from "@fortawesome/free-solid-svg-icons";
 
 function JsonFileProcessor() {
     const {
         setJsonData,
         setColors,
         setError,
-        setTexts,
-        setTextsLayerNames,
+        setTextObjects,
         setImages,
         setMarkers,
         setCurrentFrame,
@@ -22,8 +21,7 @@ function JsonFileProcessor() {
     const resetState = () => {
         setJsonData(null);
         setColors([]);
-        setTexts([]);
-        setTextsLayerNames([]);
+        setTextObjects([]);
         setImages([]);
         setCurrentFrame(0);
         setIsPlaying(true);

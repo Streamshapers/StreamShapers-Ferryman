@@ -6,12 +6,12 @@ import TextsDisplay from "./TextsDisplay";
 import ImagesDisplay from "./ImagesDisplay";
 import ColorsDisplay from "./ColorsDispaly";
 import MarkersDisplay from "./MarkersDisplay";
-import {faChevronDown, faChevronUp, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
+import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 
 function JsonElementsDisplay() {
-    const {jsonData, infos, fonts, texts, colors, images} = useContext(GlobalStateContext);
+    const {jsonData, infos, fonts, textObjects, colors, images} = useContext(GlobalStateContext);
     const [isInfoOpen, setIsInfoOpen] = useState(false);
     const [isFontsOpen, setIsFontsOpen] = useState(false);
     const [isTextsOpen, setIsTextsOpen] = useState(false);
@@ -46,7 +46,7 @@ function JsonElementsDisplay() {
                         </div>
                     </div>
                 )}
-                {texts && texts.length > 0 && (
+                {textObjects && textObjects.length > 0 && (
                     <div className="accordion-item texts">
                         <h3 className="accordion-header" onClick={() => setIsTextsOpen(!isTextsOpen)}>
                             <FontAwesomeIcon icon={isTextsOpen ? faChevronUp : faChevronDown}/> Texts

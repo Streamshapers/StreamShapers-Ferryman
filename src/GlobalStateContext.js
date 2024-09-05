@@ -7,9 +7,6 @@ export const GlobalStateProvider = ({children}) => {
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
-    const [texts, setTexts] = useState([]);
-    const [originalTexts, setOriginalTexts] = useState([]);
-    const [textsLayerNames, setTextsLayerNames] = useState([]);
     const [textObjects, setTextObjects] = useState([]);
     const [images, setImages] = useState([]);
     const [infos, setInfos] = useState({});
@@ -29,7 +26,7 @@ export const GlobalStateProvider = ({children}) => {
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
     const [useExternalSources, setUseExternalSources] = useState(false);
-    const [externalSources, setExternalSources] = useState([{key: 'Google Table', secret: '', index: 1}]);
+    const [externalSources, setExternalSources] = useState([{key: 'Google Sheet', secret: '', index: 1}]);
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
@@ -179,16 +176,10 @@ export const GlobalStateProvider = ({children}) => {
 
     useEffect(() => {
         function searchForTexts(obj) {
-            let tempTexts = [];
-            let tempOriginalTexts = [];
-            let tempTextsLayerNames = [];
             let tempTextObjects = [];
 
             if (typeof obj === "object" && obj !== null) {
                 if (obj.t && obj.t.d && obj.t.d.k && Array.isArray(obj.t.d.k) && obj.t.d.k.length > 0 && obj.t.d.k[0].s && obj.t.d.k[0].s.t) {
-                    tempTexts.push(obj.t.d.k[0].s.t);
-                    tempOriginalTexts.push(obj.t.d.k[0].s.t);
-                    tempTextsLayerNames.push(obj.nm);
                     tempTextObjects = [...tempTextObjects, {
                         layername: obj.nm,
                         text: obj.t.d.k[0].s.t,
@@ -203,26 +194,15 @@ export const GlobalStateProvider = ({children}) => {
 
                 Object.keys(obj).forEach(key => {
                     const childResults = searchForTexts(obj[key]);
-                    tempTexts.push(...childResults.texts);
-                    tempOriginalTexts.push(...childResults.originalTexts);
-                    tempTextsLayerNames.push(...childResults.textsLayerNames);
                     tempTextObjects.push(...childResults.textObjects);
                 });
             }
 
-            return {
-                texts: tempTexts,
-                originalTexts: tempOriginalTexts,
-                textsLayerNames: tempTextsLayerNames,
-                textObjects: tempTextObjects
-            };
+            return {textObjects: tempTextObjects};
         }
 
         if (jsonData) {
-            const {texts, originalTexts, textsLayerNames, textObjects} = searchForTexts(jsonData);
-            setTexts(texts);
-            setOriginalTexts(originalTexts);
-            setTextsLayerNames(textsLayerNames);
+            const {textObjects} = searchForTexts(jsonData);
             setTextObjects(textObjects);
             //console.log(textObjects);
         }
@@ -246,7 +226,7 @@ export const GlobalStateProvider = ({children}) => {
                 console.warn(`Error with type "${err.type}" already exists`);
             }
 
-            console.log("Text Errors", textObject.errors);
+            //console.log("Text Errors", textObject.errors);
         } else {
             console.warn("textObject is undefined");
         }
@@ -262,7 +242,7 @@ export const GlobalStateProvider = ({children}) => {
         if (textObject && Array.isArray(textObject.errors)) {
             textObject.errors = textObject.errors.filter(e => e.type !== errType);
 
-            console.log("Remaining Text Errors", textObject.errors);
+            //console.log("Remaining Text Errors", textObject.errors);
         } else {
             console.warn("textObject or textObject.errors is undefined");
         }
@@ -470,10 +450,10 @@ export const GlobalStateProvider = ({children}) => {
 
         let textsWithNames = {};
 
-        if (texts && textsLayerNames) {
-            for (let i = 0; i < texts.length; i++) {
-                if (textsLayerNames[i] && textsLayerNames[i].startsWith('_')) {
-                    textsWithNames[textsLayerNames[i]] = texts[i];
+        if (textObjects) {
+            for (let i = 0; i < textObjects.length; i++) {
+                if (textObjects[i].layername.startsWith('_') && textObjects[i].type === "text") {
+                    textsWithNames[textObjects[i].layername] = textObjects[i].text;
                 }
             }
         }
@@ -504,7 +484,7 @@ export const GlobalStateProvider = ({children}) => {
         }
         //console.log(spxExportJson);
         setSPXGCTemplateDefinition(spxExportJson);
-    }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
+    }, [fileName, textObjects, jsonData, refImages, markers]);
 
     //############################################ GDD ################################################################
 
@@ -528,11 +508,10 @@ export const GlobalStateProvider = ({children}) => {
         }
 
         let textsWithNames = {};
-
-        if (texts && textsLayerNames) {
-            for (let i = 0; i < texts.length; i++) {
-                if (textsLayerNames[i] && textsLayerNames[i].startsWith('_')) {
-                    textsWithNames[textsLayerNames[i]] = texts[i];
+        if (textObjects) {
+            for (let i = 0; i < textObjects.length; i++) {
+                if (textObjects[i].layername.startsWith('_') && textObjects[i].type === "text") {
+                    textsWithNames[textObjects[i].layername] = textObjects[i].text;
                 }
             }
         }
@@ -565,7 +544,7 @@ export const GlobalStateProvider = ({children}) => {
         }
         //console.log(gddExportJson);
         setGDDTemplateDefinition(gddExportJson);
-    }, [fileName, texts, textsLayerNames, jsonData, refImages, markers]);
+    }, [fileName, textObjects, jsonData, refImages, markers]);
 
     //############################################ External Sources ################################################################
 
@@ -603,7 +582,7 @@ export const GlobalStateProvider = ({children}) => {
     useEffect(() => {
         const updatedGoogleTableCells = [];
         textObjects.map(textObject => {
-            if (textObject.type === 'Google Table') {
+            if (textObject.type === 'Google Sheet') {
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
                 //textObject.text = textObject.oiginal;
@@ -659,7 +638,7 @@ export const GlobalStateProvider = ({children}) => {
                 textObject.text = source.secret;
                 updateLottieText(textObjects.findIndex(t => t === textObject), source.secret);
             }
-            if (textObject.type === "Google Table") {
+            if (textObject.type === "Google Sheet") {
                 textObject.text = textObject.oiginal;
             }
         })
@@ -783,10 +762,6 @@ export const GlobalStateProvider = ({children}) => {
             setColors,
             error,
             setError,
-            texts,
-            setTexts,
-            textsLayerNames,
-            setTextsLayerNames,
             images,
             setImages,
             infos,
@@ -795,8 +770,6 @@ export const GlobalStateProvider = ({children}) => {
             setFonts,
             uploadedFonts,
             setUploadedFonts,
-            originalTexts,
-            setOriginalTexts,
             fontFaces,
             setFontFaces,
             textShowAll,

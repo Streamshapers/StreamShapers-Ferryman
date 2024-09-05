@@ -10,7 +10,6 @@ import {
     faPlay
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {external} from "jszip";
 
 const MarkersContainer = React.memo(({markers, goToMarker}) => {
     const {jsonData} = useContext(GlobalStateContext);
@@ -48,15 +47,13 @@ function LottiePreview() {
     const {
         jsonData,
         fontFaces,
-        texts,
         markers,
         currentFrame,
         setCurrentFrame,
         isPlaying,
         setIsPlaying,
         fileName,
-        textObjects,
-        externalSources
+        textObjects
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const [lottieInstance, setLottieInstance] = useState(null);
@@ -100,7 +97,7 @@ function LottiePreview() {
             setTimeout(updateTimeFields, 500);
         };
 
-    }, [jsonData, texts, textObjects]);
+    }, [jsonData, textObjects, textObjects]);
 
     const adjustSvgWidth = () => {
         if (animationContainerRef.current) {

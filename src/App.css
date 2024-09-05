@@ -267,10 +267,26 @@ input {
     border-radius: 5px;
     color: var(--copy-light);
     padding: 5px;
+    height: 30px;
+}
+
+select {
+    border-radius: 5px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--copy);
+    height: 30px;
+    font-size: 0.8rem;
+    padding: 5px;
 }
 
 input[type="color"] {
     padding: 1px;
+}
+
+input[type="file"] {
+    height: auto;
+    background-color: var(--background);
 }
 
 input[type='file']::-webkit-file-upload-button {
@@ -461,6 +477,7 @@ input[type='file']::-webkit-file-upload-button {
     flex-grow: 1;
     padding: 5px !important;
     background: var(--background);
+    height: auto;
 }
 
 .font-item span {
@@ -492,7 +509,7 @@ input[type='file']::-webkit-file-upload-button {
     align-items: center;
     background: var(--background);
     border-radius: 5px;
-    padding: 5px;
+    padding: 5px 10px;
     border: 1px solid var(--border);
     height: 40px
 }
@@ -563,6 +580,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .marker-inputs {
     display: flex;
+    align-items: center;
     flex-direction: row;
     gap: 10px;
     background: var(--foreground);
@@ -1181,16 +1199,6 @@ input[type='file']::-webkit-file-upload-button {
     margin: 0;
 }
 
-select {
-    border-radius: 5px;
-    background: var(--background);
-    border: 1px solid var(--border);
-    color: var(--copy);
-    height: 25px;
-    font-size: 0.8rem;
-    padding: 5px;
-}
-
 .spx-extra-settings {
     display: flex;
     flex-direction: column;
@@ -1220,9 +1228,16 @@ button {
     color: var(--copy);
 }
 
-.add-button {
+.div-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--background);
+    border: 1px solid var(--border);
     border-radius: 5px;
-    width: 40px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
 }
 
 #spx-export-filetype-input {
@@ -1328,8 +1343,20 @@ label span.bla {
     padding: 5px;
 }
 
+.external-sources-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.sources-placeholder {
+    width: 30px;
+}
+
 .api-dialog {
     display: flex;
+    align-items: center;
     gap: 10px;
     background: var(--background);
     padding: 10px;
@@ -1348,6 +1375,7 @@ label span.bla {
 
 .api-dialog input {
     flex-grow: 1;
+    height: 30px;
 }
 
 .option-button-wrapper {
@@ -1423,6 +1451,8 @@ label span.bla {
 .external-source-form label {
     flex-grow: 1;
     display: flex;
+    align-items: center;
     justify-content: center;
     gap: 10px;
+    text-wrap: nowrap;
 }
