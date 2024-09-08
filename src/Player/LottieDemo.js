@@ -42,11 +42,8 @@ function LottieDemo() {
         updateGoogle,
         setUpdateGoogle,
         textObjects,
-        setTextObjects,
         updateTextRef,
-        updateMarkerReady,
-        updateLottieText,
-        setUpdateMarkerReady
+        updateLottieText
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const lottieInstanceRef = useRef(null);
@@ -91,9 +88,12 @@ function LottieDemo() {
     }, []);
 
     function updateLottie(update) {
+        let oldInstance;
         if (lottieInstanceRef.current) {
+            oldInstance = lottieInstanceRef.current;
             lottieInstanceRef.current.destroy();
         }
+
 
         if (!updateGoogle) {
             setUpdateGoogle(true);
@@ -111,14 +111,13 @@ function LottieDemo() {
         });
 
         const timeoutId = setTimeout(() => {
+
             if (updateExistRef.current && update) {
                 const updateMarker = markers.find(m => m.cm.toLowerCase() === "update");
                 instance.goToAndStop(updateMarker.tm, true);
                 setCurrentFrame(updateMarker.tm);
-                setUpdateMarkerReady(false);
             } else {
                 instance.goToAndStop(currentFrame, true);
-                if (isPlaying) instance.play();
             }
 
             onEnterFrame = (e) => {
@@ -126,8 +125,12 @@ function LottieDemo() {
             };
 
             instance.addEventListener('enterFrame', onEnterFrame);
-
+            const testInstance = instance;
             lottieInstanceRef.current = instance;
+            if (oldInstance) {
+                console.log(lottieInstanceRef.current);
+                oldInstance.destroy();
+            }
             if (updateExistRef.current && update) playMarker("update", true);
         }, 300);
 
@@ -279,6 +282,7 @@ function LottieDemo() {
             lottieInstanceRef.current.goToAndPlay(marker.tm, true);
             setIsPlaying(true);
 
+            const itv = 1000 / (jsonData.fr * 2);
             const checkInterval = setInterval(() => {
                 const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
                 const markerEnd = marker.tm + marker.dr - 1;
@@ -287,19 +291,15 @@ function LottieDemo() {
                     clearInterval(checkInterval);
 
                     if (currentFrame === markerEnd) {
-                        if (marker.cm === "update" && updateTextRef.current) {
+                        if (marker.cm === "update") {
                             if (updateTextRef.current) {
-                                setUpdateMarkerReady(true);
                                 const textObjectIndex = textObjects.findIndex(obj => obj.layername === updateTextRef.current.layername);
                                 updateLottieText(textObjectIndex, updateTextRef.current.text);
                                 updateTextRef.current = null;
-                                //updateLottie();
+                                goBackWhenReady(backFrame);
+                            } else {
+                                goBackWhenReady(backFrame);
                             }
-                            //console.log("back", backFrame);
-                            lottieInstanceRef.current.goToAndStop(backFrame, true);
-                            setCurrentFrame(backFrame);
-                            //console.log("nextMarker: ", nextMarker);
-                            console.log("update Played", marker)
                         } else {
                             lottieInstanceRef.current.goToAndStop(markerEnd, true);
                             setCurrentFrame(marker.tm + marker.dr - 1);
@@ -320,12 +320,18 @@ function LottieDemo() {
                         }
                     }
                 }
-            }, 1000 / jsonData.fr);
+            }, itv);
             return () => clearInterval(checkInterval);
         } else {
             console.log(markerName + " Marker not found!");
         }
     };
+
+    const goBackWhenReady = (backFrame) => {
+        lottieInstanceRef.current.goToAndStop(backFrame, true);
+        setCurrentFrame(backFrame);
+        updateLottie(false);
+    }
 
 
     useEffect(() => {

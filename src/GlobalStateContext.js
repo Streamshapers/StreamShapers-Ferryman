@@ -31,7 +31,6 @@ export const GlobalStateProvider = ({children}) => {
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
     const updateTextRef = useRef(null);
-    const [updateMarkerReady, setUpdateMarkerReady] = useState(false);
 
     const googleCellSnapshot = useRef([]);
 
@@ -821,8 +820,6 @@ export const GlobalStateProvider = ({children}) => {
             setUpdateGoogle,
             updateLottieText,
             updateTextRef,
-            updateMarkerReady,
-            setUpdateMarkerReady
         }}>
             {children}
         </GlobalStateContext.Provider>
