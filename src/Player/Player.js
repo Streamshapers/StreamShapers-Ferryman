@@ -25,24 +25,26 @@ function Player() {
             {markers && markers.length > 0 && (
                 <div className="player-mode">
                     <button className={`player-mode-button ${activeTab === 'standard' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('standard')}>Analyze
+                            onClick={() => handleTabChange('standard')}
+                            title="check your animation frame by frame"
+                    >Analyze
                     </button>
-                    <button className={`player-mode-button ${activeTab === 'demo' ? 'active' : ''}`}
+                    {/*<button className={`player-mode-button ${activeTab === 'demo' ? 'active' : ''}`}
                             onClick={() => handleTabChange('demo')}
                             title="Play your Template just like in CasparCG">Demo Player
-                    </button>
+                    </button>*/}
                     <button className={`player-mode-button ${activeTab === 'template' ? 'active' : ''}`}
                             onClick={() => handleTabChange('template')}
-                            title="Play your Template just like in CasparCG">Template Player
+                            title="preview your HTML-Template">Preview
                     </button>
                 </div>
             )}
             {activeTab === 'standard' && (
                 <LottiePreview key={`standard-${key}`}/>
             )}
-            {activeTab === 'demo' && (
+            {/*{activeTab === 'demo' && (
                 <LottieDemo key={`demo-${key}`}/>
-            )}
+            )}*/}
             {activeTab === 'template' && (
                 <TemplatePlayer key={`template-${key}`}/>
             )}

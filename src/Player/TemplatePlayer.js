@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { GlobalStateContext } from "../GlobalStateContext";
+import React, {useContext, useEffect, useRef} from 'react';
+import {GlobalStateContext} from "../GlobalStateContext";
 
 function CasparCGTemplateDemo() {
-    const { htmlTemplate, textObjects} = useContext(GlobalStateContext);
+    const {htmlTemplate, textObjects, updateGoogle, setUpdateGoogle} = useContext(GlobalStateContext);
     const templateRef = useRef(null);
     const clickedPlayRef = useRef(false);
 
@@ -31,6 +31,10 @@ function CasparCGTemplateDemo() {
     }, [clickedPlayRef]);
 
     const updateAction = async () => {
+        if (!updateGoogle) {
+            setUpdateGoogle(true);
+        }
+
         const iframe = templateRef.current;
         let data = {};
         for (const object of textObjects) {
