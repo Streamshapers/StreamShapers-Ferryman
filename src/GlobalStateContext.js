@@ -1,4 +1,5 @@
 import React, {createContext, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import JSZip from 'jszip';
 
 export const GlobalStateContext = createContext();
 
@@ -31,6 +32,10 @@ export const GlobalStateProvider = ({children}) => {
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
     const updateTextRef = useRef(null);
+    const [imageEmbed, setImageEmbed] = useState("embed");
+    const [exportFormat, setExportFormat] = useState("html");
+    const [mimeType, setMimeType] = useState("text/html");
+    const [htmlTemplate, setHtmlTemplate] = useState(null);
 
     const googleCellSnapshot = useRef([]);
 
@@ -764,6 +769,189 @@ export const GlobalStateProvider = ({children}) => {
         }
     }, [updateMarkerReady]);*/
 
+    /*############################# generate Template ########################################*/
+
+    const generateFile = async (production) => {
+        console.log("generated new html")
+        let fileContent;
+        let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
+        let lottiePlayerCode = '';
+        let correctPath;
+        let jsonWithoutImages = "";
+        let playerCode;
+
+        if (production) {
+            playerCode = "</head>";
+        } else {
+            playerCode = `<script>
+                    window.addEventListener('message', (event) => {
+                        console.log('Received message:', event.data);
+
+                        const message = event.data;
+
+                        if (!message) {
+                            console.log('No message received.');
+                            return;
+                        }
+                        
+                        switch (message.action) {
+                            case 'update':
+                                if(message.data){
+                                    update(message.data);
+                                } else {
+                                    update();
+                                }
+                                break;
+                            case 'play':
+                                play();
+                                break;
+                            case 'next':
+                                next();
+                                break;
+                            case 'stop':
+                                stop();
+                                break;
+                            default:
+                                console.log('Unknown action:', message.action);
+                        }
+                    });
+
+                    function update(jsonData) {
+                        if (jsonData) {
+                            console.log('Update action triggered with data:', jsonData);
+                        } else {
+                            console.log('Update action triggered without data.');
+                        }
+                    }
+
+                    function play() {
+                        console.log('Play action triggered');
+                        addEvents(animation); 
+                    }
+
+                    function next() {
+                        console.log('Next action triggered');
+                    }
+
+                    function stop() {
+                        console.log('Stop action triggered');
+                    }
+                </script></head>`;
+        }
+
+        if (imagePath != null && !imagePath.endsWith("/")) {
+            setImagePath(`${imagePath}/`);
+            correctPath = `${imagePath}/`;
+        } else {
+            correctPath = imagePath;
+        }
+
+        try {
+            const response = await fetch(lottieScriptUrl);
+            if (!response.ok) throw new Error('CDN not answering');
+            lottiePlayerCode = await response.text();
+        } catch (error) {
+            console.error('Error loading Lottie Player from CDN, use local image:', error);
+            const localScriptResponse = await fetch('/lottie/lottie.min.js');
+            if (!localScriptResponse.ok) {
+                console.error('Error loading local Lottie image:', localScriptResponse.statusText);
+                return;
+            }
+            lottiePlayerCode = await localScriptResponse.text();
+        }
+
+        if (jsonData && jsonData.assets) {
+            if (imagePath != null && !imagePath.endsWith("/")) {
+                setImagePath(`${imagePath}/`);
+            }
+            jsonWithoutImages = JSON.parse(JSON.stringify(jsonData));
+
+            jsonWithoutImages.assets.forEach(asset => {
+                if (asset.p && asset.p.startsWith('data:image')) {
+                    asset.p = asset.id + ".png";
+                    asset.e = 0;
+                    asset.u = imagePath;
+                }
+            });
+        }
+
+        switch (exportFormat) {
+            case 'html':
+                setMimeType('text/html');
+                try {
+                    let response = null;
+                    response = await fetch('/template/raw-template.html');
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const template = await response.text();
+
+                    let fontFacesString = '';
+                    for (const font in fontFaces) {
+                        fontFacesString += fontFaces[font];
+                    }
+
+                    let jsonDataString
+                    if (imageEmbed === "embed") {
+                        jsonDataString = JSON.stringify(jsonData);
+                    } else if (imageEmbed === "extra") {
+                        jsonDataString = JSON.stringify(jsonWithoutImages);
+                    }
+                    const path = `"${correctPath}"`
+                    let spxTag = " ";
+                    if (spxExport) {
+                        spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
+                    }
+
+                    fileContent = template
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${jsonData}', jsonDataString)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${version}', ferrymanVersion)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${lottieData}', lottiePlayerCode)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${imagePath}', path)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${spx}', spxTag)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${googleTableData}', JSON.stringify(googleTableCells))
+                        .replace('</head>', playerCode);
+
+                } catch (error) {
+                    console.error('Error loading the template:', error);
+                    return;
+                }
+                break;
+            case 'json':
+                setMimeType('application/json');
+                if (imageEmbed === "embed") {
+                    fileContent = JSON.stringify(jsonData);
+                } else if (imageEmbed === "extra") {
+                    fileContent = JSON.stringify(jsonWithoutImages);
+                }
+                break;
+            default:
+                console.warn('unknown exportformat:', exportFormat);
+                return;
+        }
+
+        setHtmlTemplate(fileContent);
+        return fileContent;
+    };
+
+    useEffect(() => {
+        async function generateHTML() {
+            setExportFormat("html");
+            await generateFile();
+        }
+
+        generateHTML().then();
+    }, [jsonData]);
+
     return (
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
@@ -820,6 +1008,15 @@ export const GlobalStateProvider = ({children}) => {
             setUpdateGoogle,
             updateLottieText,
             updateTextRef,
+            imageEmbed,
+            setImageEmbed,
+            exportFormat,
+            setExportFormat,
+            mimeType,
+            setMimeType,
+            generateFile,
+            htmlTemplate,
+            setHtmlTemplate
         }}>
             {children}
         </GlobalStateContext.Provider>

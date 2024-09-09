@@ -20,10 +20,16 @@ function ExportDialog({isOpen, onClose}) {
         refImages,
         SPXGCTemplateDefinition,
         spxExport,
-        googleTableCells
+        googleTableCells,
+        imageEmbed,
+        setImageEmbed,
+        exportFormat,
+        setExportFormat,
+        mimeType,
+        setMimeType,
+        generateFile
     } = useContext(GlobalStateContext);
-    const [imageEmbed, setImageEmbed] = useState("embed");
-    const [exportFormat, setExportFormat] = useState("html");
+
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
     const [startMarkerCheck, setStartMarkerCheck] = useState(false);
     const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
@@ -101,113 +107,13 @@ function ExportDialog({isOpen, onClose}) {
 
     const downloadFile = async () => {
         let fileContent;
-        let mimeType;
-        let extension;
-        let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
-        let lottiePlayerCode = '';
-        let correctPath;
         const zip = new JSZip();
-        let jsonWithoutImages = "";
+        const extension = "." + exportFormat;
 
-        if (imagePath != null && !imagePath.endsWith("/")) {
-            setImagePath(`${imagePath}/`);
-            correctPath = `${imagePath}/`;
-        } else {
-            correctPath = imagePath;
-        }
-
-        try {
-            const response = await fetch(lottieScriptUrl);
-            if (!response.ok) throw new Error('CDN not answering');
-            lottiePlayerCode = await response.text();
+        try{
+            fileContent = await generateFile();
         } catch (error) {
-            console.error('Error loading Lottie Player from CDN, use local image:', error);
-            const localScriptResponse = await fetch('/lottie/lottie.min.js');
-            if (!localScriptResponse.ok) {
-                console.error('Error loading local Lottie image:', localScriptResponse.statusText);
-                return;
-            }
-            lottiePlayerCode = await localScriptResponse.text();
-        }
-
-        if (jsonData && jsonData.assets) {
-            if (imagePath != null && !imagePath.endsWith("/")) {
-                setImagePath(`${imagePath}/`);
-            }
-            jsonWithoutImages = JSON.parse(JSON.stringify(jsonData));
-
-            jsonWithoutImages.assets.forEach(asset => {
-                if (asset.p && asset.p.startsWith('data:image')) {
-                    asset.p = asset.id + ".png";
-                    asset.e = 0;
-                    asset.u = imagePath;
-                }
-            });
-        }
-
-        switch (exportFormat) {
-            case 'html':
-                mimeType = 'text/html';
-                extension = '.html';
-                try {
-                    let response = null;
-                    response = await fetch('/template/raw-template.html');
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const template = await response.text();
-
-                    let fontFacesString = '';
-                    for (const font in fontFaces) {
-                        fontFacesString += fontFaces[font];
-                    }
-
-                    let jsonDataString
-                    if (imageEmbed === "embed") {
-                        jsonDataString = JSON.stringify(jsonData);
-                    } else if (imageEmbed === "extra") {
-                        jsonDataString = JSON.stringify(jsonWithoutImages);
-                    }
-                    const path = `"${correctPath}"`
-                    let spxTag = " ";
-                    if (spxExport) {
-                        spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
-                    }
-
-                    fileContent = template
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${jsonData}', jsonDataString)
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${version}', ferrymanVersion)
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${fontFaceStyles}', "<style>" + fontFacesString + "</style>")
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${lottieData}', lottiePlayerCode)
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${imagePath}', path)
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${spx}', spxTag)
-                        // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${googleTableData}', JSON.stringify(googleTableCells));
-
-                } catch (error) {
-                    console.error('Error loading the template:', error);
-                    return;
-                }
-                break;
-            case 'json':
-                mimeType = 'application/json';
-                extension = '.json';
-                if (imageEmbed === "embed") {
-                    fileContent = JSON.stringify(jsonData);
-                } else if (imageEmbed === "extra") {
-                    fileContent = JSON.stringify(jsonWithoutImages);
-                }
-                break;
-            default:
-                console.warn('unknown exportformat:', exportFormat);
-                return;
+            console.log("Error generating File", error);
         }
 
         if (exportFormat === 'html' || exportFormat === 'json') {

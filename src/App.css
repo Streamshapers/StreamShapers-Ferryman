@@ -632,6 +632,10 @@ input[type='file']::-webkit-file-upload-button {
     border: 1px solid var(--border);
     color: var(--copy);
     cursor: pointer;
+    border-radius: 0;
+}
+
+.player-mode button:first-child {
     border-radius: 5px 0 0 5px;
 }
 
@@ -658,6 +662,17 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
     min-width: 500px;
     box-sizing: border-box;
+}
+
+#previewWrapper{
+    width: 100%;
+}
+
+.caspar-player iframe{
+    background: url(../public/transparent-background.png);
+    border: none;
+    width: 100%;
+    aspect-ratio: 16 / 9;
 }
 
 #animationPreview {
@@ -689,12 +704,20 @@ input[type='file']::-webkit-file-upload-button {
     border-top: none;
 }
 
+#previewControlContainer.just-buttons {
+    padding: 5px 0 0 0;
+}
+
 #previewControls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 0 0 0;
     height: auto;
+}
+
+#previewControls.just-buttons {
+    padding: 0;
 }
 
 .control-input-images {

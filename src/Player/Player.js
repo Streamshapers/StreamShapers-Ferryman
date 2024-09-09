@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import LottiePreview from "./LottiePreview";
 import LottieDemo from "./LottieDemo";
 import {GlobalStateContext} from "../GlobalStateContext";
+import TemplatePlayer from "./TemplatePlayer";
 
 function Player() {
     const {setIsPlaying, setCurrentFrame, fileName, markers} = useContext(GlobalStateContext);
@@ -30,6 +31,10 @@ function Player() {
                             onClick={() => handleTabChange('demo')}
                             title="Play your Template just like in CasparCG">Demo Player
                     </button>
+                    <button className={`player-mode-button ${activeTab === 'template' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('template')}
+                            title="Play your Template just like in CasparCG">Template Player
+                    </button>
                 </div>
             )}
             {activeTab === 'standard' && (
@@ -37,6 +42,9 @@ function Player() {
             )}
             {activeTab === 'demo' && (
                 <LottieDemo key={`demo-${key}`}/>
+            )}
+            {activeTab === 'template' && (
+                <TemplatePlayer key={`template-${key}`}/>
             )}
         </div>
     )
