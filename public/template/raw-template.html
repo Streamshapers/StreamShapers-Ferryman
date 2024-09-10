@@ -196,7 +196,7 @@
     let nextCount = 1;
     let nextTotal = 0;
     let showInfo = false;
-    let currentSegment;
+    let currentSegment = "start";
     let currentSegmentFrames;
     let animReady = createDeferredPromise();
     let animLoaded = createDeferredPromise();
@@ -212,21 +212,21 @@
     let lottieState = "stop";
     let markers = [];
     let playStack = [];
+    let breakFrame = undefined
     let fetchSheet = true;
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
         let name = marker.cm;
-        markers.push(name);
-        marker.cm = "name:" + name.toLowerCase();
+        markers.push(name)
+        marker.cm = name.toLowerCase();
 
-        if (name.includes("next") && !name.includes("loop")) {
-            nextTotal++;
-        }
-        if (name == "stop") stopExist = true;
-        if (name == "update") updateExist = true;
+        if (name.includes("next")&& !name.includes("loop")) nextTotal++
+        if (name == "stop") stopExist = true
+        if (name == "update") updateExist = true
     })
+
 
     function createDeferredPromise() {
         let resolver, rejecter;
@@ -292,51 +292,21 @@
         return null;
     }
 
-    function triggerPlayStack() {
-        if (showLogs) console.log(`LottieState: ${lottieState}`);
-        if (currentSegment === "stop") {
-            animation.destroy();
-        }
-        console.log("Stack: " + playStack[0]);
-        if (playStack.length === 0 && currentSegment.includes("loop")) playStack.push(currentSegment)
-        if (playStack[0]) {
-            let nextSegment = playStack[0];
-            animation.goToAndPlay(nextSegment, true);
-            if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`);
-            currentSegment = nextSegment;
-            playStack.shift();
-        }
+    function getMarker(markerName){
+        for (let marker of lottieTemplate.markers) {
+                if (marker.cm === markerName) return marker
+            }
     }
 
-    function addEvents(animation) {
-        animation.addEventListener("enterFrame", () => {
-            for (let marker of lottieTemplate.markers) {
-                if (marker.cm === "name:" + currentSegment) {
-                    currentSegmentFrames = marker.tm;
-                }
-            }
-            currentFrame = animation.currentFrame + currentSegmentFrames;
-            if (showLogs) console.log(`Current Frame: ${currentFrame}`);
-        });
-        animation.addEventListener("_play", () => {
-            lottieState = "play";
-            if (showLogs) console.log(`LottieState: ${lottieState}`);
-        });
-        animation.addEventListener("_pause", () => {
-            lottieState = "pause";
-            setTimeout(() => {
-                triggerPlayStack();
-            }, 0)
-        });
-        animation.addEventListener("_idle", () => {
-            lottieState = "idle";
-            /*
+
+    function triggerPlayStack(){
+        setTimeout(()=>{
             if (showLogs) console.log(`LottieState: ${lottieState}`)
             if (currentSegment === "stop") {
                 animation.destroy()
             }
-            console.log("Stack: "+playStack[0])
             if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment)
+            console.log("Stack in der mitte: "+playStack[0])
             if (playStack[0]) {
                 let nextSegment = playStack[0]
                 animation.goToAndPlay(nextSegment,true)
@@ -344,9 +314,36 @@
                 currentSegment = nextSegment
                 playStack.shift()
             } 
-            */
+        },0)
+    }
 
-        });
+    function addEvents(animation){
+        animation.addEventListener("enterFrame", () => {
+            currentSegmentFrames = getMarker(currentSegment).tm
+            /*
+            for (let marker of lottieTemplate.markers) {
+                if (marker.cm === currentSegment) {
+                    currentSegmentFrames = marker.tm
+                }
+            }
+            */
+            currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames
+            if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
+            if (showLogs) console.log(`Current Frame: ${currentFrame}`);
+        })
+        animation.addEventListener("_play",()=>{
+            lottieState="play"
+            if (showLogs) console.log(`LottieState: ${lottieState}`)
+        })
+        animation.addEventListener("_pause",()=>{
+            lottieState="pause"
+                triggerPlayStack()
+        })
+        animation.addEventListener("_idle", ()=>{
+            lottieState="idle"
+        })
+
+
     }
 
     async function update(rawData) {
@@ -532,6 +529,8 @@
                 newAnimation.addEventListener("DOMLoaded", function () {
                     if (showInfo) console.log("Template - updated Animation Ready");
                     newAnimation.goToAndStop(currentFrame, true);
+                    breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
+                    console.log("BREAK: " + breakFrame)
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
@@ -546,6 +545,7 @@
                     });
 
                     addEvents(animation);
+                    breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
                     updateTimeField("animation" + updateCounter);
                     newAnimation = null;
                 });
