@@ -541,7 +541,7 @@ export const GlobalStateProvider = ({children}) => {
 
         if (textObjects) {
             for (let i = 0; i < textObjects.length; i++) {
-                if (textObjects[i].layername.startsWith('_') && textObjects[i].type === "text") {
+                if (textObjects[i].layername.startsWith('_') && textObjects[i].type === "text" && !(textObjects[i].layername.includes("_update"))) {
                     textsWithNames[textObjects[i].layername] = textObjects[i].text;
                 }
             }
