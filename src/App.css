@@ -412,6 +412,10 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px 5px 0 0;
 }
 
+.accordion-header .errors {
+    background-color: var(--error);
+}
+
 .accordion-body {
     padding: 10px;
     background: var(--background);
@@ -466,6 +470,7 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
     padding: 5px;
     width: 100%;
+    overflow: hidden;
 }
 
 .font-item-text {
@@ -664,11 +669,11 @@ input[type='file']::-webkit-file-upload-button {
     box-sizing: border-box;
 }
 
-#previewWrapper{
+#previewWrapper {
     width: 100%;
 }
 
-.caspar-player iframe{
+.caspar-player iframe {
     background: url(../public/transparent-background.png);
     border: none;
     width: 100%;
@@ -902,10 +907,11 @@ input[type='file']::-webkit-file-upload-button {
 
 .jsonText .text-layer-name {
     margin: 0;
-    width: 110px;
+    width: 120px;
     border-right: 2px solid var(--primary);
     padding-right: 10px;
     height: 100%;
+    overflow: hidden;
 }
 
 .jsonText span {
@@ -1057,7 +1063,7 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .alert-wrapper {
-    background: var(--error);
+    background: var(--warning);
     border: 1px solid var(--border);
     border-radius: 5px;
     padding: 10px;
@@ -1065,6 +1071,18 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .alert {
+    color: var(--warning-content);
+}
+
+.error-wrapper {
+    background: var(--error);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.error {
     color: var(--error-content);
 }
 
