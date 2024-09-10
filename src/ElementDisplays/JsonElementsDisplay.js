@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {GlobalStateContext} from '../GlobalStateContext';
 import InfosDisplay from "./InfosDispaly";
 import FontsDisplay from "./FontsDisplay";
@@ -8,16 +8,25 @@ import ColorsDisplay from "./ColorsDispaly";
 import MarkersDisplay from "./MarkersDisplay";
 import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import GeneralAlerts from "../GeneralAlerts";
 
 
 function JsonElementsDisplay() {
-    const {jsonData, infos, fonts, textObjects, colors, images} = useContext(GlobalStateContext);
+    const {jsonData, infos, fonts, textObjects, colors, images, generalAlerts} = useContext(GlobalStateContext);
     const [isInfoOpen, setIsInfoOpen] = useState(false);
     const [isFontsOpen, setIsFontsOpen] = useState(false);
     const [isTextsOpen, setIsTextsOpen] = useState(false);
     const [isColorsOpen, setIsColorsOpen] = useState(false);
     const [isImagesOpen, setIsImagesOpen] = useState(false);
     const [isMarkersOpen, setIsMarkersOpen] = useState(false);
+
+    useEffect(() => {
+        if (generalAlerts.length > 0) {
+            setIsInfoOpen(true);
+        } else {
+            setIsInfoOpen(false);
+        }
+    }, []);
 
     if (!jsonData) {
         return null;
@@ -30,8 +39,10 @@ function JsonElementsDisplay() {
                     <div className="accordion-item infos">
                         <h3 className="accordion-header" onClick={() => setIsInfoOpen(!isInfoOpen)}>
                             <FontAwesomeIcon icon={isInfoOpen ? faChevronUp : faChevronDown}/> Info
+                            {generalAlerts.length > 0 ? ` & ${generalAlerts.length} Alerts` : ""}
                         </h3>
                         <div className="accordion-body" style={{display: isInfoOpen ? 'block' : 'none'}}>
+                            <GeneralAlerts/>
                             <InfosDisplay/>
                         </div>
                     </div>

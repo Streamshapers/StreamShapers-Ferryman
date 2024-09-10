@@ -1,5 +1,4 @@
-import React, {createContext, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import JSZip from 'jszip';
+import React, {createContext, useEffect, useRef, useState} from 'react';
 
 export const GlobalStateContext = createContext();
 
@@ -36,6 +35,7 @@ export const GlobalStateProvider = ({children}) => {
     const [exportFormat, setExportFormat] = useState("html");
     const [mimeType, setMimeType] = useState("text/html");
     const [htmlTemplate, setHtmlTemplate] = useState(null);
+    const [generalAlerts, setGeneralAlerts] = useState([]);
 
     const googleCellSnapshot = useRef([]);
 
@@ -46,14 +46,97 @@ export const GlobalStateProvider = ({children}) => {
     useEffect(() => {
         setMarkers(null);
         setCurrentFrame(0);
+        setGeneralAlerts([]);
     }, [jsonFile]);
 
+    //###################################### Errors / Alerts #####################################################################
+    const addGeneralAlert = (type, title, message) => {
+        const error = {type: type.toString(), title: title.toString(), message: message.toString()};
+        setGeneralAlerts(prevAlerts => {
+            const filteredAlerts = prevAlerts.filter(alert => alert.title !== error.title);
+            return [...filteredAlerts, error];
+        });
+        //console.log("Added or replaced error:", JSON.stringify(error));
+    };
+
+
+    const removeGeneralAlert = (title) => {
+        setGeneralAlerts(prevAlerts => {
+            //console.log("Removed alert with title:", title);
+            return prevAlerts.filter(alert => alert.title !== title);
+        });
+    };
+
+    useEffect(() => {
+        if (markers) {
+            const startExists = markers.some(event => event.cm === 'start');
+            const stopExists = markers.some(event => event.cm === 'stop');
+            if (!startExists) {
+                addGeneralAlert(
+                    "error",
+                    "Missing start marker",
+                    'Your animation has no start marker and might not play correctly in CasparCG. (Start marker needs to be named "start".)'
+                );
+            } else {
+                removeGeneralAlert("Missing start marker");
+            }
+
+            if (!stopExists) {
+                addGeneralAlert(
+                    "error",
+                    "Missing stop marker",
+                    'Your animation has no stop marker and might not play correctly in CasparCG. (Stop marker needs to be named "stop".)'
+                );
+            } else {
+                removeGeneralAlert("Missing stop marker");
+            }
+
+            let markerWithoutDuration = [];
+            for (let marker of markers) {
+                if (marker.dr <= 0) {
+                    markerWithoutDuration.push(marker.cm);
+                }
+            }
+            if (markerWithoutDuration.length > 0) {
+                const wrongMarkersString = markerWithoutDuration.join(', ');
+                addGeneralAlert(
+                    "error",
+                    "Marker without duration",
+                    'Following markers have no duration: ' + wrongMarkersString + '. Markers without an duration can\'t be played.'
+                );
+            } else {
+                removeGeneralAlert("Marker without duration");
+            }
+        }
+    }, [markers]);
+
+    useEffect(() => {
+        let allUploaded = true;
+        for (const font of fonts) {
+            if (!uploadedFonts.hasOwnProperty(font)) {
+                allUploaded = false;
+                break;
+            }
+        }
+        if (!allUploaded) {
+            addGeneralAlert(
+                "error",
+                "Font missing",
+                'Your animation contains fonts that you haven\'t uploaded. \n This may result in some ' +
+                'fonts not being displayed as intended in the animation.\n Please close this dialog and upload' +
+                ' all fonts in the fonts Tab.'
+            );
+        } else {
+            removeGeneralAlert("Font missing");
+        }
+    }, [uploadedFonts, fonts]);
+
+    //################################# Infos ######################################################################
     useEffect(() => {
         if (!jsonData) {
             return;
         }
 
-        //################################# Infos ######################################################################
         const newInfos = {};
 
         if (jsonData.op && jsonData.fr) {
@@ -1016,7 +1099,9 @@ export const GlobalStateProvider = ({children}) => {
             setMimeType,
             generateFile,
             htmlTemplate,
-            setHtmlTemplate
+            setHtmlTemplate,
+            generalAlerts,
+            setGeneralAlerts
         }}>
             {children}
         </GlobalStateContext.Provider>

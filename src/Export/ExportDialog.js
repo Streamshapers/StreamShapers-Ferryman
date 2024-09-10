@@ -3,6 +3,7 @@ import {GlobalStateContext} from "../GlobalStateContext";
 import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
 import GddExport from "./GddExport";
+import GeneralAlerts from "../GeneralAlerts";
 
 function ExportDialog({isOpen, onClose}) {
     const {
@@ -110,7 +111,7 @@ function ExportDialog({isOpen, onClose}) {
         const zip = new JSZip();
         const extension = "." + exportFormat;
 
-        try{
+        try {
             fileContent = await generateFile();
         } catch (error) {
             console.log("Error generating File", error);
@@ -175,14 +176,6 @@ function ExportDialog({isOpen, onClose}) {
         console.log(fileName)
     };
 
-    useEffect(() => {
-        if (markers) {
-            const startExists = markers.some(event => event.cm === 'start');
-            const stopExists = markers.some(event => event.cm === 'stop');
-            setStartMarkerCheck(startExists);
-            setStopMarkerCheck(stopExists);
-        }
-    }, [markers]);
 
     if (!isOpen) return null;
 
@@ -195,42 +188,7 @@ function ExportDialog({isOpen, onClose}) {
                         <div className="success alert-success">{message}</div>
                     </div>
                 )}
-                {/*{spxExport && (
-                    <div className="warning-wrapper">
-                        <div className="warning">
-                            When exporting for SPX, the imagePath set in the Images settings will be overwritten.
-                        </div>
-                    </div>
-                )}*/}
-                {!allFontsLoaded && <div className="alert-wrapper">
-                    <div className="alert">
-                        The animation contains fonts that you haven't uploaded.
-                    </div>
-                    <div className="alert">
-                        This may result in some fonts not being displayed as intended in the animation.
-                    </div>
-                    <div className="alert">
-                        Please close this dialog and upload all fonts in the fonts Tab.
-                    </div>
-                </div>}
-                {!startMarkerCheck && <div className="alert-wrapper">
-                    <div className="alert">
-                        Your animation has no start marker and might not play correctly in CasparCG. (Start marker needs
-                        to be named "start".)
-                    </div>
-                    <div className="alert">
-                        Please close this dialog and rename the start marker to "start" in the markers section.
-                    </div>
-                </div>}
-                {!stopMarkerCheck && <div className="alert-wrapper">
-                    <div className="alert">
-                        Your animation has no stop marker and might not play correctly in CasparCG. (Stop marker needs
-                        to be named "stop".)
-                    </div>
-                    <div className="alert">
-                        Please close this dialog and rename the stop marker to "stop" in the markers section.
-                    </div>
-                </div>}
+                <GeneralAlerts/>
                 <div className="tab-navigation">
                     <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
                             onClick={() => handleTabChange('default')}>General
