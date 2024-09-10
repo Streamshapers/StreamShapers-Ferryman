@@ -328,7 +328,7 @@
             }
             */
             currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames
-            if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
+            //if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
             if (showLogs) console.log(`Current Frame: ${currentFrame}`);
         })
         animation.addEventListener("_play",()=>{
@@ -513,7 +513,7 @@
                 });
             }
             //only without update animation
-            if (!updateExist) {
+            if (!updateExist && lottieState==="idle") {
                 let newDiv = document.createElement("div");
                 newDiv.id = "animation" + updateCounter;
                 document.body.appendChild(newDiv);
@@ -529,7 +529,7 @@
                 newAnimation.addEventListener("DOMLoaded", function () {
                     if (showInfo) console.log("Template - updated Animation Ready");
                     newAnimation.goToAndStop(currentFrame, true);
-                    breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
+                    //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
                     console.log("BREAK: " + breakFrame)
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
@@ -545,7 +545,7 @@
                     });
 
                     addEvents(animation);
-                    breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
+                    //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
                     updateTimeField("animation" + updateCounter);
                     newAnimation = null;
                 });
