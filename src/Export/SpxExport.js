@@ -32,12 +32,12 @@ function SpxExport() {
 
 
     const handleInstructionChange = (event) => {
-        const { value } = event.target;
+        const {value} = event.target;
         const newFields = [...SPXGCTemplateDefinition.DataFields];
         const instructionIndex = newFields.findIndex(field => field.ftype === "instruction");
 
         if (value.trim()) {
-            const newInstruction = { ftype: "instruction", value: value.trim() };
+            const newInstruction = {ftype: "instruction", value: value.trim()};
             if (instructionIndex !== -1) {
                 newFields[instructionIndex] = newInstruction;
                 if (instructionIndex !== 0) {
@@ -51,7 +51,7 @@ function SpxExport() {
             newFields.splice(instructionIndex, 1);
         }
 
-        setSPXGCTemplateDefinition({ ...SPXGCTemplateDefinition, DataFields: newFields });
+        setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
         console.log(SPXGCTemplateDefinition);
     };
 
@@ -184,6 +184,7 @@ function SpxExport() {
                                                     <option value="dropdown">Dropdown</option>
                                                     <option value="textarea">Textarea</option>
                                                     <option value="checkbox">Checkbox</option>
+                                                    <option value="color">Color</option>
                                                 </select>
                                             </label>
                                         )}

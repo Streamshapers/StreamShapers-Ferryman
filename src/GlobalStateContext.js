@@ -75,7 +75,7 @@ export const GlobalStateProvider = ({children}) => {
                 addGeneralAlert(
                     "error",
                     "Missing start marker",
-                    'Your animation has no start marker and might not play correctly in CasparCG. (Start marker needs to be named "start".)'
+                    'Your animation has no start marker and might not play correctly. (Start marker needs to be named "start".)'
                 );
             } else {
                 removeGeneralAlert("Missing start marker");
@@ -85,7 +85,7 @@ export const GlobalStateProvider = ({children}) => {
                 addGeneralAlert(
                     "error",
                     "Missing stop marker",
-                    'Your animation has no stop marker and might not play correctly in CasparCG. (Stop marker needs to be named "stop".)'
+                    'Your animation has no stop marker and might not play correctly. (Stop marker needs to be named "stop".)'
                 );
             } else {
                 removeGeneralAlert("Missing stop marker");
