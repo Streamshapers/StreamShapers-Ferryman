@@ -147,8 +147,7 @@
         }
     }
 
-
-    async function updateGoogleTableData(templateJSON) {
+    async function updateGoogleTableData(data) {
         const tableData = await parseGoogleTable();
         let sources = {};
 
@@ -168,14 +167,12 @@
 
             if (csvArray && csvArray.length > 0) {
                 const value = getCellData(element.cell, csvArray);
-                for (const layer of templateJSON.layers) {
-                    if (layer.nm === element.key) {
-                        layer.t.d.k[0].s.t = value != null ? value.toString() : "";
-                    }
+                if (!data[element.key]){
+                    data[element.key] = value
                 }
             }
         }
-        return templateJSON;
+        return data
     }
 
     // Uncomment the following lines to periodically update data
@@ -214,7 +211,7 @@
     let playStack = [];
     let breakFrame = undefined
     let fetchSheet = true;
-    let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
+    
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -345,11 +342,10 @@
 
 
     }
+    let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
-        if (fetchSheet && googleTableCells) {
-            lottieTemplateNew = await updateGoogleTableData(lottieTemplate);
-        }
+        if (lottieState=="idle") console.log("Updating is not possible while Playing ")
 
         lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)) //copy the "old" updated template for the update Animation
         lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
@@ -371,12 +367,19 @@
             } else {
                 parsed = JSON.parse(rawData);
             }
+        } else {parsed = {}}
+        
+        if (fetchSheet && googleTableCells) {
+            parsed = await updateGoogleTableData(parsed)
+        }
+        if (parsed) {
             for (let key of Object.keys(parsed)) {
                 if (key === "_templateInfo") showInfo = true;
                 if (key === "_debug") showLogs = true;
                 if (key === "epochID") imagesPathPrefix = "";
                 if (key === "_stopFetch") fetchSheet = false;
             }
+            console.log(parsed)
             for (let key of Object.keys(parsed)) {
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
@@ -389,16 +392,6 @@
                 })
             }
         }
-
-        /*if(parsed){
-            for (let key of Object.keys(parsed)) {
-                lottieTemplateNew.layers.forEach((layer) => {
-                    if (layer.nm === key) {
-                        layer.t.d.k[0].s.t = parsed[key]
-                    }
-                })
-            }
-        }*/
 
         //first Update and create Lottie for the first time
         if (playStatus === "") {
@@ -441,7 +434,7 @@
             updateCounter++;
 
             //Only for UpdateAnimations
-            if (updateExist && rawData) {
+            if (updateExist && parsed) {
                 let updateValues = [];
                 for (let key of Object.keys(parsed)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
@@ -530,7 +523,7 @@
                     if (showInfo) console.log("Template - updated Animation Ready");
                     newAnimation.goToAndStop(currentFrame, true);
                     //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
-                    console.log("BREAK: " + breakFrame)
+                    //console.log("BREAK: " + breakFrame)
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
