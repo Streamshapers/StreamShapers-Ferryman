@@ -1,4 +1,4 @@
-import {useContext} from "react";
+import React, {useContext} from "react";
 import {GlobalStateContext} from "./GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
@@ -7,7 +7,7 @@ import {
     faFileArrowUp,
     faHashtag,
     faImage,
-    faList, faRotate,
+    faList, faRotate, faRotateRight,
     faUser
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -83,13 +83,17 @@ function StartScreen() {
                             <h4>List</h4>
                         </div>
                         <div className="sample"
-                             onClick={() => handleSampleFile("Photodisplay_Ver05_fontsEmbedded.json")}>
+                             onClick={() => handleSampleFile("TodaysTeam_Ver02.json")}>
                             <FontAwesomeIcon className="icon" icon={faImage}/>
                             <h4>Images</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("Balls_Rolling_Loop_Ver01.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("Balls_Rolling_Loop_Ver03.json")}>
                             <FontAwesomeIcon className="icon" icon={faRotate}/>
                             <h4>Loop</h4>
+                        </div>
+                        <div className="sample" onClick={() => handleSampleFile("Update_Values_Ver03.json")}>
+                            <FontAwesomeIcon className="icon" icon={faRotateRight}/>
+                            <h4>Update Animation</h4>
                         </div>
                     </div>
                 </div>

@@ -186,7 +186,8 @@ function TextsDisplay() {
                             )}
 
                             <div className="textForm">
-                                <label className="text-layer-name">{textObject.layername}</label>
+                                <label className="text-layer-name"
+                                       title={textObject.layername}>{textObject.layername}</label>
                                 {textObject.type === "text" && (
                                     <input
                                         type="text"

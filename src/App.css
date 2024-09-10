@@ -470,6 +470,7 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
     padding: 5px;
     width: 100%;
+    overflow: hidden;
 }
 
 .font-item-text {
@@ -906,10 +907,11 @@ input[type='file']::-webkit-file-upload-button {
 
 .jsonText .text-layer-name {
     margin: 0;
-    width: 110px;
+    width: 120px;
     border-right: 2px solid var(--primary);
     padding-right: 10px;
     height: 100%;
+    overflow: hidden;
 }
 
 .jsonText span {
