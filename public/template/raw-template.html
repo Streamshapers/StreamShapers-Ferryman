@@ -303,7 +303,6 @@
                 animation.destroy()
             }
             if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment)
-            console.log("Stack in der mitte: "+playStack[0])
             if (playStack[0]) {
                 let nextSegment = playStack[0]
                 animation.goToAndPlay(nextSegment,true)
@@ -345,7 +344,7 @@
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
-        if (lottieState=="idle") console.log("Updating is not possible while Playing ")
+        if (lottieState!="idle") console.log("Updating is not possible while Playing ")
 
         lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)) //copy the "old" updated template for the update Animation
         lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
@@ -379,7 +378,6 @@
                 if (key === "epochID") imagesPathPrefix = "";
                 if (key === "_stopFetch") fetchSheet = false;
             }
-            console.log(parsed)
             for (let key of Object.keys(parsed)) {
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
@@ -430,7 +428,7 @@
 
         }
         //Update when tamplate is playing
-        if (playStatus === "play") {
+        if (playStatus === "play" && lottieState==="idle") {
             updateCounter++;
 
             //Only for UpdateAnimations
@@ -439,10 +437,8 @@
                 for (let key of Object.keys(parsed)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm == `${key}_update`) {
-                            console.log(`${key} has Update layer`);
                             parsed[`${key}_update`] = parsed[key];
                             delete parsed[key];
-                            console.log(parsed);
                         }
                     });
                 }
@@ -470,15 +466,15 @@
                 })
                 updateAnimation.addEventListener("DOMLoaded", async function () {
                     if (showInfo) console.log("Template - updated Animation Ready");
+                    addEvents(updateAnimation)
                     updateAnimation.goToAndPlay("update", true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
                     updateAnimation = null;
-                    console.log("Upadte Animation läuft");
-                    animation.addEventListener("_pause", () => {
-                        lottieState = "pause";
-                        console.log(`LottieState: "${lottieState}`);
+                    animation.addEventListener("_idle", () => {
+                        lottieState = "idle";
+                        if(showInfo) console.log(`LottieState: "${lottieState}`);
 
                         updateCounter++;
                         let newDiv = document.createElement("div");
@@ -506,7 +502,7 @@
                 });
             }
             //only without update animation
-            if (!updateExist && lottieState==="idle") {
+            if (!updateExist) {
                 let newDiv = document.createElement("div");
                 newDiv.id = "animation" + updateCounter;
                 document.body.appendChild(newDiv);
@@ -549,7 +545,7 @@
 
 
     async function play() {
-        console.log(await animLoaded.promise);
+        await animLoaded.promise;
         await animReady;
         await loadFonts();
         animation.goToAndPlay("start", true);

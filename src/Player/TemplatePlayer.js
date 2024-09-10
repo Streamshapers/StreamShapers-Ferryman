@@ -38,9 +38,7 @@ function CasparCGTemplateDemo() {
         const iframe = templateRef.current;
         let data = {};
         for (const object of textObjects) {
-            if (!(object.layername.includes("_update"))){
-                data[object.layername] = object.text;
-            }
+            data[object.layername] = object.text;
         }
 
         if (iframe && iframe.contentWindow) {
