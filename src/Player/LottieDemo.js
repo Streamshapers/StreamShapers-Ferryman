@@ -1,3 +1,4 @@
+/*
 import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {GlobalStateContext} from "../GlobalStateContext";
 import lottie from 'lottie-web';
@@ -456,3 +457,4 @@ function LottieDemo() {
 }
 
 export default LottieDemo;
+*/

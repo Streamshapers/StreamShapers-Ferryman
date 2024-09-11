@@ -1,8 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
-import LottiePreview from "./LottiePreview";
-import LottieDemo from "./LottieDemo";
+import AnalyzePlayer from "./AnalyzePlayer";
 import {GlobalStateContext} from "../GlobalStateContext";
-import TemplatePlayer from "./TemplatePlayer";
+import TemplatePlayer from "./PreviewPlayer";
 
 function Player() {
     const {setIsPlaying, setCurrentFrame, fileName, markers} = useContext(GlobalStateContext);
@@ -29,10 +28,6 @@ function Player() {
                             title="check your animation frame by frame"
                     >Analyze
                     </button>
-                    {/*<button className={`player-mode-button ${activeTab === 'demo' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('demo')}
-                            title="Play your Template just like in CasparCG">Demo Player
-                    </button>*/}
                     <button className={`player-mode-button ${activeTab === 'template' ? 'active' : ''}`}
                             onClick={() => handleTabChange('template')}
                             title="preview your HTML-Template">Preview
@@ -40,11 +35,8 @@ function Player() {
                 </div>
             )}
             {activeTab === 'standard' && (
-                <LottiePreview key={`standard-${key}`}/>
+                <AnalyzePlayer key={`standard-${key}`}/>
             )}
-            {/*{activeTab === 'demo' && (
-                <LottieDemo key={`demo-${key}`}/>
-            )}*/}
             {activeTab === 'template' && (
                 <TemplatePlayer key={`template-${key}`}/>
             )}

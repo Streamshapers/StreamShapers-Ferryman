@@ -1468,6 +1468,25 @@ label span.bla {
     border-radius: 5px;
 }
 
+.layer-name-edit {
+    position: absolute;
+    display: flex;
+    gap: 5px;
+    left: -306px;
+    bottom: -10px;
+    background: var(--foreground);
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+    z-index: 2000;
+    list-style-type: none;
+    padding: 5px;
+    width: 300px;
+}
+
+.layer-name-edit button {
+    cursor: pointer;
+}
+
 .source-select {
     display: flex;
     gap: 5px;

@@ -43,7 +43,7 @@ const MarkersContainer = React.memo(({markers, goToMarker}) => {
     );
 });
 
-function LottiePreview() {
+function AnalyzePlayer() {
     const {
         jsonData,
         fontFaces,
@@ -317,4 +317,4 @@ function LottiePreview() {
     );
 }
 
-export default LottiePreview;
+export default AnalyzePlayer;

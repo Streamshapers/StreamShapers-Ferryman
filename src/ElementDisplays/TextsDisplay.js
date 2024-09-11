@@ -17,6 +17,8 @@ function TextsDisplay() {
         updateTextRef
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
+    const [isEditingLayerNameIndex, setIsEditingLayerNameIndex] = useState(null);
+    const [layerName, setLayerName] = useState("");
     const [colValue, setColValue] = useState('');
 
     /*useEffect(() => {
@@ -28,16 +30,19 @@ function TextsDisplay() {
             if (!event.target.closest('.text-option-dropdown')) {
                 setShowOptionMenuIndex(null);
             }
+            if (!event.target.closest('.layer-name-edit')) {
+                setIsEditingLayerNameIndex(null);
+            }
         };
 
-        if (showOptionMenuIndex != null) {
+        if (showOptionMenuIndex != null || isEditingLayerNameIndex != null) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [showOptionMenuIndex]);
+    }, [showOptionMenuIndex, isEditingLayerNameIndex]);
 
     const toggleTextShowAll = () => {
         setTextShowAll(!textShowAll);
@@ -114,19 +119,7 @@ function TextsDisplay() {
     }
 
     const updateTextObject = (index, newText) => {
-        const updateIndex = textObjects.findIndex(t => t.layername === textObjects[index].layername + "_update");
-        //console.log(updateIndex);
-        if (updateIndex && updateIndex !== -1) {
-            if (textObjects[updateIndex].text !== newText) {
-                updateLottieText(updateIndex, newText);
-                const updateObject = textObjects[index];
-                updateObject.text = newText;
-                updateTextRef.current = updateObject;
-                console.log("updateTextObject");
-            }
-        } else {
-            updateLottieText(index, newText);
-        }
+        updateLottieText(index, newText);
     }
 
     const filteredTexts = textObjects.filter((textObject) => {
@@ -136,6 +129,25 @@ function TextsDisplay() {
         );
     });
 
+    const startChangeLayername = (index) => {
+        setShowOptionMenuIndex(null);
+        setIsEditingLayerNameIndex(index);
+    }
+
+    const handleLayerNameChange = (event) => {
+        setLayerName(event.target.value);
+    };
+
+    const saveLayerName = (object) => {
+        const updatedTextObjects = [...textObjects];
+        const changeObject = updatedTextObjects.find(t => t === object);
+        if (changeObject) {
+            changeObject.layername = layerName;
+            setIsEditingLayerNameIndex(null);
+            setLayerName("");
+            setTextObjects(updatedTextObjects);
+        }
+    };
 
     return (
         <>
@@ -257,10 +269,21 @@ function TextsDisplay() {
                                                         className="text-option-item">Connect Text
                                                     </li>
                                                 )}
-                                                <li onClick={() => handleSelect("change", textObject)}
+                                                <li onClick={() => startChangeLayername(isEditingLayerNameIndex === i ? null : i)}
                                                     className="text-option-item">Change Layer Name
                                                 </li>
                                             </ul>
+                                        </div>
+                                    )}
+                                    {isEditingLayerNameIndex === i && (
+                                        <div className="layer-name-edit">
+                                            <input
+                                                type="text"
+                                                value={layerName}
+                                                onChange={handleLayerNameChange}
+                                                placeholder="Enter new layer name"
+                                            />
+                                            <button onClick={() => saveLayerName(textObject)}>Save</button>
                                         </div>
                                     )}
                                 </div>

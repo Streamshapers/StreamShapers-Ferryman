@@ -465,7 +465,7 @@ export const GlobalStateProvider = ({children}) => {
 
             if (typeof obj === "object" && obj !== null) {
                 // Prüfen, ob das Objekt die Eigenschaften 'nm' und 'refId' hat
-                if (obj.hasOwnProperty('nm') && obj.hasOwnProperty('refId')) {
+                if (obj.hasOwnProperty('nm') && obj.hasOwnProperty('refId') && !obj.nm.startsWith('_imagesequence')) {
                     tempList.push(obj);
                 }
 
@@ -477,13 +477,14 @@ export const GlobalStateProvider = ({children}) => {
                     }
                 });
             }
-
+            console.log("temList = ", tempList);
             return tempList;
         }
 
         if (jsonData) {
             const imageNames = searchForObjectsWithRefId(jsonData);
             setRefImages(imageNames);
+            console.log("refImages: ", refImages);
         }
     }, [jsonData]);
 
@@ -512,6 +513,7 @@ export const GlobalStateProvider = ({children}) => {
         if (jsonData) {
             const extractedImages = searchForImages(jsonData);
             setImages(extractedImages);
+            console.log("images: ", images)
         }
     }, [jsonData]);
 
