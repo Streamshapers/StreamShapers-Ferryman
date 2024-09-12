@@ -88,13 +88,13 @@ function AnalyzePlayer() {
 
             instance.addEventListener('enterFrame', onEnterFrame);
             setLottieInstance(instance);
+            setTimeout(updateTimeFields, 500);
         }, 300);
 
         return () => {
             clearTimeout(timeoutId);
             instance.removeEventListener('enterFrame', onEnterFrame);
             instance.destroy();
-            setTimeout(updateTimeFields, 500);
         };
 
     }, [jsonData, textObjects, textObjects]);
@@ -137,7 +137,6 @@ function AnalyzePlayer() {
 
                     function updateTime() {
                         let formattedTime;
-
                         if (format === 'HH:mm:ss') {
                             formattedTime = new Intl.DateTimeFormat("en-GB", {
                                 hour: "2-digit",
