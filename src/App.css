@@ -1415,6 +1415,8 @@ label span.bla {
     align-items: center;
     gap: 10px;
     width: 100%;
+    padding-left: 10px;
+    border-left: 2px solid var(--primary);
 }
 
 .api-dialog input {
@@ -1518,4 +1520,11 @@ label span.bla {
     justify-content: center;
     gap: 10px;
     text-wrap: nowrap;
+}
+
+.external-source-clock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }

@@ -7,10 +7,14 @@ function CasparCGTemplateDemo() {
     const [clickedPlay, setClickedPlay] = useState(false);
     const [iframeKey, setIframeKey] = useState(0);
 
+    useEffect(() => {
+
+    }, []);
+
     const triggerAction = (action) => {
         let iframe = templateRef.current;
         if (iframe && iframe.contentWindow) {
-            console.log(`Sending action: ${action}`);
+            //console.log(`Sending action: ${action}`);
             let timeout;
             if (action === "play") {
                 setIframeKey(prevKey => prevKey + 1);
@@ -18,7 +22,7 @@ function CasparCGTemplateDemo() {
                     iframe = templateRef.current;
                     iframe.contentWindow.postMessage({"action": action}, '*');
                     setClickedPlay(true);
-                    triggerAction("update");
+                    updateAction().then()
                 }, 200);
             } else if (action === "stop") {
                 setClickedPlay(false);
@@ -48,7 +52,7 @@ function CasparCGTemplateDemo() {
         }
 
         if (iframe && iframe.contentWindow) {
-            console.log('Sending update message with data:', JSON.stringify(data));
+            //console.log('Sending update message with data:', JSON.stringify(data));
             iframe.contentWindow.postMessage({
                 action: "update",
                 data: JSON.stringify(data)

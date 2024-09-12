@@ -30,6 +30,7 @@ export const GlobalStateProvider = ({children}) => {
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
+    const [updateExternalSources, setUpdateExternalSources] = useState(0);
     const updateTextRef = useRef(null);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
@@ -47,6 +48,7 @@ export const GlobalStateProvider = ({children}) => {
         setMarkers(null);
         setCurrentFrame(0);
         setGeneralAlerts([]);
+        setUseExternalSources(false);
     }, [jsonFile]);
 
     //###################################### Errors / Alerts #####################################################################
@@ -375,10 +377,6 @@ export const GlobalStateProvider = ({children}) => {
 
         setJsonData(tempJsonData);
 
-        /*const updatedTexts = [...texts];
-        updatedTexts[index] = newText;
-        setTexts(updatedTexts);*/
-
         const updatedTextObjects = [...textObjects];
         updatedTextObjects[index].text = newText;
         setTextObjects(updatedTextObjects);
@@ -477,14 +475,12 @@ export const GlobalStateProvider = ({children}) => {
                     }
                 });
             }
-            console.log("temList = ", tempList);
             return tempList;
         }
 
         if (jsonData) {
             const imageNames = searchForObjectsWithRefId(jsonData);
             setRefImages(imageNames);
-            console.log("refImages: ", refImages);
         }
     }, [jsonData]);
 
@@ -513,7 +509,6 @@ export const GlobalStateProvider = ({children}) => {
         if (jsonData) {
             const extractedImages = searchForImages(jsonData);
             setImages(extractedImages);
-            console.log("images: ", images)
         }
     }, [jsonData]);
 
@@ -717,26 +712,26 @@ export const GlobalStateProvider = ({children}) => {
 
 
     useEffect(() => {
-        //console.log("before: ", externalSources);
-        //console.log("before: ", textObjects);
-        const updatedTextObjects = [...textObjects];
-        updatedTextObjects.map(textObject => {
-            const source = externalSources.find(obj => obj.index === parseInt(textObject.source, 10));
-            if (source) {
-                textObject.type = source.key;
-            }
-            if (textObject.type === "Digital Clock") {
-                textObject.text = source.secret;
-                updateLottieText(textObjects.findIndex(t => t === textObject), source.secret);
-            }
-            if (textObject.type === "Google Sheet") {
-                textObject.text = textObject.oiginal;
-            }
-        })
-        setTextObjects(updatedTextObjects);
-        //console.log("after: ", externalSources);
-        //console.log("after: ", textObjects);
-    }, [externalSources]);
+        if (textObjects && textObjects.length > 0) {
+            const updatedTextObjects = [...textObjects];
+
+            updatedTextObjects.map(textObject => {
+                const source = externalSources.find(obj => obj.index === parseInt(textObject.source, 10));
+                if (source) {
+                    textObject.type = source.key;
+                }
+                if (textObject.type === "Digital Clock") {
+                    textObject.text = source.secret;
+                    updateLottieText(textObjects.findIndex(t => t === textObject), textObject.text);
+                }
+                if (textObject.type === "Google Sheet") {
+                    textObject.text = textObject.oiginal;
+                }
+            })
+
+            setTextObjects(updatedTextObjects);
+        }
+    }, [externalSources, updateExternalSources]);
 
     async function fetchDataFromGoogle(url) {
         try {
@@ -857,7 +852,6 @@ export const GlobalStateProvider = ({children}) => {
     /*############################# generate Template ########################################*/
 
     const generateFile = async (production) => {
-        console.log("generated new html")
         let fileContent;
         let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
         let lottiePlayerCode = '';
@@ -870,7 +864,7 @@ export const GlobalStateProvider = ({children}) => {
         } else {
             playerCode = `<script>
                     window.addEventListener('message', (event) => {
-                        console.log('Received message:', event.data);
+                        //console.log('Received message:', event.data);
 
                         const message = event.data;
 
@@ -1103,7 +1097,9 @@ export const GlobalStateProvider = ({children}) => {
             htmlTemplate,
             setHtmlTemplate,
             generalAlerts,
-            setGeneralAlerts
+            setGeneralAlerts,
+            updateExternalSources,
+            setUpdateExternalSources
         }}>
             {children}
         </GlobalStateContext.Provider>

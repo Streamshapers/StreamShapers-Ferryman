@@ -136,16 +136,24 @@ function AnalyzePlayer() {
                     const textElements = Array.from(g.getElementsByTagName('text'));
 
                     function updateTime() {
-                        const now = new Date();
                         let formattedTime;
 
                         if (format === 'HH:mm:ss') {
-                            formattedTime = now.toLocaleTimeString();
+                            formattedTime = new Intl.DateTimeFormat("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: false
+                            }).format(new Date());
                         } else if (format === 'HH:mm') {
-                            formattedTime = now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                            formattedTime = new Intl.DateTimeFormat("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false
+                            }).format(new Date());
                         }
 
-                        const timeParts = formattedTime.split(':');
+                        const timeParts = formattedTime.match(/\d{2}/g);
 
                         if (timeParts.length >= 2) {
                             textElements[0].textContent = timeParts[0][0];

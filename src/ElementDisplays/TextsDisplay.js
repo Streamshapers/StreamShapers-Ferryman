@@ -14,7 +14,8 @@ function TextsDisplay() {
         setTextObjects,
         externalSources,
         updateLottieText,
-        updateTextRef
+        updateExternalSources,
+        setUpdateExternalSources
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [isEditingLayerNameIndex, setIsEditingLayerNameIndex] = useState(null);
@@ -68,6 +69,7 @@ function TextsDisplay() {
                 }
                 setTextObjects(updatedTextObjects);
             }
+            setUpdateExternalSources(updateExternalSources + 1);
         }
 
         if (action === "change") {

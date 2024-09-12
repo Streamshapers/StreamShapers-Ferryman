@@ -25,12 +25,21 @@ function ConnectApiDialog() {
                 if (field === "key" && value === "Digital Clock") {
                     const newSecret = api.secret === "" ? "cc:cc:cc" : api.secret;
                     return {...api, [field]: value, secret: newSecret};
-                } else if (field === "secret") {
+                } else if (field === "secret" && api.key === "Google Sheet") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
                     const match = value.match(regex);
                     const id = match ? match[1] : null;
-                    //console.log(id);
                     return {...api, [field]: id};
+                } else if (field === "secret" && api.key === "Digital Clock") {
+                    let clockFormat;
+                    if (value === "hh:mm:ss") {
+                        clockFormat = "cc:cc:cc";
+                        return {...api, [field]: clockFormat};
+                    } else if (value === "hh:mm") {
+                        clockFormat = "cc:cc";
+                        return {...api, [field]: clockFormat};
+                    }
+
                 } else {
                     return {...api, [field]: value};
                 }
@@ -78,10 +87,13 @@ function ConnectApiDialog() {
                                         placeholder="put your spreadsheet url here..."/>
                                 )}
                                 {api.key === "Digital Clock" && (
-                                    <select onChange={e => handleChange(index, 'secret', e.target.value)}>
-                                        <option>cc:cc:cc</option>
-                                        <option>cc:cc</option>
-                                    </select>
+                                    <div className="external-source-clock">
+                                        <div>Format:</div>
+                                        <select onChange={e => handleChange(index, 'secret', e.target.value)}>
+                                            <option>hh:mm:ss</option>
+                                            <option>hh:mm</option>
+                                        </select>
+                                    </div>
                                 )}
 
                                 <div className="div-button remove-button" onClick={() => handleRemoveApi(index)}>
