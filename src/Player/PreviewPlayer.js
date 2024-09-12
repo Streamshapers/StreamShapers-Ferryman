@@ -1,34 +1,40 @@
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {GlobalStateContext} from "../GlobalStateContext";
 
 function CasparCGTemplateDemo() {
     const {htmlTemplate, textObjects, updateGoogle, setUpdateGoogle} = useContext(GlobalStateContext);
     const templateRef = useRef(null);
-    const clickedPlayRef = useRef(false);
+    const [clickedPlay, setClickedPlay] = useState(false);
+    const [iframeKey, setIframeKey] = useState(0);
 
     const triggerAction = (action) => {
-        const iframe = templateRef.current;
+        let iframe = templateRef.current;
         if (iframe && iframe.contentWindow) {
             console.log(`Sending action: ${action}`);
-            if (action === "start") {
-                clickedPlayRef.current = true;
+            let timeout;
+            if (action === "play") {
+                setIframeKey(prevKey => prevKey + 1);
+                timeout = setTimeout(() => {
+                    iframe = templateRef.current;
+                    iframe.contentWindow.postMessage({"action": action}, '*');
+                    setClickedPlay(true);
+                    triggerAction("update");
+                }, 200);
             } else if (action === "stop") {
-                clickedPlayRef.current = false;
+                setClickedPlay(false);
+                iframe.contentWindow.postMessage({"action": action}, '*');
+            } else if (action === "next") {
+                if (clickedPlay) {
+                    iframe.contentWindow.postMessage({"action": action}, '*');
+                }
+            } else {
+                iframe.contentWindow.postMessage({"action": action}, '*');
             }
-            iframe.contentWindow.postMessage({"action": action}, '*');
+            return () => clearTimeout(timeout);
         } else {
             console.error('iframe not ready or contentWindow not accessible');
         }
     }
-
-    useEffect(() => {
-        const delay = 300;
-        const timeoutId = setTimeout(() => {
-            triggerAction("update");
-        }, delay);
-
-        return () => clearTimeout(timeoutId);
-    }, [clickedPlayRef]);
 
     const updateAction = async () => {
         if (!updateGoogle) {
@@ -55,6 +61,7 @@ function CasparCGTemplateDemo() {
     return (
         <div className="caspar-player">
             <iframe
+                key={iframeKey}
                 ref={templateRef}
                 srcDoc={htmlTemplate}
                 title="CasparCG Template Preview"
@@ -65,7 +72,7 @@ function CasparCGTemplateDemo() {
                     <div className="previewControlButton demo" title="Play" onClick={() => triggerAction('play')}>
                         Play
                     </div>
-                    <div className={`previewControlButton demo ${clickedPlayRef ? 'blue' : 'grey'}`} title="Next"
+                    <div className={`previewControlButton demo ${clickedPlay ? 'blue' : 'grey'}`} title="Next"
                          onClick={() => triggerAction('next')}>
                         Next
                     </div>

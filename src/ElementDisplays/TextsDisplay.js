@@ -141,11 +141,13 @@ function TextsDisplay() {
     const saveLayerName = (object) => {
         const updatedTextObjects = [...textObjects];
         const changeObject = updatedTextObjects.find(t => t === object);
-        if (changeObject) {
-            changeObject.layername = layerName;
+        if (changeObject && layerName.trim() !== "") {
+            changeObject.layername = layerName.trim();
             setIsEditingLayerNameIndex(null);
             setLayerName("");
             setTextObjects(updatedTextObjects);
+        } else {
+            setIsEditingLayerNameIndex(null)
         }
     };
 
@@ -240,7 +242,7 @@ function TextsDisplay() {
                                                        onChange={(e) => handleGoogleCoordinates(textObject, "row", e.target.value)}/>
                                             </label>*/}
                                                 <label>Sheet (gid):
-                                                    <input className=""
+                                                    <input className="google-table-input"
                                                            onChange={(e) => setSheetName(e.target.value, textObject)}
                                                            placeholder="leave blank for first sheet..."
                                                     />

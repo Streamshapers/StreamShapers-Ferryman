@@ -217,6 +217,8 @@ hr {
     display: flex;
     flex-direction: column;
     text-align: center;
+    width: 130px;
+    height: 100px;
 }
 
 .sample .icon {
@@ -870,7 +872,6 @@ input[type='file']::-webkit-file-upload-button {
     align-items: center;
     box-sizing: border-box;
     gap: 10px;
-    padding: 5px;
     border-radius: 5px;
     width: 100%;
 }
@@ -912,6 +913,7 @@ input[type='file']::-webkit-file-upload-button {
     padding-right: 10px;
     height: 100%;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .jsonText span {
@@ -1333,6 +1335,7 @@ label.spx-radiobutton {
     display: flex;
     flex-direction: row;
     gap: 5px;
+    align-items: center;
 }
 
 .spx-radiobutton span {

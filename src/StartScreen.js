@@ -100,7 +100,7 @@ function StartScreen() {
                 <br/>
                 <p>Welcome to StreamShapers Ferryman!</p>
                 <p>We hope this tool will help you to create your own real time graphics.
-                    It was just released in April 2024, that's why you might encounter problems. If so, we want to
+                    Ferryman is a work in progress, that's why you might encounter problems. If so, we want to
                     encourage you to report issues on <a href="https://github.com/Streamshapers/StreamShapers-Converter"
                                                          target="_blank" rel="noreferrer">GitHub</a> to us.
                 </p>

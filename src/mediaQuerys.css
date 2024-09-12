@@ -1,4 +1,3 @@
-
 /* ############################## Media Query's ########################################### */
 @media (width < 1600px) {
     #exportDialogWindow {
@@ -159,7 +158,19 @@
     }
 
     .sample .icon {
-        font-size: 30px;
+        font-size: 60px;
+    }
+
+    .external-source-fields input {
+        width: 100%;
+    }
+
+    .external-source-form {
+        width: 50%;
+    }
+
+    .external-source-form input {
+        width: 100%;
     }
 }
 
