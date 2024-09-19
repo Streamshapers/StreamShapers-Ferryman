@@ -133,6 +133,26 @@ export const GlobalStateProvider = ({children}) => {
         }
     }, [uploadedFonts, fonts]);
 
+    //Check for embedded Images
+    useEffect(()=>{
+        if (!jsonData) {
+            return;
+        }
+        let missingImages = []
+        for (let asset of jsonData.assets){
+            if (!asset.p.startsWith("data:image")){
+                missingImages.push(asset.id)
+            }
+        }
+        if (missingImages.length != 0){
+            addGeneralAlert(
+                "alert",
+                `Images are missing`,
+                'You don\'t have embedded you images in your lottie file. Please check the documentation:  '
+            );
+        }
+    },[jsonData])
+
     //################################# Infos ######################################################################
     useEffect(() => {
         if (!jsonData) {
