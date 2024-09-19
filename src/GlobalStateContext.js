@@ -52,8 +52,8 @@ export const GlobalStateProvider = ({children}) => {
     }, [jsonFile]);
 
     //###################################### Errors / Alerts #####################################################################
-    const addGeneralAlert = (type, title, message) => {
-        const error = {type: type.toString(), title: title.toString(), message: message.toString()};
+    const addGeneralAlert = (type, title, message, linkName = "", link ="") => {
+        const error = {type: type.toString(), title: title.toString(), message: message.toString(), linkName: linkName.toString(), link : link.toString()};
         setGeneralAlerts(prevAlerts => {
             const filteredAlerts = prevAlerts.filter(alert => alert.title !== error.title);
             return [...filteredAlerts, error];
@@ -77,7 +77,9 @@ export const GlobalStateProvider = ({children}) => {
                 addGeneralAlert(
                     "error",
                     "Missing start marker",
-                    'Your animation has no start marker and might not play correctly. (Start marker needs to be named "start".)'
+                    'Your animation has no start marker and might not play correctly. (Start marker needs to be named "start".)',
+                    "Here is the documentation",
+                    "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
                 );
             } else {
                 removeGeneralAlert("Missing start marker");
@@ -87,7 +89,9 @@ export const GlobalStateProvider = ({children}) => {
                 addGeneralAlert(
                     "error",
                     "Missing stop marker",
-                    'Your animation has no stop marker and might not play correctly. (Stop marker needs to be named "stop".)'
+                    'Your animation has no stop marker and might not play correctly. (Stop marker needs to be named "stop".)',
+                    "Here is the documentation",
+                    "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
                 );
             } else {
                 removeGeneralAlert("Missing stop marker");
@@ -104,7 +108,9 @@ export const GlobalStateProvider = ({children}) => {
                 addGeneralAlert(
                     "error",
                     "Marker without duration",
-                    'Following markers have no duration: ' + wrongMarkersString + '. Markers without an duration can\'t be played.'
+                    'Following markers have no duration: ' + wrongMarkersString + '. Markers without an duration can\'t be played.',
+                    "Here is the documentation",
+                    "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
                 );
             } else {
                 removeGeneralAlert("Marker without duration");
@@ -126,7 +132,8 @@ export const GlobalStateProvider = ({children}) => {
                 "Font missing",
                 'Your animation contains fonts that you haven\'t uploaded. \n This may result in some ' +
                 'fonts not being displayed as intended in the animation.\n Please close this dialog and upload' +
-                ' all fonts in the fonts Tab.'
+                ' all fonts in the fonts Tab.',
+                
             );
         } else {
             removeGeneralAlert("Font missing");
@@ -148,7 +155,9 @@ export const GlobalStateProvider = ({children}) => {
             addGeneralAlert(
                 "alert",
                 `Images are missing`,
-                'You don\'t have embedded you images in your lottie file. Please check the documentation:  '
+                'You don\'t have embedded you images in your lottie file. Please check the documentation:  ',
+                "See here",
+                "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/bodymovin/dynamic-templates-export"
             );
         }
     },[jsonData])
