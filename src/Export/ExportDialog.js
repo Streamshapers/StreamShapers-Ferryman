@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {GlobalStateContext} from "../GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
 import GddExport from "./GddExport";

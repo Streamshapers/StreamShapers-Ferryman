@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {GlobalStateContext} from '../GlobalStateContext';
+import {GlobalStateContext} from '../Context/GlobalStateContext';
 
 function ColorsDisplay() {
     const {jsonData, setJsonData, colors} = useContext(GlobalStateContext);
@@ -41,7 +41,7 @@ function ColorsDisplay() {
 
         if (jsonData) {
             searchAndUpdateColor(jsonData);
-            setJsonData({ ...jsonData });
+            setJsonData({...jsonData});
         }
     }
 

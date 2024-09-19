@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import AnalyzePlayer from "./AnalyzePlayer";
-import {GlobalStateContext} from "../GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 import TemplatePlayer from "./PreviewPlayer";
 
 function Player() {
@@ -22,13 +22,13 @@ function Player() {
     return (
         <div id="previewWrapper">
             {markers && markers.length > 0 && (
-                <div className="player-mode">
-                    <button className={`player-mode-button ${activeTab === 'standard' ? 'active' : ''}`}
+                <div className="mode-switch">
+                    <button className={`mode-button ${activeTab === 'standard' ? 'active' : ''}`}
                             onClick={() => handleTabChange('standard')}
                             title="check your animation frame by frame"
                     >Analyze
                     </button>
-                    <button className={`player-mode-button ${activeTab === 'template' ? 'active' : ''}`}
+                    <button className={`mode-button ${activeTab === 'template' ? 'active' : ''}`}
                             onClick={() => handleTabChange('template')}
                             title="preview your HTML-Template">Preview
                     </button>

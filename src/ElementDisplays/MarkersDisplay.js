@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {GlobalStateContext} from '../GlobalStateContext';
+import {GlobalStateContext} from '../Context/GlobalStateContext';
 
 function ImagePreview() {
     const {jsonData, setJsonData, markers, setMarkers} = useContext(GlobalStateContext);

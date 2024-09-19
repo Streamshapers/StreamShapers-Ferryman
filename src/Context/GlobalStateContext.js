@@ -4,6 +4,7 @@ export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
     const [ferrymanVersion] = useState("v1.6.1");
+    const [serverUrl] = useRef("http://localhost:4000");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -1034,6 +1035,7 @@ export const GlobalStateProvider = ({children}) => {
     return (
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
+            serverUrl,
             jsonData,
             setJsonData,
             colors,

@@ -3,6 +3,10 @@
     #exportDialogWindow {
         width: 80vw;
     }
+
+    #startWrapper {
+        max-width: 80vw;
+    }
 }
 
 @media (width < 1080px) {
@@ -50,6 +54,18 @@
 
     #timeDisplay {
         width: 80px;
+    }
+
+    .template-grid {
+        flex-direction: column;
+    }
+
+    #startWrapper {
+        max-width: 90vw;
+    }
+
+    #samples {
+        flex-wrap: wrap;
     }
 }
 
@@ -215,12 +231,11 @@
         display: none;
     }
 
-    #downloadArea span {
-        display: none;
-    }
-
     .dropdown-item, .dropdown-item .headerButton {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
         width: 100%;
     }
 
@@ -242,6 +257,7 @@
         background-color: transparent;
         box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
         z-index: 1;
+        width: 50%;
     }
 
     .dropdown:hover .dropdown-content {

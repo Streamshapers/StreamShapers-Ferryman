@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import {GlobalStateContext} from "../GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 

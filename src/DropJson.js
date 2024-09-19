@@ -1,8 +1,8 @@
-import { useEffect, useContext } from 'react';
-import { GlobalStateContext } from "./GlobalStateContext";
+import {useEffect, useContext} from 'react';
+import {GlobalStateContext} from "./Context/GlobalStateContext";
 
 function DropJson() {
-    const { setJsonFile, setFileName } = useContext(GlobalStateContext);
+    const {setJsonFile, setFileName} = useContext(GlobalStateContext);
 
     useEffect(() => {
         const handleDragOver = (e) => {
@@ -23,13 +23,12 @@ function DropJson() {
                     } //else if (["ttf", "otf", "woff"].includes(fileExtension)) {
                       //  setFontFile(file);
                     //}
-                else {
+                    else {
                         console.error("Nicht unterstützter Dateityp.");
                     }
                 }
             }
         };
-
 
 
         document.addEventListener('dragover', handleDragOver);

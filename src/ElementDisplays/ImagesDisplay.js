@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {GlobalStateContext} from '../GlobalStateContext';
+import {GlobalStateContext} from '../Context/GlobalStateContext';
 
 function ImagePreview() {
     const {jsonData, setJsonData, refImages, setImagePath, imagePath} = useContext(GlobalStateContext);
@@ -74,7 +74,7 @@ function ImagePreview() {
         ? refImages
         : refImages.filter(asset => asset.nm.startsWith('_'));
 
-    function changeImagePath(path){
+    function changeImagePath(path) {
         setImagePath(path);
     }
 

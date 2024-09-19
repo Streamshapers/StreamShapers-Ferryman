@@ -1,9 +1,9 @@
 import React, {createContext, useContext, useEffect} from 'react';
-import {GlobalStateContext} from "../GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 
 const ThemeContext = createContext();
 
-export const ThemeProvider = ({ children }) => {
+export const ThemeProvider = ({children}) => {
     const {theme, setTheme} = useContext(GlobalStateContext);
 
     const toggleTheme = () => {
@@ -15,7 +15,7 @@ export const ThemeProvider = ({ children }) => {
     }, [theme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{theme, toggleTheme}}>
             {children}
         </ThemeContext.Provider>
     );

@@ -196,6 +196,9 @@ hr {
     align-items: center;
     justify-content: space-around;
     flex-direction: column;
+    background: var(--background);
+    padding: 20px;
+    border-radius: 5px;
 }
 
 #sampleWrapper h2 {
@@ -204,8 +207,8 @@ hr {
 
 #samples {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+
+
     justify-content: space-around;
     width: 100%;
     padding: 40px 0 0 0;
@@ -217,12 +220,12 @@ hr {
     display: flex;
     flex-direction: column;
     text-align: center;
-    width: 130px;
-    height: 100px;
+    width: 100px;
+    min-height: 100px;
 }
 
 .sample .icon {
-    font-size: 60px;
+    font-size: 50px;
 }
 
 .container {
@@ -321,7 +324,14 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .headerButton {
-    font-size: 24px;
+    display: flex;
+    gap: 10px;
+    min-width: 40px;
+    width: auto;
+    height: 40px;
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
     border-radius: 5px;
     background-color: var(--background);
     border: 1px solid var(--border);
@@ -329,6 +339,14 @@ input[type='file']::-webkit-file-upload-button {
     cursor: pointer;
     padding: 5px 10px;
     transition: background-color 0.3s;
+}
+
+.headerButton span {
+    font-size: 16px;
+}
+
+#login-button {
+
 }
 
 .dropdown {
@@ -340,7 +358,7 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .headerButton:hover {
-    background-color: var(--secondary);
+    border-color: var(--secondary);
     color: var(--secondary-content);
 }
 
@@ -626,13 +644,13 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 5px;
 }
 
-.player-mode {
+.mode-switch {
     padding-bottom: 10px;
     display: flex;
     justify-content: center;
 }
 
-.player-mode button {
+.mode-switch button {
     padding: 10px 20px;
     margin-right: 0;
     background-color: var(--background);
@@ -642,15 +660,15 @@ input[type='file']::-webkit-file-upload-button {
     border-radius: 0;
 }
 
-.player-mode button:first-child {
+.mode-switch button:first-child {
     border-radius: 5px 0 0 5px;
 }
 
-.player-mode button:last-child {
+.mode-switch button:last-child {
     border-radius: 0 5px 5px 0;
 }
 
-.player-mode-button.active {
+.mode-button.active {
     background-color: var(--foreground);
     border: 1px solid var(--primary);
     font-weight: bold;
@@ -1037,6 +1055,10 @@ input[type='file']::-webkit-file-upload-button {
     text-align: center;
     min-height: 40px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+#downloadArea {
+    margin-right: 10px;
 }
 
 #downloadBtn:hover {
@@ -1527,4 +1549,256 @@ label span.bla {
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+/*################################### LOGIN #################################################*/
+
+#login-dialog-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--foreground);
+    border-radius: 5px;
+    padding: 15px 20px 40px 20px;
+    z-index: 1001;
+    border: 1px solid var(--border);
+    width: auto;
+    min-width: 400px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#login-dialog-window h2 {
+    padding: 0 20px 20px 0;
+}
+
+#login-dialog-window .mode-switch {
+    height: 50px;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+
+#login-dialog-window form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.auth-input {
+    position: relative;
+    width: 80%;
+}
+
+.auth-input input {
+    border: solid 1px var(--border);
+    border-radius: 5px;
+    padding: 1rem;
+    font-size: 1rem;
+    height: 50px;
+    color: var(--copy);
+    background-color: var(--background);
+    transition: border 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+
+.auth-input .input-label {
+    position: absolute;
+    left: 15px;
+    top: -11px;
+    height: 22px;
+    color: var(--copy);
+    pointer-events: none;
+    background: var(--border);
+    border-radius: 5px;
+    padding: 0 5px;
+    font-size: 1rem;
+}
+
+.auth-input .input:focus {
+    outline: none;
+    border: 1px solid var(--primary);
+}
+
+.auth-input .input.invalid {
+    border: 1px solid var(--error);
+}
+
+.auth-button {
+    font-size: 1.4rem;
+    background: var(--primary);
+    color: var(--primary-content);
+    border-radius: 5px;
+    padding: 10px;
+    width: 80%;
+    border: none;
+}
+
+.close-icon {
+    display: flex;
+    justify-content: flex-end;
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--copy);
+}
+
+.close-icon svg {
+    transition: transform 0.5s ease;
+}
+
+.close-icon svg:hover {
+    color: var(--error);
+    transform: rotate(90deg);
+}
+
+.user-dropdown-content {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 10px;
+    top: 55px;
+    background-color: var(--foreground);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    min-width: 150px;
+    border-radius: 5px 0 5px 5px;
+    border: 1px solid var(--secondary);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Nur wenn .open hinzugefügt wird, wird das Dropdown sichtbar */
+.user-dropdown-content.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--copy-light);
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.user-dropdown-item:hover {
+    background-color: var(--secondary-light);
+}
+
+/* Zusätzliche Stile für Links */
+.user-dropdown-item a, .user-dropdown-item a:visited {
+    color: inherit; /* Verwende die gleiche Farbe wie die Dropdown-Elemente */
+    text-decoration: none;
+}
+
+
+.user-dropdown-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.user-dropdown-item.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-dropdown-item:hover {
+    color: var(--primary);
+}
+
+.last-uploaded-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.template-grid {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.template-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+    min-width: 300px;
+}
+
+.template-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 26px;
+    padding-bottom: 5px;
+    position: relative;
+}
+
+.template-card-more {
+    cursor: pointer;
+}
+
+.template-card-body svg {
+    background: url(/public/transparent-background.png);
+}
+
+.template-card:hover {
+    border: 1px solid var(--primary);
+}
+
+.template-card h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.template-card p {
+    font-size: 14px;
+    color: var(--copy);
+}
+
+.template-card .lottie-player {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.template-card-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.template-card-dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.template-card-dropdown-menu button:hover {
+    color: var(--primary);
 }

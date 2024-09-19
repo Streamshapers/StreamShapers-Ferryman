@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from "react";
-import { GlobalStateContext } from "../GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 
 function GddExport() {
     const {
@@ -61,13 +61,13 @@ function GddExport() {
                                             Extensions
                                             <input type="text" name="extensions"
                                                    value={prop.gddOptions.extensions.join(',')}
-                                                   onChange={(e) => handleImageChange(key, 'extensions', e.target.value)} />
+                                                   onChange={(e) => handleImageChange(key, 'extensions', e.target.value)}/>
                                         </label>
                                         <label>
                                             Default Image Path
                                             <input type="text" name="default"
                                                    value={prop.default}
-                                                   onChange={(e) => handleImageChange(key, 'default', e.target.value)} />
+                                                   onChange={(e) => handleImageChange(key, 'default', e.target.value)}/>
                                         </label>
                                     </>
                                 ) : (
@@ -75,12 +75,12 @@ function GddExport() {
                                         <label>
                                             Type
                                             <input type="text" name="type" value={prop.type}
-                                                   onChange={(e) => handleTextChange(key, 'type', e.target.value)} />
+                                                   onChange={(e) => handleTextChange(key, 'type', e.target.value)}/>
                                         </label>
                                         <label>
                                             Default Text
                                             <input type="text" name="default" value={prop.default}
-                                                   onChange={(e) => handleTextChange(key, 'default', e.target.value)} />
+                                                   onChange={(e) => handleTextChange(key, 'default', e.target.value)}/>
                                         </label>
                                     </>
                                 )}

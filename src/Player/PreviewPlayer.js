@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import {GlobalStateContext} from "../GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 
 function CasparCGTemplateDemo() {
     const {htmlTemplate, textObjects, updateGoogle, setUpdateGoogle} = useContext(GlobalStateContext);

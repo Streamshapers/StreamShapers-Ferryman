@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {GlobalStateContext} from '../GlobalStateContext';
+import {GlobalStateContext} from '../Context/GlobalStateContext';
 import ConnectApiDialog from "./ConnectApiDialog";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";

@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {GlobalStateContext} from "./GlobalStateContext";
+import {GlobalStateContext} from "../Context/GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     faChartPie,
@@ -10,6 +10,7 @@ import {
     faList, faRotate, faRotateRight,
     faUser
 } from "@fortawesome/free-solid-svg-icons";
+import LastUploads from "./LastUploads";
 
 function StartScreen() {
     const {jsonData, setJsonFile, setFileName, setError, error} = useContext(GlobalStateContext);
@@ -97,18 +98,21 @@ function StartScreen() {
                         </div>
                     </div>
                 </div>
-                <br/>
-                <p>Welcome to StreamShapers Ferryman!</p>
-                <p>We hope this tool will help you to create your own real time graphics.
-                    Ferryman is a work in progress, that's why you might encounter problems. If so, we want to
-                    encourage you to report issues on <a href="https://github.com/Streamshapers/StreamShapers-Converter"
-                                                         target="_blank" rel="noreferrer">GitHub</a> to us.
-                </p>
-                <p>For further improvements or ideas for more features find us on <a
-                    href="https://discord.gg/ksNhRkzrM6" target="_blank" rel="noreferrer">Discord</a> or reach out
-                    via <a href="mailto:mail@streamshapers.com" target="_blank" rel="noreferrer">Email</a>!
-                </p>
-                <p>Thank You ❤</p>
+                <LastUploads/>
+                <div>
+                    <p>Welcome to StreamShapers Ferryman!</p>
+                    <p>We hope this tool will help you to create your own real time graphics.
+                        Ferryman is a work in progress, that's why you might encounter problems. If so, we want to
+                        encourage you to report issues on <a
+                            href="https://github.com/Streamshapers/StreamShapers-Converter"
+                            target="_blank" rel="noreferrer">GitHub</a> to us.
+                    </p>
+                    <p>For further improvements or ideas for more features find us on <a
+                        href="https://discord.gg/ksNhRkzrM6" target="_blank" rel="noreferrer">Discord</a> or reach out
+                        via <a href="mailto:mail@streamshapers.com" target="_blank" rel="noreferrer">Email</a>!
+                    </p>
+                    <p>Thank You ❤</p>
+                </div>
             </div>
         </div>
     );
