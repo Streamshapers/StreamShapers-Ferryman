@@ -1,10 +1,12 @@
-import React, {createContext, useEffect, useRef, useState} from 'react';
+import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
+import AuthContext from "./AuthContext";
 
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
+    const {user, login, serverURL} = useContext(AuthContext);
     const [ferrymanVersion] = useState("v1.6.1");
-    const [serverUrl] = useRef("http://localhost:4000");
+    const [serverUrl] = useState(serverURL);
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);

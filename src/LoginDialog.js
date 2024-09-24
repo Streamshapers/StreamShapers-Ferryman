@@ -135,7 +135,7 @@ function LoginDialog({isOpen, onClose}) {
         } else {
             console.error('Validation Errors:', errors);
         }
-    };
+    }
 
 
     if (!isOpen) return null;

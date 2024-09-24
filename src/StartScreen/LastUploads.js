@@ -8,7 +8,7 @@ import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 
 function LastUploads() {
     const {user, logout} = useContext(AuthContext);
-    const {jsonFile, setJsonFile, theme} = useContext(GlobalStateContext);
+    const {jsonFile, setJsonFile, theme, serverUrl} = useContext(GlobalStateContext);
     const [loading, setLoading] = useState(true);
     const [templates, setTemplates] = useState([]);
     const [error, setError] = useState('');
@@ -21,7 +21,7 @@ function LastUploads() {
         const fetchTemplates = async () => {
             setLoading(true);
             try {
-                const res = await axios.get('http://localhost:4000/templates', {
+                const res = await axios.get(serverUrl + '/templates', {
                     withCredentials: true
                 });
                 setTemplates(res.data);
@@ -109,7 +109,7 @@ function LastUploads() {
                                             {showDropdown === template._id && (
                                                 <div className="template-card-dropdown-menu" ref={dropdownRef}>
                                                     <button
-                                                        onClick={() => handleLoadInFerryman(`http://localhost:4000/${template.path}`)}>Open
+                                                        onClick={() => handleLoadInFerryman(`${serverUrl}/${template.path}`)}>Open
                                                         in Ferryman
                                                     </button>
 
@@ -119,7 +119,7 @@ function LastUploads() {
                                         <div className="template-card-body">
                                             <Player
                                                 ref={el => playerRefs.current[template._id] = el}
-                                                src={`http://localhost:4000/${template.path}`}
+                                                src={`${serverUrl}/${template.path}`}
                                                 style={{height: 'auto', width: '100%'}}
                                                 loop
                                             />
