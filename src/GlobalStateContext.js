@@ -147,8 +147,10 @@ export const GlobalStateProvider = ({children}) => {
         }
         let missingImages = []
         for (let asset of jsonData.assets){
-            if (!asset.p.startsWith("data:image")){
-                missingImages.push(asset.id)
+            if(asset.p){
+                if (!asset.p.startsWith("data:image")&& !asset.id.includes("video")){
+                    missingImages.push(asset.id)
+                }
             }
         }
         if (missingImages.length != 0){
@@ -160,6 +162,29 @@ export const GlobalStateProvider = ({children}) => {
                 "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/bodymovin/dynamic-templates-export"
             );
         }
+    },[jsonData])
+
+    //check for video Layer
+    useEffect(()=>{
+        if (!jsonData) {
+            return;
+        }
+        let foundVideos = []
+        for(let asset of jsonData.assets){
+            if(asset.id.includes("video")){
+                foundVideos.push(asset.id)
+            }
+        }
+        if(foundVideos.length != 0){
+            addGeneralAlert(
+                "Error",
+                `Video-Clips are not supported`,
+                'Lottiefiles does not support videos, neither Ferryman does. Try to use image-sequenzes instead.',
+                "See here",
+                "https://streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/supported-features#image-sequences"
+            );
+        }
+        
     },[jsonData])
 
     //################################# Infos ######################################################################

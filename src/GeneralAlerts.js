@@ -14,7 +14,7 @@ function GeneralAlerts() {
                 return (
                     <div key={i} className={alert.type === "alert" ? "alert-wrapper" : "error-wrapper"}>
                         <div className={alert.type === "alert" ? "alert" : "error"}>
-                            <b>{alert.title}</b>{" " + alert.message} {alert.link  ? <a href={alert.link}>{alert.linkName}</a>: null}
+                            <b>{alert.title}</b>{" " + alert.message} {alert.link  ? <a target="_blank" rel="noopener noreferrer" href={alert.link}>{alert.linkName}</a>: null}
                         </div>
                     </div>
                 );

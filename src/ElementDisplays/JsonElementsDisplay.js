@@ -20,6 +20,7 @@ function JsonElementsDisplay() {
     const [isImagesOpen, setIsImagesOpen] = useState(false);
     const [isMarkersOpen, setIsMarkersOpen] = useState(false);
 
+    
     useEffect(() => {
         if (generalAlerts.length > 0) {
             setIsInfoOpen(true);
@@ -27,7 +28,8 @@ function JsonElementsDisplay() {
             setIsInfoOpen(false);
         }
     }, []);
-
+    
+    
     if (!jsonData) {
         return null;
     }
