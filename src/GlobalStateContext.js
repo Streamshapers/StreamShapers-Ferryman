@@ -558,14 +558,16 @@ export const GlobalStateProvider = ({children}) => {
 
         if (refImages) {
             refImages.forEach(refImage => {
-                spxExportJson.DataFields.push({
-                    "field": refImage.nm,
-                    "ftype": "filelist",
-                    "title": "Choose Image",
-                    "assetfolder": `/media/images/`,
-                    "extension": "png",
-                    "value": `/media/images/${refImage.refId}.png`
-                });
+                if (refImage.nm.startsWith("_")){
+                    spxExportJson.DataFields.push({
+                        "field": refImage.nm,
+                        "ftype": "filelist",
+                        "title": "Choose Image",
+                        "assetfolder": `/media/images/`,
+                        "extension": "png",
+                        "value": `/media/images/${refImage.refId}.png`
+                    });
+                }
             });
         }
         //console.log(spxExportJson);
