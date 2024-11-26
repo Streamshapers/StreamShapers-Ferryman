@@ -9,7 +9,7 @@ export const GlobalStateProvider = ({children}) => {
     const [serverUrl] = useState(serverURL);
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
-    const [ferrymanTemplateJSON, setFerrymanTemplateJSON] = useState(null);
+    const [ferrymanTemplateJSON, setFerrymanTemplateJSON] = useState({});
     const [colors, setColors] = useState([]);
     const [textObjects, setTextObjects] = useState([]);
     const [images, setImages] = useState([]);
@@ -986,6 +986,10 @@ export const GlobalStateProvider = ({children}) => {
                     if (spxExport) {
                         spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
                     }
+                    let ferrymanJson = " ";
+                    if (ferrymanTemplateJSON) {
+                        ferrymanJson = "<script type=\"text/javascript\">window.ferrymanTemplateJSON = " + JSON.stringify(ferrymanTemplateJSON) + ";</script>";
+                    }
 
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
@@ -1002,7 +1006,9 @@ export const GlobalStateProvider = ({children}) => {
                         .replace('${spx}', spxTag)
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${googleTableData}', JSON.stringify(googleTableCells))
-                        .replace('</head>', playerCode);
+                        .replace('</head>', playerCode)
+                        // eslint-disable-next-line no-template-curly-in-string
+                        .replace('${ferrymanJSON}', ferrymanJson);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);
@@ -1034,6 +1040,19 @@ export const GlobalStateProvider = ({children}) => {
 
         generateHTML().then();
     }, [jsonData]);
+
+    //################################## FerrymanJSON #################################################################
+    useEffect(() => {
+        const temporaryJSON = {};
+
+        if(ferrymanVersion) temporaryJSON.ferrymanVersion = ferrymanVersion;
+        if(textObjects) temporaryJSON.textObjects = textObjects;
+        if(useExternalSources) temporaryJSON.useExternalSources = useExternalSources;
+        if(externalSources) temporaryJSON.externalSources = externalSources;
+
+        console.log(JSON.stringify(temporaryJSON));
+        setFerrymanTemplateJSON(temporaryJSON);
+    }, [externalSources, ferrymanVersion, textObjects, useExternalSources]);
 
     return (
         <GlobalStateContext.Provider value={{
