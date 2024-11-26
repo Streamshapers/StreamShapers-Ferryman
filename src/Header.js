@@ -117,12 +117,16 @@ function Header() {
                         <span>{user ? user.username : 'Login'}</span>
                         {dropdownOpen && (
                             <div className={`user-dropdown-content ${dropdownOpen ? 'open' : ''}`} ref={dropdownRef}>
+                                {user &&(
                                 <a href="https://streamshapers.com" className="user-dropdown-item"
                                    onClick={test}>Settings</a>
+                                )}
+                                {user &&(
                                 <div className="user-dropdown-item logout" onClick={logout}>
                                     Logout
                                     <FontAwesomeIcon icon={faRightToBracket}/>
                                 </div>
+                                )}
                             </div>
                         )}
 

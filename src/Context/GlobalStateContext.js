@@ -9,6 +9,7 @@ export const GlobalStateProvider = ({children}) => {
     const [serverUrl] = useState(serverURL);
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
+    const [ferrymanTemplateJSON, setFerrymanTemplateJSON] = useState(null);
     const [colors, setColors] = useState([]);
     const [textObjects, setTextObjects] = useState([]);
     const [images, setImages] = useState([]);
