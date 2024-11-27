@@ -22,7 +22,11 @@ export const AuthProvider = ({children}) => {
             }
         };
 
-        checkAuth();
+        if (document.cookie) {
+            checkAuth().then();
+        } else {
+            setLoading(false);
+        }
     }, []);
 
     const login = async (formData) => {

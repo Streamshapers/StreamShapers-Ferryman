@@ -19,6 +19,7 @@ function LastUploads() {
 
     useEffect(() => {
         const fetchTemplates = async () => {
+            if (!user) return;
             setLoading(true);
             try {
                 const res = await axios.get(serverUrl + '/templates', {
