@@ -118,7 +118,7 @@ function Header() {
                         {dropdownOpen && (
                             <div className={`user-dropdown-content ${dropdownOpen ? 'open' : ''}`} ref={dropdownRef}>
                                 {user &&(
-                                <a href="https://streamshapers.com" className="user-dropdown-item"
+                                <a href="https://streamshapers.com" className="user-dropdown-item" target="_blank"
                                    onClick={test}>Settings</a>
                                 )}
                                 {user &&(

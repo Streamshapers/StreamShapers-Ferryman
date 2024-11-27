@@ -11,44 +11,40 @@ export const AuthProvider = ({children}) => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await axios.get(serverURL + '/auth/me', {withCredentials: true});
-                console.log('CheckAuth Antwort:', response.data);
+                const response = await axios.get(serverURL + '/auth/me', { withCredentials: true });
+                //console.log('CheckAuth answer:', response.data);
                 setUser(response.data.user);
             } catch (error) {
-                setUser(null);
-                console.error('Fehler bei der Authentifizierung:', error);
+                console.error('authentication error:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        if (document.cookie) {
-            checkAuth().then();
-        } else {
-            setLoading(false);
-        }
+        checkAuth().then();
     }, []);
 
+
     const login = async (formData) => {
-        console.log('Versuche, mich einzuloggen mit:', formData);
+        //console.log('Try logging in with:', formData);
         const response = await axios.post(serverURL + '/auth/login', formData, {withCredentials: true});
-        console.log('Login erfolgreich, Antwort:', response.data);
+        //console.log('Login successfully, answer:', response.data);
 
         if (response.data.user) {
             setUser(response.data.user);
-            console.log('Benutzerzustand nach Login:', response.data.user);
+            //console.log('User:', response.data.user);
         } else {
-            console.error('Keine Benutzerdaten in der Antwort gefunden');
+            console.error('No user found');
         }
     };
 
     const logout = async () => {
         try {
             const response = await axios.post(serverURL + '/auth/logout', {}, {withCredentials: true});
-            console.log('Logout erfolgreich, Antwort:', response.data);
+            //console.log('Logout successfully:', response.data);
             setUser(null);
         } catch (error) {
-            console.error('Fehler beim Logout:', error.message);
+            console.error('Error logging out:', error.message);
         }
     };
 

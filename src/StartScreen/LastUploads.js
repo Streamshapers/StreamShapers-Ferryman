@@ -27,15 +27,15 @@ function LastUploads() {
                 });
                 setTemplates(res.data);
             } catch (err) {
-                console.error('Fehler beim Abrufen der Templates:', err);
-                setError('Fehler beim Abrufen der Templates');
+                console.error('Error loading templates:', err);
+                setError('Error loading templates');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchTemplates();
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
