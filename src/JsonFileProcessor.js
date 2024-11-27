@@ -15,7 +15,10 @@ function JsonFileProcessor() {
         setIsPlaying,
         setFileName,
         jsonFile,
-        setJsonFile
+        setJsonFile,
+        importFerrymanJSON,
+        setUseExternalSources,
+        setExternalSources
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -66,6 +69,11 @@ function JsonFileProcessor() {
             if (jsonData.markers && jsonData.markers.length > 0) {
                 setMarkers(jsonData.markers);
             }
+            if(importFerrymanJSON) {
+                if(importFerrymanJSON.textObjects) setTextObjects(importFerrymanJSON.textObjects);
+                if(importFerrymanJSON.useExternalSources) setUseExternalSources(importFerrymanJSON.useExternalSources);
+                if(importFerrymanJSON.externalSources) setExternalSources(importFerrymanJSON.externalSources);
+            }
         } catch (error) {
             setError(`Error reading the JSON file. Please make sure it is a valid JSON file. Error: ${error.message}`);
         }
@@ -82,7 +90,7 @@ function JsonFileProcessor() {
             {error && <div className="error-message">{error}</div>}*/}
             <div id="loadArea" className="headerButton headerButton1" onClick={resetJsonFile}>
                 <span>New </span>
-                <FontAwesomeIcon icon={faFileArrowUp} title="Export"/>
+                <FontAwesomeIcon icon={faFileArrowUp} title="New File"/>
             </div>
         </>
     );

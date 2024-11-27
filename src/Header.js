@@ -98,8 +98,8 @@ function Header() {
                 </div>
                 <div className="headerSide">
                     <ThemeSwitch/>
-                    <a id="question-button" className="headerButton headerButton1" title="Help"
-                       href="https://www.streamshapers.com/docs/streamshapers-converter/">
+                    <a id="question-button" className="headerButton headerButton1" title="Help" target="_blank"
+                       rel="noopener" href="https://www.streamshapers.com/docs/streamshapers-converter/">
                         <FontAwesomeIcon icon={faCircleQuestion}/>
                     </a>
                     <div id="info-button" className="headerButton headerButton1" title="Info" onClick={openInfoDialog}>
@@ -117,10 +117,10 @@ function Header() {
                         <span>{user ? user.username : 'Login'}</span>
                         {dropdownOpen && (
                             <div className={`user-dropdown-content ${dropdownOpen ? 'open' : ''}`} ref={dropdownRef}>
-                                {user &&(
-                                <a href="https://streamshapers.com" className="user-dropdown-item" target="_blank"
+                                {/*{user &&(
+                                <a href="https://streamshapers.com" className="user-dropdown-item"
                                    onClick={test}>Settings</a>
-                                )}
+                                )}*/}
                                 {user &&(
                                 <div className="user-dropdown-item logout" onClick={logout}>
                                     Logout

@@ -9,6 +9,7 @@ export const GlobalStateProvider = ({children}) => {
     const [serverUrl] = useState(serverURL);
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
+    const [importFerrymanJSON, setImportFerrymanJSON] = useState(null);
     const [ferrymanTemplateJSON, setFerrymanTemplateJSON] = useState({});
     const [colors, setColors] = useState([]);
     const [textObjects, setTextObjects] = useState([]);
@@ -30,7 +31,7 @@ export const GlobalStateProvider = ({children}) => {
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
     const [useExternalSources, setUseExternalSources] = useState(false);
-    const [externalSources, setExternalSources] = useState([{key: 'Google Sheet', secret: '', index: 1}]);
+    const [externalSources, setExternalSources] = useState([{key: 'Google Sheet', secret: '', index: 1, errors:''}]);
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
@@ -54,6 +55,63 @@ export const GlobalStateProvider = ({children}) => {
         setGeneralAlerts([]);
         setUseExternalSources(false);
     }, [jsonFile]);
+
+    const loadNewFile = (file) => {
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        if (file.type === "application/json" || fileExtension === "json") {
+            setJsonFile(file);
+            setFileName(file.name.replace(/\.json$/, ''));
+        } else if (file.type === "text/html" || fileExtension === "html") {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const htmlContent = event.target.result;
+
+                const lottieMatch = htmlContent.match(/const lottieTemplate\s*=\s*(\{[\s\S]*?\});/);
+                const ferrymanMatch = htmlContent.match(/window\.ferrymanTemplateJSON\s*=\s*(\{[\s\S]*?\});/);
+                const spxMatch = htmlContent.match(/window\.SPXGCTemplateDefinition\s*=\s*(\{[\s\S]*?\});/);
+
+                if (lottieMatch) {
+                    try {
+                        const lottieTemplate = JSON.parse(lottieMatch[1]);
+
+                        const blob = new Blob([JSON.stringify(lottieTemplate, null, 2)], {
+                            type: 'application/json',
+                        });
+                        const lottieFile = new File([blob], "lottieTemplate.json", { type: "application/json" });
+
+                        setJsonFile(lottieFile);
+                        setFileName("lottieTemplate");
+                        //console.log("set new JSON file:", lottieFile);
+                    } catch (err) {
+                        console.error("Error parsing lottieTemplate:", err);
+                    }
+                }
+
+                if (ferrymanMatch) {
+                    try {
+                        const ferrymanTemplateJSON = JSON.parse(ferrymanMatch[1]);
+                        setImportFerrymanJSON(ferrymanTemplateJSON);
+                        //console.log("Ferryman Template JSON:", ferrymanTemplateJSON);
+                    } catch (err) {
+                        console.error("Error reading ferrymanTemplateJSON:", err);
+                    }
+                }
+
+                if (spxMatch) {
+                    try {
+                        const spxTemplate = JSON.parse(spxMatch[1]);
+                        setSPXGCTemplateDefinition(spxTemplate);
+                    } catch (err) {
+                        console.error("Error parsing spXGCTemplate:", err);
+                    }
+                }
+            };
+            setFileName(file.name.replace(/\.html$/, ''));
+            reader.readAsText(file);
+        } else {
+            console.error("File not supported.");
+        }
+    }
 
     //###################################### Errors / Alerts #####################################################################
     const addGeneralAlert = (type, title, message) => {
@@ -520,21 +578,23 @@ export const GlobalStateProvider = ({children}) => {
 
     useEffect(() => {
         const steps = markers ? markers.length - 1 : 0;
+        const description = SPXGCTemplateDefinition.description ? SPXGCTemplateDefinition.description : '';
+        const uiColor = SPXGCTemplateDefinition.uicolor ? SPXGCTemplateDefinition.uicolor : '0';
         const rawSpxJson = {
-            "description": "",
-            "playserver": "OVERLAY",
-            "playchannel": "1",
-            "playlayer": "5",
-            "webplayout": "5",
-            "out": "manual",
-            "dataformat": "json",
-            "uicolor": "0",
-            "steps": `${steps}`,
-            "DataFields": []
+            description: `${description}`,
+            playserver: "OVERLAY",
+            playchannel: "1",
+            playlayer: "5",
+            webplayout: "5",
+            out: "manual",
+            dataformat: "json",
+            uicolor: `${uiColor}`,
+            steps: `${steps}`,
+            DataFields: SPXGCTemplateDefinition.DataFields ? [...SPXGCTemplateDefinition.DataFields] : []
         };
-        let spxExportJson = {...rawSpxJson};
+        let spxExportJson = { ...rawSpxJson };
 
-        if (fileName) {
+        if (fileName && spxExportJson.description === '') {
             spxExportJson.description = fileName;
         }
 
@@ -542,39 +602,55 @@ export const GlobalStateProvider = ({children}) => {
 
         if (textObjects) {
             for (let i = 0; i < textObjects.length; i++) {
-                if (textObjects[i].layername.startsWith('_') && textObjects[i].type === "text" && !(textObjects[i].layername.includes("_update"))) {
+                if (
+                    textObjects[i].layername.startsWith('_') &&
+                    textObjects[i].type === "text" &&
+                    !(textObjects[i].layername.includes("_update"))
+                ) {
                     textsWithNames[textObjects[i].layername] = textObjects[i].text;
                 }
             }
         }
 
+        // Helper function to find and update DataFields
+        const updateOrAddField = (dataFields, newField) => {
+            const existingField = dataFields.find(field => field.field === newField.field);
+            if (existingField) {
+                existingField.value = newField.value;
+                if (newField.title) existingField.title = newField.title;
+                if (newField.field) existingField.field = newField.field;
+            } else {
+                dataFields.push(newField); // Add new field
+            }
+        };
+
         if (Object.keys(textsWithNames).length > 0) {
-            Object.keys(textsWithNames).forEach((key, index) => {
-                spxExportJson.DataFields.push({
-                    "field": key,
-                    "ftype": "textfield",
-                    "title": key,
-                    "value": textsWithNames[key]
+            Object.keys(textsWithNames).forEach(key => {
+                updateOrAddField(spxExportJson.DataFields, {
+                    field: key,
+                    ftype: "textfield",
+                    title: key,
+                    value: textsWithNames[key]
                 });
             });
         }
-
 
         if (refImages) {
             refImages.forEach(refImage => {
-                spxExportJson.DataFields.push({
-                    "field": refImage.nm,
-                    "ftype": "filelist",
-                    "title": "Choose Image",
-                    "assetfolder": `/media/images/`,
-                    "extension": "png",
-                    "value": `/media/images/${refImage.refId}.png`
+                updateOrAddField(spxExportJson.DataFields, {
+                    field: refImage.nm,
+                    ftype: "filelist",
+                    title: "Choose Image",
+                    assetfolder: `/media/images/`,
+                    extension: "png",
+                    value: `/media/images/${refImage.refId}.png`
                 });
             });
         }
-        //console.log(spxExportJson);
+
         setSPXGCTemplateDefinition(spxExportJson);
     }, [fileName, textObjects, jsonData, refImages, markers]);
+
 
     //############################################ GDD ################################################################
 
@@ -1050,7 +1126,7 @@ export const GlobalStateProvider = ({children}) => {
         if(useExternalSources) temporaryJSON.useExternalSources = useExternalSources;
         if(externalSources) temporaryJSON.externalSources = externalSources;
 
-        console.log(JSON.stringify(temporaryJSON));
+        //console.log(JSON.stringify(temporaryJSON));
         setFerrymanTemplateJSON(temporaryJSON);
     }, [externalSources, ferrymanVersion, textObjects, useExternalSources]);
 
@@ -1123,7 +1199,12 @@ export const GlobalStateProvider = ({children}) => {
             generalAlerts,
             setGeneralAlerts,
             updateExternalSources,
-            setUpdateExternalSources
+            setUpdateExternalSources,
+            ferrymanTemplateJSON,
+            setFerrymanTemplateJSON,
+            importFerrymanJSON,
+            setImportFerrymanJSON,
+            loadNewFile
         }}>
             {children}
         </GlobalStateContext.Provider>

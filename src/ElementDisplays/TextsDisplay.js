@@ -234,7 +234,7 @@ function TextsDisplay() {
                                                 <label>Cell:
                                                     <input className="google-table-input"
                                                            type="text"
-
+                                                            value={textObject.cell}
                                                            pattern="[A-Za-z]+[0-9]+"
                                                            onChange={(e) => handleGoogleCoordinates(textObject, e.target.value)}/>
                                                 </label>

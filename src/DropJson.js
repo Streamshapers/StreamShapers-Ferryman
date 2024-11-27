@@ -2,7 +2,7 @@ import {useEffect, useContext} from 'react';
 import {GlobalStateContext} from "./Context/GlobalStateContext";
 
 function DropJson() {
-    const {setJsonFile, setFileName} = useContext(GlobalStateContext);
+    const {setJsonFile, loadNewFile} = useContext(GlobalStateContext);
 
     useEffect(() => {
         const handleDragOver = (e) => {
@@ -15,17 +15,7 @@ function DropJson() {
             if (files.length > 0) {
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    const fileExtension = file.name.split('.').pop().toLowerCase();
-
-                    if (file.type === "application/json" || fileExtension === "json") {
-                        setJsonFile(file);
-                        setFileName(file.name.replace(/\.json$/, ''));
-                    } //else if (["ttf", "otf", "woff"].includes(fileExtension)) {
-                      //  setFontFile(file);
-                    //}
-                    else {
-                        console.error("Nicht unterstützter Dateityp.");
-                    }
+                    loadNewFile(file);
                 }
             }
         };

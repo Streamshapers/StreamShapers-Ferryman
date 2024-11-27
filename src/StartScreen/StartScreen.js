@@ -13,7 +13,7 @@ import {
 import LastUploads from "./LastUploads";
 
 function StartScreen() {
-    const {jsonData, setJsonFile, setFileName, setError, error} = useContext(GlobalStateContext);
+    const {jsonData, setJsonFile, setFileName, setError, error, loadNewFile} = useContext(GlobalStateContext);
 
     const handleSampleFile = async (fileName) => {
         const response = await fetch(`./samples/${fileName}`);
@@ -31,16 +31,9 @@ function StartScreen() {
     function handleFileChange(file) {
         if (!file) {
             setError("Select a file please.");
-            return;
+        } else{
+            loadNewFile(file);
         }
-        if (file.type !== 'application/json') {
-            setError("Please select a valid JSON file.");
-            return;
-        }
-
-        setFileName(file.name.replace(/\.json$/, ''));
-
-        setJsonFile(file);
     }
 
     if (jsonData) {
@@ -51,12 +44,11 @@ function StartScreen() {
         <div id="startScreenContainer">
             <div id="startWrapper">
                 <div id="uploadWrapper">
-                    <h2>Drop JSON to start</h2>
+                    <h2>Drag & Drop JSON or HTML</h2>
                     <div id="uploadIcon">
                         <FontAwesomeIcon icon={faFileArrowUp}/>
                     </div>
-                    <h2>or</h2>
-                    <input type="file" id="jsonFile" accept=".json"
+                    <input type="file" id="jsonFile" accept=".json, .html"
                            onChange={(e) => handleFileChange(e.target.files[0])}/>
                     {error && <div className="error-message">{error}</div>}
                 </div>

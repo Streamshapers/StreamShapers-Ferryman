@@ -39,9 +39,12 @@ function ExportDialog({isOpen, onClose}) {
     const [activeTab, setActiveTab] = useState('default');
 
 
-    if (isOpen) {
-        setIsPlaying(false);
-    }
+    useEffect(() => {
+        if (isOpen) {
+            setIsPlaying(false);
+        }
+    }, [isOpen, setIsPlaying]);
+
 
 
     const handleTabChange = tabName => {

@@ -9,7 +9,6 @@ function SpxExport() {
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
     } = useContext(GlobalStateContext);
-    const [uiColor, setUiColor] = useState("gra");
     const spxUiColors = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"]
     const templateDescription = SPXGCTemplateDefinition.description;
 
@@ -18,18 +17,22 @@ function SpxExport() {
     }*/
 
     const handleUiColorChange = (color) => {
-        setUiColor(color);
         const spxJson = {...SPXGCTemplateDefinition};
-        spxJson.uicolor = spxUiColors.indexOf(color + 1);
+        console.log("Color: ", color)
+        spxJson.uicolor = spxUiColors.indexOf(color);
+        console.log(spxJson.uicolor)
         setSPXGCTemplateDefinition(spxJson);
     }
 
     const handleDescriptionChange = (event) => {
-        const spxJson = {...SPXGCTemplateDefinition};
-        spxJson.description = event.target.value;
-        setSPXGCTemplateDefinition(spxJson);
-    }
-
+        const newDescription = event.target.value;
+        if (newDescription !== SPXGCTemplateDefinition.description) {
+            setSPXGCTemplateDefinition({
+                ...SPXGCTemplateDefinition,
+                description: newDescription
+            });
+        }
+    };
 
     const handleInstructionChange = (event) => {
         const {value} = event.target;
@@ -162,7 +165,7 @@ function SpxExport() {
                         <div className="spx-export-right">
                             {
                                 spxUiColors.map((color, index) => (
-                                    <RadioButton value={uiColor === color} label={color}
+                                    <RadioButton key={index} value={spxUiColors[SPXGCTemplateDefinition.uicolor] === color} label={color}
                                                  onChange={() => handleUiColorChange(color)}/>
                                 ))
                             }
