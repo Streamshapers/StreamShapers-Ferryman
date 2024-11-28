@@ -256,6 +256,10 @@ h2 {
     margin: 0;
 }
 
+h3 svg{
+    margin-right: 5px;
+}
+
 #logo-img {
     height: 40px;
     margin-right: 20px;
@@ -307,6 +311,13 @@ input[type='file']::-webkit-file-upload-button {
     margin-right: 10px;
 }
 
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
 #headerContainer {
     display: flex;
     justify-content: space-between;
@@ -341,11 +352,15 @@ input[type='file']::-webkit-file-upload-button {
     color: var(--copy-light);
     cursor: pointer;
     padding: 5px 10px;
-    transition: background-color 0.3s;
+    transition: 0.3s;
 }
 
 .headerButton span {
     font-size: 16px;
+}
+
+.headerButton span, .headerButton svg{
+    transition: 0.5s;
 }
 
 #login-button {
@@ -363,6 +378,10 @@ input[type='file']::-webkit-file-upload-button {
 .headerButton:hover {
     border-color: var(--secondary);
     color: var(--secondary-content);
+}
+
+.headerButton:hover svg {
+    transform: scale(1.2);
 }
 
 #info-button {
@@ -430,9 +449,15 @@ input[type='file']::-webkit-file-upload-button {
 
 .accordion-header {
     margin: 0;
-    background: var(--primary);
+    background: var(--background);
     padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--primary);
+}
+
+.accordion-header.open{
     border-radius: 5px 5px 0 0;
+    border-bottom: 5px solid var(--primary);
 }
 
 .accordion-header .errors {
@@ -440,12 +465,23 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .accordion-body {
-    padding: 10px;
+    max-height: 0;
+    padding: 0;
     background: var(--background);
     border-radius: 0 0 5px 5px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow: hidden;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+    transform-origin: top;
+}
+
+.accordion-body.open {
+    max-height: 100000px;
+    transform: scaleY(1);
+    padding: 10px;
 }
 
 .accordionInfo {
@@ -533,7 +569,7 @@ input[type='file']::-webkit-file-upload-button {
 
 .control-item {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     align-items: center;
     background: var(--background);
     border-radius: 5px;
@@ -756,13 +792,17 @@ input[type='file']::-webkit-file-upload-button {
 .previewControlButton {
     font-size: 24px;
     border-radius: 5px;
-    background-color: var(--primary);
+    background-color: var(--foreground);
     border: 1px solid var(--border);
-    color: var(--primary-content);
+    color: var(--copy);
     cursor: pointer;
-    padding: 5px 10px;
-    transition: background-color 0.3s;
+    padding: 2px 10px;
+    transition: 0.2s ease;
     min-width: 20px;
+}
+
+.previewControlButton svg {
+    transition: transform 0.5s;
 }
 
 .previewControlButton.grey {
@@ -780,8 +820,12 @@ input[type='file']::-webkit-file-upload-button {
 }
 
 .previewControlButton:hover {
-    background-color: var(--secondary);
-    color: var(--secondary-content);
+    border-color: var(--primary);
+
+}
+
+.previewControlButton:hover svg{
+    transform: scale(1.2);
 }
 
 #timeDisplay {
@@ -789,9 +833,9 @@ input[type='file']::-webkit-file-upload-button {
     font-size: 24px;
     border: 1px solid var(--border);
     border-radius: 5px;
-    background-color: var(--primary);
-    color: var(--primary-content);
-    padding: 1px 10px;
+    background-color: var(--foreground);
+    color: var(--copy);
+    padding: 2px 10px;
     overflow: hidden;
 }
 
@@ -1035,13 +1079,22 @@ input[type='file']::-webkit-file-upload-button {
     cursor: pointer;
     background: var(--foreground);
     border: 1px solid var(--border);
-    margin-bottom: 10px;
 }
 
 .exportRadioButton {
     padding: 10px;
     display: flex;
     gap: 5px;
+}
+
+.template-name-wrapper{
+    display: flex;
+    gap: 10px;
+}
+
+.collection-selection{
+    display: flex;
+    gap: 10px;
 }
 
 #downloadBtn {
@@ -1081,12 +1134,21 @@ input[type='file']::-webkit-file-upload-button {
     background: var(--foreground);
     border: 1px solid var(--border);
     border-radius: 5px;
-    margin-bottom: 10px;
 }
 
 #exportFileName input {
     flex-grow: 1;
     margin: 0 5px 0 5px;
+}
+
+#save-in-account{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background: var(--foreground);
+    border: 1px solid var(--border);
 }
 
 .alert-wrapper {
@@ -1200,6 +1262,12 @@ input[type='file']::-webkit-file-upload-button {
     overflow: auto;
 }
 
+.tab-content.general{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .tab-button.active {
     background-color: var(--foreground);
     border: 2px solid var(--border);
@@ -1306,7 +1374,26 @@ button {
     width: 30px;
     height: 30px;
     cursor: pointer;
+    transition: transform 0.5s ease;
 }
+.div-button svg {
+    transition: transform 0.5s ease;
+}
+
+.div-button:hover svg {
+    transform: rotate(90deg);
+    color: var(--primary);
+}
+
+.div-button.remove-button:hover {
+    border-color: var(--error);
+}
+
+.div-button.remove-button:hover svg {
+    color: var(--error);
+}
+
+
 
 #spx-export-filetype-input {
     flex-grow: 0;
@@ -1471,6 +1558,14 @@ label span.bla {
     padding: 0;
     height: 100%;
     background: var(--foreground);
+}
+
+.option-button svg {
+    transition: transform 0.5s ease;
+}
+
+.option-button:hover svg {
+    transform: scale(1.4);
 }
 
 .text-option-dropdown {
@@ -1656,13 +1751,13 @@ label span.bla {
     color: var(--copy);
 }
 
-.close-icon svg {
+.close-icon svg , .div-button svg{
     transition: transform 0.5s ease;
 }
 
-.close-icon svg:hover {
-    color: var(--error);
+.close-icon svg:hover{
     transform: rotate(90deg);
+    color: var(--error);
 }
 
 .user-dropdown-content {

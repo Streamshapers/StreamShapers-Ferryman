@@ -16,17 +16,23 @@ function StartScreen() {
     const {jsonData, setJsonFile, setFileName, setError, error, loadNewFile} = useContext(GlobalStateContext);
 
     const handleSampleFile = async (fileName) => {
-        const response = await fetch(`./samples/${fileName}`);
-        if (!response.ok) {
-            console.error("Fehler beim Laden der Datei:", fileName);
-            return;
-        }
-        const text = await response.text();
-        const blob = new Blob([text], {type: 'application/json'});
+        try {
+            const response = await fetch(`./samples/${fileName}`);
+            if (!response.ok) {
+                console.error(`Error loading file: ${fileName}`);
+                setError("Failed to load sample file. Please try again.");
+                return;
+            }
+            const text = await response.text();
+            const blob = new Blob([text], {type: 'application/json'});
 
-        setJsonFile(blob);
-        setFileName(fileName.replace(/\.json$/, ''));
-    };
+            setJsonFile(blob);
+            setFileName(fileName.replace(/\.json$/, ''));
+        } catch (error) {
+            console.error(error.message);
+            setError("Failed to load sample file. Please try again.");
+        }
+    }
 
     function handleFileChange(file) {
         if (!file) {

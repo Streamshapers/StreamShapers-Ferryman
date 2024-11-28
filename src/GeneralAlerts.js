@@ -9,7 +9,7 @@ function GeneralAlerts() {
     }
 
     return (
-        <div>
+        <>
             {generalAlerts.map((alert, i) => {
                 return (
                     <div key={i} className={alert.type === "alert" ? "alert-wrapper" : "error-wrapper"}>
@@ -19,7 +19,7 @@ function GeneralAlerts() {
                     </div>
                 );
             })}
-        </div>
+        </>
     );
 }
 

@@ -26,6 +26,7 @@ function LastUploads() {
                     withCredentials: true
                 });
                 setTemplates(res.data);
+                console.log(res.data);
             } catch (err) {
                 console.error('Error loading templates:', err);
                 setError('Error loading templates');
@@ -120,7 +121,7 @@ function LastUploads() {
                                         <div className="template-card-body">
                                             <Player
                                                 ref={el => playerRefs.current[template._id] = el}
-                                                src={`${serverUrl}/${template.path}`}
+                                                src={template.templateJson}
                                                 style={{height: 'auto', width: '100%'}}
                                                 loop
                                             />

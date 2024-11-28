@@ -77,10 +77,10 @@ export const GlobalStateProvider = ({children}) => {
                         const blob = new Blob([JSON.stringify(lottieTemplate, null, 2)], {
                             type: 'application/json',
                         });
-                        const lottieFile = new File([blob], "lottieTemplate.json", { type: "application/json" });
+                        const lottieFile = new File([blob], file.name.replace(/\.html$/, '') + ".json", { type: "application/json" });
 
                         setJsonFile(lottieFile);
-                        setFileName("lottieTemplate");
+                        setFileName(file.name.replace(/\\.html$/, ''));
                         //console.log("set new JSON file:", lottieFile);
                     } catch (err) {
                         console.error("Error parsing lottieTemplate:", err);
@@ -204,11 +204,11 @@ export const GlobalStateProvider = ({children}) => {
         const newInfos = {};
 
         if (jsonData.op && jsonData.fr) {
-            newInfos.duration = jsonData.op / jsonData.fr;
+            newInfos.durationSeconds = jsonData.op / jsonData.fr;
         }
 
         const jsonSizeInBytes = new TextEncoder().encode(JSON.stringify(jsonData)).length;
-        newInfos.animationSize = (jsonSizeInBytes / 1024).toFixed(2) + " kb";
+        newInfos.JsonSize = (jsonSizeInBytes / 1024).toFixed(2) + " kb";
 
         if (jsonData.fr) {
             newInfos.frameRate = jsonData.fr;
@@ -1117,7 +1117,7 @@ export const GlobalStateProvider = ({children}) => {
         generateHTML().then();
     }, [jsonData]);
 
-    //################################## FerrymanJSON #################################################################
+    //################################## FerrymanTemplateJSON ##################################################################
     useEffect(() => {
         const temporaryJSON = {};
 
@@ -1129,6 +1129,17 @@ export const GlobalStateProvider = ({children}) => {
         //console.log(JSON.stringify(temporaryJSON));
         setFerrymanTemplateJSON(temporaryJSON);
     }, [externalSources, ferrymanVersion, textObjects, useExternalSources]);
+
+    //#################################### Streamshapers JSON ##########################################################
+
+    const generateStreamshapersJson = () => {
+        const streamshapersJson = {};
+
+        streamshapersJson.templateJson = jsonData;
+        if(ferrymanTemplateJSON) streamshapersJson.ferrymanJson = ferrymanTemplateJSON;
+
+        return streamshapersJson;
+    }
 
     return (
         <GlobalStateContext.Provider value={{
@@ -1204,7 +1215,8 @@ export const GlobalStateProvider = ({children}) => {
             setFerrymanTemplateJSON,
             importFerrymanJSON,
             setImportFerrymanJSON,
-            loadNewFile
+            loadNewFile,
+            generateStreamshapersJson
         }}>
             {children}
         </GlobalStateContext.Provider>

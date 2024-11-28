@@ -4,8 +4,11 @@ import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
 import GddExport from "./GddExport";
 import GeneralAlerts from "../GeneralAlerts";
+import axios from 'axios';
+import AuthContext from "../Context/AuthContext";
 
 function ExportDialog({isOpen, onClose}) {
+    const {user} = useContext(AuthContext);
     const {
         jsonData,
         ferrymanVersion,
@@ -28,23 +31,41 @@ function ExportDialog({isOpen, onClose}) {
         setExportFormat,
         mimeType,
         setMimeType,
-        generateFile
+        generateFile,
+        serverUrl,
+        generateStreamshapersJson
     } = useContext(GlobalStateContext);
 
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
-    const [startMarkerCheck, setStartMarkerCheck] = useState(false);
-    const [stopMarkerCheck, setStopMarkerCheck] = useState(false);
     const [base64Images, setBase64Images] = useState([]);
     const [message, setMessage] = useState(null);
     const [activeTab, setActiveTab] = useState('default');
-
+    const [remainingUploads, setRemainingUploads] = useState(null);
+    const [categories, setCategories] = useState([]);
+    const [newCategory, setNewCategory] = useState('');
+    const [templateName, setTemplateName] = useState('');
 
     useEffect(() => {
         if (isOpen) {
             setIsPlaying(false);
         }
     }, [isOpen, setIsPlaying]);
+    useEffect(() => {
+        if (isOpen && user) {
+            axios.get(serverUrl + '/templates/limit', {withCredentials: true})
+                .then(response => {
+                    setRemainingUploads(response.data.remainingUploads);
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching template limit:', error);
+                });
 
+            if(user.categories) {
+                setCategories(user.categories);
+            }
+        }
+    }, [isOpen]);
 
 
     const handleTabChange = tabName => {
@@ -179,6 +200,72 @@ function ExportDialog({isOpen, onClose}) {
         console.log(fileName)
     };
 
+    const handleTemplateNameChange = (e) => {
+        setTemplateName(e.target.value);
+    };
+
+    const handleNewCategoryChange = (e) => {
+        setNewCategory(e.target.value);
+    };
+
+    const handleSaveTemplate = () => {
+        if (!templateName) {
+            showAlert('Please provide a template name', 5000);
+            return;
+        }
+
+        const category = newCategory || document.getElementById('category-select').value;
+        if (!category) {
+            showAlert('Please provide a category', 5000);
+            return;
+        }
+
+        const templateJson = generateStreamshapersJson();
+        console.log(JSON.stringify(templateJson));
+        const sizeInKB = new Blob([JSON.stringify(templateJson)]).size / 1024;
+        console.log(`Payload size: ${sizeInKB} KB`);
+
+        const templateData = {
+            name: templateName,
+            category: category,
+            description: '',
+            data: templateJson
+        };
+
+        axios.post(serverUrl + '/test-payload', {
+            data: 'a'.repeat(100000) // 500 KB Payload
+        }, { withCredentials: true })
+            .then(response => console.log(response.data))
+            .catch(error => console.error('Error:', error));
+
+
+
+        axios.post(serverUrl + '/templates', templateData, {
+            withCredentials: true
+        })
+            .then(response => {
+                showAlert('Template saved successfully', 5000);
+                if (newCategory) {
+                    setCategories(prev => [...prev, newCategory]);
+
+                    axios.post(serverUrl + '/user/add-category', {
+                        category: newCategory
+                    }, { withCredentials: true })
+                        .then(() => {
+                            console.log('New category added to user successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error adding new category to user:', error);
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Error saving template:', error);
+                showAlert('Error saving template', 5000);
+            });
+    };
+
+
 
     if (!isOpen) return null;
 
@@ -192,6 +279,34 @@ function ExportDialog({isOpen, onClose}) {
                     </div>
                 )}
                 <GeneralAlerts/>
+                {remainingUploads !== null && (
+                    <div className="streamshapers-export-save">
+                        <p>Save this Template to Your StreamShapers account. Free Slots: {remainingUploads}</p>
+                        <div className="template-name-wrapper">
+                            <label htmlFor="template-name">Name</label>
+                            <input type="text" placeholder="Template Name" id="template-name" value={templateName}
+                                   onChange={handleTemplateNameChange}/>
+                        </div>
+                        <div className="collection-selection">
+                            <span>Category</span>
+                            {categories.length > 0 ? (
+                                <select id="category-select">
+                                    <option value="">Select Category</option>
+                                    {categories.map((cat, index) => (
+                                        <option key={index} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <p>No categories available</p>
+                            )}
+                            <input type="text" placeholder="New Category" id="category" value={newCategory}
+                                   onChange={handleNewCategoryChange}/>
+                        </div>
+                        <button id="save-streamshapers-button" disabled={remainingUploads <= 0}
+                                onClick={handleSaveTemplate}>Save
+                        </button>
+                    </div>
+                )}
                 <div className="tab-navigation">
                     <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
                             onClick={() => handleTabChange('default')}>General
@@ -204,28 +319,36 @@ function ExportDialog({isOpen, onClose}) {
                     </button>*/}
                 </div>
                 {activeTab === 'default' && (
-                    <div className="tab-content">
+                    <div className="tab-content general">
                         <div id="exportFileName">
                             <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                             <input type="text" id="fileNameInput" value={String(fileName)}
                                    onChange={handleFileNameChange}/>
                             <span id="fileType">.{exportFormat}</span>
                         </div>
-                        <div id="exportOptions">
-                            {refImages.length > 0 && <div id="image-export-options">
+                        {refImages.length > 0 && (
+                            <div id="image-export-options">
                                 <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
                                              onChange={handleImageExport("embed")}/>
                                 <RadioButton value={imageEmbed === 'extra'} label="Images separately"
                                              onChange={handleImageExport('extra')}/>
-                            </div>}
-                            <div id="export-format">
-                                <RadioButton value={exportFormat === 'html'} label="HTML-Template"
-                                             onChange={handleExportFormat("html")}/>
-                                <RadioButton value={exportFormat === 'json'} label="JSON"
-                                             onChange={handleExportFormat('json')}/>
-                                {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
                             </div>
+                        )}
+                        <div id="export-format">
+                            <RadioButton value={exportFormat === 'html'} label="HTML-Template"
+                                         onChange={handleExportFormat("html")}/>
+                            <RadioButton value={exportFormat === 'json'} label="JSON"
+                                         onChange={handleExportFormat('json')}/>
+                            {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
                         </div>
+                        {remainingUploads !== null && (
+                            <div id="save-in-account">
+                                <input type="checkbox" id="save-in-account" name="save-in-account"
+                                       disabled={remainingUploads <= 0}/>
+                                <label htmlFor="save-in-account">Save to StreamShapers Account</label>
+                                <span className="remaining-uploads"> (You can upload {remainingUploads} more templates. Upgrade Plan)</span>
+                            </div>
+                        )}
                     </div>
                 )}
                 {activeTab === 'spx' && (

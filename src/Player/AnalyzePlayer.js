@@ -304,20 +304,23 @@ function AnalyzePlayer() {
                     <div id="timeDisplay" title="Time (seconds:frame)">
                         {formatTimeFromFrames(currentFrame, jsonData.fr)}
                     </div>
-                    <FontAwesomeIcon icon={faBackwardStep} className="previewControlButton" title="Frame back"
-                                     onClick={() => stepFrame(-1)}/>
-                    <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause} className="previewControlButton"
-                                     title="Play/Pause" onClick={togglePlayPause}/>
-                    <FontAwesomeIcon icon={faForwardStep} className="previewControlButton" title="Frame next"
-                                     onClick={() => stepFrame(1)}/>
+                    <div className="previewControlButton" title="Frame back" onClick={() => stepFrame(-1)}>
+                        <FontAwesomeIcon icon={faBackwardStep}/>
+                    </div>
+                    <div className="previewControlButton" title="Play/Pause" onClick={togglePlayPause}>
+                        <FontAwesomeIcon icon={!isPlaying ? faPlay : faPause}/>
+                    </div>
+                    <div className="previewControlButton" title="Frame next" onClick={() => stepFrame(1)}>
+                        <FontAwesomeIcon icon={faForwardStep}/>
+                    </div>
                     {jsonData.markers && jsonData.markers.length > 0 &&
-                        <FontAwesomeIcon icon={faForwardFast} className="previewControlButton"
-                                         title="Play current Marker and stop"
-                                         onClick={playCurrenMarker}/>}
-
-                    <FontAwesomeIcon icon={faCamera} className="previewControlButton"
-                                     title="<Save current Frame>"
-                                     onClick={downloadCurrentFrame}/>
+                        <div className="previewControlButton" title="Play current Marker and stop" onClick={playCurrenMarker}>
+                            <FontAwesomeIcon icon={faForwardFast}/>
+                        </div>
+                    }
+                    <div className="previewControlButton" title="<Save current Frame>" onClick={downloadCurrentFrame}>
+                        <FontAwesomeIcon icon={faCamera}/>
+                    </div>
                 </div>
             </div>
         </>
