@@ -219,7 +219,7 @@
     let playStack = [];
     let breakFrame = undefined;
     let fetchSheet = true;
-    
+
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -283,6 +283,16 @@
         });
     }
 
+    function decodeHtmlEntities(encodedString) {
+        const textArea = document.createElement("textarea"); // Create auxiliary element
+        textArea.innerHTML = encodedString; // Set HTML entities
+        return textArea.value; // Return decoded text
+    }
+
+    function updateLayerText(layer,newText){
+        layer.t.d.k[0].s.t = decodeHtmlEntities(newText);
+    }
+
     //updates Images Assets by there Refid  //Credits to HeineFro  @https://github.com/HeineFro
     function updateAssetsByRefid(array, searchValue, newValue) {
         const foundObject = array.find(obj => obj['id'] === searchValue);
@@ -299,8 +309,8 @@
 
     function getMarker(markerName){
         for (let marker of lottieTemplate.markers) {
-                if (marker.cm === markerName) return marker;
-            }
+            if (marker.cm === markerName) return marker;
+        }
     }
 
 
@@ -317,7 +327,7 @@
                 if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`);
                 currentSegment = nextSegment;
                 playStack.shift();
-            } 
+            }
         },0);
     }
 
@@ -377,7 +387,7 @@
         } else {
             parsed = {};
         }
-        
+
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
         }
@@ -394,7 +404,7 @@
                         if ('refId' in layer) {
                             updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, parsed[key]);
                         } else {
-                            layer.t.d.k[0].s.t = parsed[key];
+                            updateLayerText(layer, parsed[key])
                         }
                     }
                 })
@@ -460,7 +470,7 @@
                             if ('refId' in layer) {
                                 updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, parsed[key]);
                             } else {
-                                layer.t.d.k[0].s.t = parsed[key];
+                                updateLayerText(layer, parsed[key])
                             }
                         }
                     })
