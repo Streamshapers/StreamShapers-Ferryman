@@ -8,8 +8,6 @@
 
 For detailed instructions, visit our tutorials at [streamshapers.com](https://streamshapers.com).
 
----
-
 ## Features
 
 - **Lottie JSON to HTML Conversion**  
@@ -30,8 +28,6 @@ For detailed instructions, visit our tutorials at [streamshapers.com](https://st
 - **Seamless Integration**  
   Export templates fully compatible with CasparCG and SPX-GC, ensuring a smooth workflow.
 
----
-
 ## How It Works
 
 1. **Design:** Create your animation in Adobe After Effects.
@@ -40,8 +36,6 @@ For detailed instructions, visit our tutorials at [streamshapers.com](https://st
 4. **Customize:** Adjust text, images, and markers using Ferryman's tools.
 5. **Preview & Export:** Preview the final result and export it as an HTML template.
 6. **Ready to go:** You can now use your production ready HTML-graphic template
-
----
 
 ## Preparing for Ferryman
 
@@ -57,21 +51,15 @@ For detailed instructions, visit our tutorials at [streamshapers.com](https://st
 
 For detailed preparation steps, refer to the [Prepare for Ferryman Guide](https://streamshapers.com/prepare-for-ferryman).
 
----
-
 ## Export Options
 
 - **HTML Templates:** Export templates with embedded or separate images.
 - **SPX-GC Integration:** Add layer metadata for SPX Graphics Controller compatibility.
 - **Debugging:** Use `_templateInfo` and `_debug` keys to analyze and troubleshoot animations.
 
----
-
 ## Contributing
 
 Contributions to this project are highly encouraged! Whether it's bug fixes, feature enhancements, or documentation improvements, your help is appreciated.
-
----
 
 ## License
 
@@ -79,5 +67,3 @@ This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**
 For more details, see the LICENSE file.
 
 By contributing to this project, you agree to abide by its terms.
-
----
