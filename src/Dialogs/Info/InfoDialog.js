@@ -1,0 +1,45 @@
+import React, {useContext, useEffect, useState} from "react";
+import {GlobalStateContext} from "../../Context/GlobalStateContext";
+import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+function InfoDialog() {
+    const {theme, ferrymanVersion} = useContext(GlobalStateContext);
+    const [isImprintOpen, setIsImprintOpen] = useState(false);
+
+    return (<>
+            <div id="info-title">
+                <img id="logo-img" src={theme === 'dark' ? './logo-light.png' : './logo-dark.png'} alt="logo"/>
+                <h1>Ferryman</h1>
+            </div>
+            <div id="info-version">
+                <h3>{ferrymanVersion}</h3>
+            </div>
+
+                <div className="accordion-wrapper">
+                    <div className="accordion">
+                        <div className="accordion-item imprint">
+                            <h3 className="accordion-header" onClick={() => setIsImprintOpen(!isImprintOpen)}>
+                                <FontAwesomeIcon icon={isImprintOpen ? faChevronUp : faChevronDown}/> Imprint
+                            </h3>
+                            <div className={`accordion-body ${isImprintOpen ? 'open' : ''}`}>
+                                <p>StreamShapers by Jan-Philipp Peters, Nico Peters and Richard Weyer</p>
+                                <p>E-Mail: <a href="mailto:mail@streamshapers.com">mail@streamshapers.com</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <div id="info-copyright">
+                <div>
+                    © StreamShapers 2024
+                </div>
+            </div>
+            <div className="popupButtonArea">
+            </div>
+        </>
+    )
+        ;
+}
+
+export default InfoDialog;

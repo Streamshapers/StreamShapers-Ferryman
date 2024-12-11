@@ -87,13 +87,13 @@
     font-family: 'OpenSans-RegularS';
     font-style: normal;
     src: url('../public/fonts/OpenSans-Regular.ttf');
-    font-display: auto;
+    font-display: swap;
 }
 
 @font-face {
     font-family: 'OpenSans-SemiBoldS';
     src: url('../public/fonts/OpenSans-SemiBold.ttf');
-    font-display: auto;
+    font-display: swap;
 }
 
 * {
@@ -103,6 +103,7 @@
 }
 
 html {
+    font-family: "OpenSans-RegularS", sans-serif;
     width: 100%;
 }
 
@@ -333,6 +334,7 @@ input[type="checkbox"] {
 
 .headerSide {
     display: flex;
+    gap: 10px;
     align-items: center;
     justify-content: space-around;
 }
@@ -371,10 +373,6 @@ input[type="checkbox"] {
     display: none;
 }
 
-.theme-switch {
-    margin-right: 10px;
-}
-
 .headerButton:hover {
     border-color: var(--secondary);
     color: var(--secondary-content);
@@ -382,14 +380,6 @@ input[type="checkbox"] {
 
 .headerButton:hover svg {
     transform: scale(1.2);
-}
-
-#info-button {
-    margin-right: 10px;
-}
-
-#question-button {
-    margin-right: 10px;
 }
 
 #previewContainer {
@@ -1019,7 +1009,7 @@ input[type="checkbox"] {
     padding-bottom: 0;
 }
 
-/*+++++++++++++++++++++++++ Export ++++++++++++++++++++++++++++++++++++++*/
+/*+++++++++++++++++++++++++ Dialogs ++++++++++++++++++++++++++++++++++++++*/
 
 .overlay {
     position: fixed;
@@ -1031,7 +1021,7 @@ input[type="checkbox"] {
     z-index: 1000;
 }
 
-#exportDialogWindow {
+.dialog-window {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1049,8 +1039,12 @@ input[type="checkbox"] {
     flex-direction: column;
 }
 
-#exportDialogWindow h2 {
+.dialog-window h2 {
     padding: 0 20px 20px 0;
+}
+
+.dialog-window p {
+    padding: 0 0 20px 0;
 }
 
 .popupButtonArea {
@@ -1088,11 +1082,6 @@ input[type="checkbox"] {
 }
 
 .template-name-wrapper{
-    display: flex;
-    gap: 10px;
-}
-
-.collection-selection{
     display: flex;
     gap: 10px;
 }
@@ -1143,7 +1132,8 @@ input[type="checkbox"] {
 
 #save-in-account{
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
     padding: 10px;
     border-radius: 5px;
@@ -1231,6 +1221,7 @@ input[type="checkbox"] {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 10px;
 }
 
 #info-version h3 {
@@ -1658,40 +1649,12 @@ label span.bla {
 
 /*################################### LOGIN #################################################*/
 
-#login-dialog-window {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--foreground);
-    border-radius: 5px;
-    padding: 15px 20px 40px 20px;
-    z-index: 1001;
-    border: 1px solid var(--border);
-    width: auto;
-    min-width: 400px;
-    height: auto;
+.auth-form{
     display: flex;
     flex-direction: column;
-}
-
-#login-dialog-window h2 {
-    padding: 0 20px 20px 0;
-}
-
-#login-dialog-window .mode-switch {
-    height: 50px;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-
-#login-dialog-window form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     gap: 20px;
+    width: 100%;
+    align-items: center;
 }
 
 .auth-input {
@@ -1823,12 +1786,12 @@ label span.bla {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 20px;
 }
 
 .template-grid {
     display: flex;
     gap: 20px;
-    padding: 20px;
 }
 
 .template-card {
@@ -1906,4 +1869,64 @@ label span.bla {
 
 .template-card-dropdown-menu button:hover {
     color: var(--primary);
+}
+
+.row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.deactivated{
+    color: var(--border);
+}
+
+.tags-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid var(--border);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.tag {
+    background-color: var(--background);
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.remove-tag {
+    margin-left: 5px;
+    cursor: pointer;
+    color: var(--error);
+    font-weight: bold;
+}
+
+#save-in-account input{
+    background-color: var(--background);
+}
+
+.tag-input {
+    background-color: var(--foreground);
+    border: none;
+    outline: none;
+    margin: 5px;
+    flex: 1;
+}
+
+textarea {
+    font-family: "OpenSans-Regular", sans-serif;
+    color: var(--copy);
+    caret-color: var(--copy);
+    width: 100%;
+    border: 1px solid var(--border);
+    outline: none;
+    padding: 10px;
+    border-radius: 5px;
+    background: var(--background);
 }

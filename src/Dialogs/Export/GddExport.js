@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from "react";
-import {GlobalStateContext} from "../Context/GlobalStateContext";
+import {GlobalStateContext} from "../../Context/GlobalStateContext";
 
 function GddExport() {
     const {

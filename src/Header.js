@@ -4,29 +4,30 @@ import {
     faCircleInfo,
     faCircleQuestion,
     faFileExport,
-    faNavicon, faRightToBracket,
+    faNavicon, faRightToBracket, faSave,
     faUser
 } from "@fortawesome/free-solid-svg-icons";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import ExportDialog from "./Export/ExportDialog";
 import ThemeSwitch from "./Theme/ThemeSwitch";
 import {GlobalStateContext} from "./Context/GlobalStateContext";
 import AuthContext from "./Context/AuthContext";
-import InfoDialog from "./InfoDialog";
-import LoginDialog from "./LoginDialog";
+import Dialog from "./Dialogs/Dialog";
 
 function Header() {
-    const {user, logout} = useContext(AuthContext);
+    const {user, handleLogout} = useContext(AuthContext);
     const {jsonFile, theme} = useContext(GlobalStateContext);
     const [isExportDialogOpen, setExportDialogOpen] = useState(false);
     const [isInfoDialogOpen, setInfoDialogOpen] = useState(false);
     const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
+    const [isSaveDialogOpen, setSaveDialogOpen] = useState(false);
     const openExportDialog = () => setExportDialogOpen(true);
     const closeExportDialog = () => setExportDialogOpen(false);
     const openInfoDialog = () => setInfoDialogOpen(true);
     const closeInfoDialog = () => setInfoDialogOpen(false);
     const openLoginDialog = () => setLoginDialogOpen(true);
     const closeLoginDialog = () => setLoginDialogOpen(false);
+    const openSaveDialog = () => setSaveDialogOpen(true);
+    const closeSaveDialog = () => setSaveDialogOpen(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -54,9 +55,10 @@ function Header() {
 
     return (
         <>
-            <ExportDialog isOpen={isExportDialogOpen} onClose={closeExportDialog}/>
-            <InfoDialog isOpen={isInfoDialogOpen} onClose={closeInfoDialog}/>
-            <LoginDialog isOpen={isLoginDialogOpen} onClose={closeLoginDialog}/>
+            <Dialog isOpen={isExportDialogOpen} onClose={closeExportDialog} type='export'/>
+            <Dialog isOpen={isInfoDialogOpen} onClose={closeInfoDialog} type='info'/>
+            <Dialog isOpen={isLoginDialogOpen} onClose={closeLoginDialog} type='login'/>
+            <Dialog isOpen={isSaveDialogOpen} onClose={closeSaveDialog} type="save" />
             <div id="headerContainer">
                 <div className="headerSide">
                     <div className="dropdown">
@@ -65,6 +67,20 @@ function Header() {
                             <div className="dropdown-item">
                                 {jsonFile && <JsonFileProcessor/>}
                             </div>
+                            {user &&
+                                <div className="headerButton dropdown-item" title="Save to Your StreamShapers Account"
+                                     onClick={() => openSaveDialog()}>
+                                    <span>Save</span>
+                                    <FontAwesomeIcon icon={faSave}/>
+                                </div>
+                            }
+                            {jsonFile &&
+                                <div id="downloadArea" className="headerButton dropdown-item" title="Export"
+                                     onClick={openExportDialog}>
+                                    <span>Export </span>
+                                    <FontAwesomeIcon icon={faFileExport}/>
+                                </div>
+                            }
                             <ThemeSwitch/>
                             <a id="question-button" className="headerButton dropdown-item" title="Help"
                                href="https://www.streamshapers.com/docs/streamshapers-converter/">
@@ -74,12 +90,6 @@ function Header() {
                                  onClick={openInfoDialog}>
                                 <FontAwesomeIcon icon={faCircleInfo}/>
                             </div>
-                            {jsonFile &&
-                                <div id="downloadArea" className="headerButton dropdown-item" title="Export"
-                                     onClick={openExportDialog}>
-                                    <span>Export </span>
-                                    <FontAwesomeIcon icon={faFileExport}/>
-                                </div>}
                             <div id="login-button" className="headerButton dropdown-item" title="Login"
                                  ref={dropdownRef}
                                  onClick={openLoginDialog}>
@@ -88,7 +98,23 @@ function Header() {
                             </div>
                         </div>
                     </div>
-                    {jsonFile && <JsonFileProcessor/>}
+                    {jsonFile &&
+                        <>
+                            <JsonFileProcessor/>
+                            {user &&
+                                <div className="headerButton" title="Save to Your StreamShapers Account"
+                                     onClick={() => openSaveDialog()}>
+                                    <span>Save</span>
+                                    <FontAwesomeIcon icon={faSave}/>
+                                </div>
+                            }
+                            <div id="downloadArea" className="headerButton headerButton1" title="Export"
+                                 onClick={openExportDialog}>
+                                <span>Export </span>
+                                <FontAwesomeIcon icon={faFileExport}/>
+                            </div>
+                        </>
+                    }
                 </div>
                 <div id="header-title">
                     <a href="https://www.streamshapers.com/"><img id="logo-img"
@@ -105,12 +131,6 @@ function Header() {
                     <div id="info-button" className="headerButton headerButton1" title="Info" onClick={openInfoDialog}>
                         <FontAwesomeIcon icon={faCircleInfo}/>
                     </div>
-                    {jsonFile &&
-                        <div id="downloadArea" className="headerButton headerButton1" title="Export"
-                             onClick={openExportDialog}>
-                            <span>Export </span>
-                            <FontAwesomeIcon icon={faFileExport}/>
-                        </div>}
                     <div id="login-button" className="headerButton headerButton1" title="Login"
                          onClick={!user ? openLoginDialog : toggleDropdown}>
                         <FontAwesomeIcon icon={faUser}/>
@@ -122,7 +142,7 @@ function Header() {
                                    onClick={test}>Settings</a>
                                 )}*/}
                                 {user &&(
-                                <div className="user-dropdown-item logout" onClick={logout}>
+                                <div className="user-dropdown-item logout" onClick={handleLogout}>
                                     Logout
                                     <FontAwesomeIcon icon={faRightToBracket}/>
                                 </div>

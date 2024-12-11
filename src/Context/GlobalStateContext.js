@@ -1,11 +1,12 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import AuthContext from "./AuthContext";
+import api from "../axiosInstance";
 
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
     const {user, login, serverURL} = useContext(AuthContext);
-    const [ferrymanVersion] = useState("v1.6.1");
+    const [ferrymanVersion] = useState("v1.6.3 demo");
     const [serverUrl] = useState(serverURL);
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
@@ -31,7 +32,7 @@ export const GlobalStateProvider = ({children}) => {
     const [spxExport, setSpxExport] = useState(true);
     const [GDDTemplateDefinition, setGDDTemplateDefinition] = useState({});
     const [useExternalSources, setUseExternalSources] = useState(false);
-    const [externalSources, setExternalSources] = useState([{key: 'Google Sheet', secret: '', index: 1, errors:''}]);
+    const [externalSources, setExternalSources] = useState([{key: 'Google Sheet', secret: '', index: 1, errors: ''}]);
     const [deleteExternalSource, setDeleteExternalSource] = useState(null);
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
@@ -42,6 +43,8 @@ export const GlobalStateProvider = ({children}) => {
     const [mimeType, setMimeType] = useState("text/html");
     const [htmlTemplate, setHtmlTemplate] = useState(null);
     const [generalAlerts, setGeneralAlerts] = useState([]);
+    const [templateData, setTemplateData] = useState(null);
+    const [remainingUploads, setRemainingUploads] = useState(null);
 
     const googleCellSnapshot = useRef([]);
 
@@ -49,18 +52,40 @@ export const GlobalStateProvider = ({children}) => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
     }, []);
 
-    useEffect(() => {
-        setMarkers(null);
-        setCurrentFrame(0);
-        setGeneralAlerts([]);
-        setUseExternalSources(false);
-    }, [jsonFile]);
+    async function parseBlobAsJson(blob) {
+        try {
+            const text = await blob.text();
+            return JSON.parse(text);
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            throw error;
+        }
+    }
 
-    const loadNewFile = (file) => {
-        const fileExtension = file.name.split('.').pop().toLowerCase();
+    const loadNewFile = async (file) => {
+        const fileName = file.name || '';
+        const fileExtension = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+
         if (file.type === "application/json" || fileExtension === "json") {
-            setJsonFile(file);
-            setFileName(file.name.replace(/\.json$/, ''));
+            if (fileExtension === '') {
+                const parsedFile = await parseBlobAsJson(file);
+                setTemplateData(parsedFile);
+                //console.log(parsedFile);
+
+                const blob = new Blob([JSON.stringify(parsedFile.data.templateJson, null, 2)], {
+                    type: 'application/json',
+                });
+                const lottieFile = new File([blob], parsedFile.name + ".json", {type: "application/json"});
+                setJsonFile(lottieFile);
+
+                if (parsedFile.data.name) setFileName(parsedFile.name);
+                if (parsedFile.data.ferrymanJson.textObjects) setTextObjects(parsedFile.data.ferrymanJson.textObjects);
+                if (parsedFile.data.ferrymanJson.externalSources) setExternalSources(parsedFile.data.ferrymanJson.externalSources);
+                if (parsedFile.data.ferrymanJson.useExternalSources) setUseExternalSources(parsedFile.data.ferrymanJson.useExternalSources);
+            } else {
+                setJsonFile(file);
+                setFileName(file.name.replace(/\.json$/, ''));
+            }
         } else if (file.type === "text/html" || fileExtension === "html") {
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -77,7 +102,7 @@ export const GlobalStateProvider = ({children}) => {
                         const blob = new Blob([JSON.stringify(lottieTemplate, null, 2)], {
                             type: 'application/json',
                         });
-                        const lottieFile = new File([blob], file.name.replace(/\.html$/, '') + ".json", { type: "application/json" });
+                        const lottieFile = new File([blob], file.name.replace(/\.html$/, '') + ".json", {type: "application/json"});
 
                         setJsonFile(lottieFile);
                         setFileName(file.name.replace(/\\.html$/, ''));
@@ -132,7 +157,7 @@ export const GlobalStateProvider = ({children}) => {
     };
 
     useEffect(() => {
-        if (markers) {
+        if (jsonData && markers) {
             const startExists = markers.some(event => event.cm === 'start');
             const stopExists = markers.some(event => event.cm === 'stop');
             if (!startExists) {
@@ -592,7 +617,7 @@ export const GlobalStateProvider = ({children}) => {
             steps: `${steps}`,
             DataFields: SPXGCTemplateDefinition.DataFields ? [...SPXGCTemplateDefinition.DataFields] : []
         };
-        let spxExportJson = { ...rawSpxJson };
+        let spxExportJson = {...rawSpxJson};
 
         if (fileName && spxExportJson.description === '') {
             spxExportJson.description = fileName;
@@ -896,13 +921,17 @@ export const GlobalStateProvider = ({children}) => {
                     const value = getCellData(object.key, cell, csvArray);
                     if (value !== undefined && value !== object.value) {
                         //console.log(`Extracted value for ${cell}: ${value}`);
-                        let copiedJsonData = {...jsonData};
-                        for (const layer of copiedJsonData.layers) {
-                            if (layer.nm === object.key) {
-                                const textObject = textObjects.find(obj => obj.layername === object.key);
-                                const textIndex = textObjects.findIndex(t => t === textObject);
-                                updateLottieText(textIndex, value.toString());
+                        let copiedJsonData = { ...jsonData };
+                        if (Array.isArray(copiedJsonData.layers)) {
+                            for (const layer of copiedJsonData.layers) {
+                                if (layer.nm === object.key) {
+                                    const textObject = textObjects.find(obj => obj.layername === object.key);
+                                    const textIndex = textObjects.findIndex(t => t === textObject);
+                                    updateLottieText(textIndex, value.toString());
+                                }
                             }
+                        } else {
+                            //console.error('layers ist nicht definiert oder kein Array (Google Update):', copiedJsonData.layers);
                         }
                         object.value = value;
 
@@ -1117,28 +1146,109 @@ export const GlobalStateProvider = ({children}) => {
         generateHTML().then();
     }, [jsonData]);
 
-    //################################## FerrymanTemplateJSON ##################################################################
+    //################################## FerrymanTemplateJSON ##########################################################
     useEffect(() => {
         const temporaryJSON = {};
 
-        if(ferrymanVersion) temporaryJSON.ferrymanVersion = ferrymanVersion;
-        if(textObjects) temporaryJSON.textObjects = textObjects;
-        if(useExternalSources) temporaryJSON.useExternalSources = useExternalSources;
-        if(externalSources) temporaryJSON.externalSources = externalSources;
+        if (ferrymanVersion) temporaryJSON.ferrymanVersion = ferrymanVersion;
+        if (textObjects) temporaryJSON.textObjects = textObjects;
+        if (useExternalSources) temporaryJSON.useExternalSources = useExternalSources;
+        if (externalSources) temporaryJSON.externalSources = externalSources;
 
         //console.log(JSON.stringify(temporaryJSON));
         setFerrymanTemplateJSON(temporaryJSON);
+        //console.log(temporaryJSON);
     }, [externalSources, ferrymanVersion, textObjects, useExternalSources]);
 
-    //#################################### Streamshapers JSON ##########################################################
+    //#################################### Streamshapers JSON (streamshapers hosting) ##################################
 
     const generateStreamshapersJson = () => {
         const streamshapersJson = {};
 
         streamshapersJson.templateJson = jsonData;
-        if(ferrymanTemplateJSON) streamshapersJson.ferrymanJson = ferrymanTemplateJSON;
+        if (ferrymanTemplateJSON) streamshapersJson.ferrymanJson = ferrymanTemplateJSON;
 
         return streamshapersJson;
+    }
+
+    const saveTemplate = (name, category, description, tags) => {
+        const templateJson = generateStreamshapersJson();
+        let templateName;
+        let templateCategory;
+        let templateDescription;
+        let templateTags;
+
+        if (templateData) {
+            templateName = templateData.name;
+            templateCategory = templateData.category;
+            templateDescription = templateData.description;
+            templateTags = templateData.tags;
+        }
+
+        if (name && name !== '') templateName = name;
+        if (category && category !== '') templateCategory = category;
+        if (description && description !== '') templateDescription = description;
+        if (tags && tags !== '') templateTags = tags;
+
+        if (templateName && templateJson) {
+            const saveTemplate = {
+                name: templateName,
+                category: templateCategory ? templateCategory : '',
+                description: templateDescription ? templateDescription : '',
+                data: templateJson,
+                tags: templateTags ? templateTags : []
+            }
+
+            if (templateData) {
+                api.put(`/templates/${templateData._id}`, saveTemplate, {withCredentials: true}).then(r => {
+                    console.log('saved template', saveTemplate);
+                    if (!user.categories.includes(templateCategory)) {
+                        api.post('/user/add-category', {
+                            category: templateCategory
+                        }, {withCredentials: true})
+                            .then(() => {
+                                console.log('New category added to user successfully');
+                            })
+                            .catch(error => {
+                                console.error('Error adding new category to user:', error);
+                            });
+                    }
+                })
+            } else{
+                api.post('/templates', saveTemplate, {
+                    withCredentials: true
+                })
+                    .then(response => {
+                        if (!user.categories.includes(templateCategory)) {
+                            api.post('/user/add-category', {
+                                category: templateCategory
+                            }, {withCredentials: true})
+                                .then(() => {
+                                    console.log('New category added to user successfully');
+                                })
+                                .catch(error => {
+                                    console.error('Error adding new category to user:', error);
+                                });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving template:', error);
+                    });
+            }
+        }
+    }
+
+    const getTemplateLimit = () => {
+        if (user) {
+            api.get('/templates/limit', {withCredentials: true})
+                .then(response => {
+                    setRemainingUploads(response.data.remainingUploads);
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching template limit:', error);
+                });
+        }
     }
 
     return (
@@ -1216,7 +1326,13 @@ export const GlobalStateProvider = ({children}) => {
             importFerrymanJSON,
             setImportFerrymanJSON,
             loadNewFile,
-            generateStreamshapersJson
+            generateStreamshapersJson,
+            templateData,
+            setTemplateData,
+            saveTemplate,
+            remainingUploads,
+            setRemainingUploads,
+            getTemplateLimit
         }}>
             {children}
         </GlobalStateContext.Provider>

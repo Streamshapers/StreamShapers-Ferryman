@@ -1,12 +1,11 @@
 import React, {useContext, useEffect, useState} from "react";
-import {GlobalStateContext} from "./Context/GlobalStateContext";
-import AuthContext from './Context/AuthContext';
-import axios from 'axios';
+import {GlobalStateContext} from "../../Context/GlobalStateContext";
+import AuthContext from '../../Context/AuthContext';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import api from '../../axiosInstance';
 
-function LoginDialog({isOpen, onClose}) {
-    const {setIsPlaying, serverUrl} = useContext(GlobalStateContext);
+function LoginDialog({ onClose }) {
     const {user, login} = useContext(AuthContext);
 
     const [loginData, setLoginData] = useState({
@@ -29,16 +28,12 @@ function LoginDialog({isOpen, onClose}) {
         registerMail: false,
         registerPassword: false
     });
+
     const {loginMail, loginPassword} = loginData;
     const {registerUsername, registerMail, registerPassword} = registerData;
     const onLoginChange = e => setLoginData({...loginData, [e.target.name]: e.target.value});
     const [message, setMessage] = useState(null);
     const [activeTab, setActiveTab] = useState('login');
-
-    if (isOpen) {
-        setIsPlaying(false);
-    }
-
 
     const handleTabChange = tabName => {
         setActiveTab(tabName);
@@ -51,23 +46,33 @@ function LoginDialog({isOpen, onClose}) {
         }, duration);
     };
 
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-    }, [isOpen]);
-
     const onLoginSubmit = async e => {
         e.preventDefault();
         try {
             console.log('Sending Login-Data...');
-            await login(loginData);
-            console.log('Login successful, directing to Dashboard-Site...');
-            //navigate('/dashboard');
+            const response = await api.post('/auth/login', loginData, {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true,
+            });
+
+            const { accessToken } = response.data;
+
+            localStorage.setItem('accessToken', accessToken);
+
+            console.log('Login successful, token stored.');
+
+            const userResponse = await api.get('/auth/me', {
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+                withCredentials: true,
+            });
+
+            const user = userResponse.data.user;
+            console.log('User information retrieved:', user);
+
+            login(user);
+            onClose();
         } catch (error) {
-            console.error('Error logging in:', error.message);
+            console.error('Error logging in:', error.response?.data || error.message);
         }
     };
 
@@ -107,47 +112,27 @@ function LoginDialog({isOpen, onClose}) {
     };
 
 
-    const onRegisterSubmit = async (e) => {
+    const onRegisterSubmit = async e => {
         e.preventDefault();
-        console.log('Register button clicked');
 
-        // Debugging: log the form data
-        console.log('Form data:', registerData);
+        try {
+            console.log('Sending Registration-Data...');
+            const response = await api.post('/auth/register', registerData, {
+                headers: { 'Content-Type': 'application/json' },
+            });
 
-        // Validate all fields
-        const isUsernameValid = validateField('registerUsername', registerData.registerUsername);
-        const isMailValid = validateField('registerMail', registerData.registerMail);
-        const isPasswordValid = validateField('registerPassword', registerData.registerPassword);
+            console.log('Registration successful:', response.data);
 
-        console.log('Validation Results:', {isUsernameValid, isMailValid, isPasswordValid});
-
-        // Only submit if all fields are valid
-        if (isUsernameValid && isMailValid && isPasswordValid) {
-            try {
-                const response = await axios.post(serverUrl + '/auth/register', registerData, {
-                    headers: {'Content-Type': 'application/json'}
-                });
-                console.log('Registration successful', response.data);
-                await login({loginMail: registerMail, loginPassword: registerPassword});
-            } catch (error) {
-                console.error('Registration Error:', error);
-            }
-        } else {
-            console.error('Validation Errors:', errors);
+            await onLoginSubmit(e);
+        } catch (error) {
+            console.error('Registration Error:', error.response?.data || error.message);
         }
     }
-
-
-    if (!isOpen) return null;
 
     return (<>
             {!user && (
                 <>
-                    <div className="overlay"></div>
-                    <div id="login-dialog-window">
-                        <div className="close-icon" onClick={onClose}>
-                            <FontAwesomeIcon icon={faXmark}/>
-                        </div>
+                    <h2>{activeTab === 'login' ? 'Login' : 'Register'}</h2>
                         {message && (
                             <div className="success-wrapper">
                                 <div className="success alert-success">{message}</div>
@@ -162,7 +147,7 @@ function LoginDialog({isOpen, onClose}) {
                             </button>
                         </div>
                         {activeTab === 'login' && (
-                            <form onSubmit={onLoginSubmit}>
+                            <form className="auth-form" onSubmit={onLoginSubmit}>
                                 <div className="auth-input">
                                     <input autoComplete="loginMail" type="loginMail" name="loginMail" value={loginMail}
                                            onChange={onLoginChange}
@@ -235,7 +220,6 @@ function LoginDialog({isOpen, onClose}) {
                     <button id="downloadBtn" onClick={onClose}>Close</button>
                     <button id="downloadBtn" onClick={downloadFile}>Download File</button>
                 </div>*/}
-                    </div>
                 </>
             )}
         </>

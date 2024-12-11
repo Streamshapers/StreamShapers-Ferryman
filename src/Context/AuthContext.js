@@ -1,5 +1,5 @@
 import React, {createContext, useState, useEffect, useContext, useRef} from 'react';
-import axios from 'axios';
+import api from "../axiosInstance";
 
 const AuthContext = createContext();
 
@@ -11,45 +11,74 @@ export const AuthProvider = ({children}) => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await axios.get(serverURL + '/auth/me', { withCredentials: true });
-                //console.log('CheckAuth answer:', response.data);
+                const refreshResponse = await api.post('/auth/refresh', {}, { withCredentials: true });
+                const newAccessToken = refreshResponse.data.accessToken;
+
+                localStorage.setItem('accessToken', newAccessToken);
+
+                const response = await api.get('/auth/me', {
+                    headers: { 'Authorization': `Bearer ${newAccessToken}` },
+                    withCredentials: true,
+                });
+
                 setUser(response.data.user);
             } catch (error) {
                 console.error('authentication error:', error);
+                setUser(null);
             } finally {
                 setLoading(false);
             }
         };
 
         checkAuth().then();
+
+        const refreshTokenInterval = setInterval(async () => {
+            try {
+                const refreshResponse = await api.post('/auth/refresh', {}, { withCredentials: true });
+                const newAccessToken = refreshResponse.data.accessToken;
+
+                localStorage.setItem('accessToken', newAccessToken);
+                console.log('Access token refreshed:', newAccessToken);
+
+                const response = await api.get('/auth/me', {
+                    headers: { 'Authorization': `Bearer ${newAccessToken}` },
+                    withCredentials: true,
+                });
+
+                setUser(response.data.user);
+            } catch (error) {
+                console.error('Error refreshing token:', error);
+                setUser(null);
+            }
+        }, 14 * 60 * 1000);
+
+        return () => clearInterval(refreshTokenInterval);
     }, []);
 
-
-    const login = async (formData) => {
-        //console.log('Try logging in with:', formData);
-        const response = await axios.post(serverURL + '/auth/login', formData, {withCredentials: true});
-        //console.log('Login successfully, answer:', response.data);
-
-        if (response.data.user) {
-            setUser(response.data.user);
-            //console.log('User:', response.data.user);
-        } else {
-            console.error('No user found');
-        }
+    const login = (userData) => {
+        setUser(userData);
+        setLoading(false);
+        //console.log('User state updated:', userData);
     };
 
-    const logout = async () => {
+
+    const handleLogout = async () => {
         try {
-            const response = await axios.post(serverURL + '/auth/logout', {}, {withCredentials: true});
-            //console.log('Logout successfully:', response.data);
+            await api.post(serverURL + '/auth/logout', {}, {
+                withCredentials: true,
+            });
+
+            localStorage.removeItem('accessToken');
             setUser(null);
+
+            console.log('Logout successful');
         } catch (error) {
-            console.error('Error logging out:', error.message);
+            console.error('Error during logout:', error.message);
         }
     };
 
     return (
-        <AuthContext.Provider value={{user, login, logout, loading, serverURL}}>
+        <AuthContext.Provider value={{user, login, handleLogout, loading, serverURL}}>
             {children}
         </AuthContext.Provider>
     );

@@ -18,7 +18,8 @@ function JsonFileProcessor() {
         setJsonFile,
         importFerrymanJSON,
         setUseExternalSources,
-        setExternalSources
+        setExternalSources,
+        setGeneralAlerts
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -28,6 +29,9 @@ function JsonFileProcessor() {
         setImages([]);
         setCurrentFrame(0);
         setIsPlaying(true);
+        setMarkers(null);
+        setGeneralAlerts([]);
+        setUseExternalSources(false);
     };
 
     const processJsonFile = (file) => {
@@ -63,7 +67,6 @@ function JsonFileProcessor() {
         }
 
         try {
-            resetState();
             const jsonData = JSON.parse(content);
             setJsonData(jsonData);
             if (jsonData.markers && jsonData.markers.length > 0) {
@@ -82,6 +85,7 @@ function JsonFileProcessor() {
     const resetJsonFile = () => {
         setJsonFile(null);
         setJsonData(null);
+        resetState()
     }
 
     return (

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import {GlobalStateContext} from "../Context/GlobalStateContext";
+import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
@@ -134,7 +134,7 @@ function SpxExport() {
                 <h3>SPX Export Settings</h3>
                 {/*<div className="spx-checkbox">
                     <input type="checkbox" id="spx-compatible" checked={spxExport} onChange={handleCheckboxChange}/>
-                    <label htmlFor="spx-compatible">Export SPX compatible</label>
+                    <label htmlFor="spx-compatible">Dialogs SPX compatible</label>
                 </div>*/}
                 <a href="https://www.spx.graphics/" target="_blank" rel="noreferrer">
                     <img id="spx-logo" src="./SPX_logo.png" alt=""/>

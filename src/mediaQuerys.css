@@ -1,6 +1,6 @@
 /* ############################## Media Query's ########################################### */
 @media (width < 1600px) {
-    #exportDialogWindow {
+    .dialog-window {
         width: 80vw;
     }
 
@@ -143,7 +143,7 @@
         display: none;
     }
 
-    #exportDialogWindow {
+    .dialog-window {
         min-width: 100%;
     }
 
