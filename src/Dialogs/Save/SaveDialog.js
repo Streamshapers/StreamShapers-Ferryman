@@ -82,7 +82,7 @@ function SaveDialog({ onClose }) {
                     {categories.length > 0 ? (
                         <>
                             <select id="category-select" onChange={(e) => setTemplateCategory(e.target.value)} disabled={newCategory !== ''}>
-                                <option value={templateCategory}>{templateCategory}</option>
+                                <option value={templateCategory}>{templateCategory ? templateCategory : 'select category'}</option>
                                 {categories.map((cat, index) => (
                                     <option key={index} value={cat}>{cat}</option>
                                 ))}

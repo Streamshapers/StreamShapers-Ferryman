@@ -1,8 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import AuthContext from '../../Context/AuthContext';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import api from '../../axiosInstance';
 
 function LoginDialog({ onClose }) {
