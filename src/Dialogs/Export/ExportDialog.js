@@ -43,7 +43,7 @@ function ExportDialog({ onClose }) {
 
     useEffect(() => {
         getTemplateLimit();
-        if (user.categories) {
+        if (user && user.categories) {
             setCategories(user.categories);
         }
     }, []);

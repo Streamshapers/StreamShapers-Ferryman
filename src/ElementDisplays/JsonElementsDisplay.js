@@ -13,7 +13,7 @@ import GeneralAlerts from "../GeneralAlerts";
 
 function JsonElementsDisplay() {
     const {jsonData, infos, fonts, textObjects, colors, images, generalAlerts} = useContext(GlobalStateContext);
-    const [isInfoOpen, setIsInfoOpen] = useState(true);
+    const [isInfoOpen, setIsInfoOpen] = useState(false);
     const [isFontsOpen, setIsFontsOpen] = useState(false);
     const [isTextsOpen, setIsTextsOpen] = useState(false);
     const [isColorsOpen, setIsColorsOpen] = useState(false);
