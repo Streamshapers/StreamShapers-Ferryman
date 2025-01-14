@@ -20,7 +20,7 @@ function SpxExport() {
     const handleUiColorChange = (color) => {
         setUiColor(color);
         const spxJson = {...SPXGCTemplateDefinition};
-        spxJson.uicolor = spxUiColors.indexOf(color + 1);
+        spxJson.uicolor = spxUiColors.indexOf(color);
         setSPXGCTemplateDefinition(spxJson);
     }
 
@@ -125,6 +125,12 @@ function SpxExport() {
         setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
     };
 
+    function handleLayerChange(value) {
+        const spxJson = {...SPXGCTemplateDefinition};
+        spxJson.webplayout = value;
+        setSPXGCTemplateDefinition(spxJson);
+    }
+
     return (
         <div className="tab-content">
             <div className="export-checkbox spx-header">
@@ -162,12 +168,26 @@ function SpxExport() {
                         <div className="spx-export-right">
                             {
                                 spxUiColors.map((color, index) => (
-                                    <RadioButton value={uiColor === color} label={color}
+                                    <RadioButton key={index} value={uiColor === color} label={color}
                                                  onChange={() => handleUiColorChange(color)}/>
                                 ))
                             }
                         </div>
                     </div>
+                    <div className="spx-instruction spx-setting-header">
+                        <div id="spx-item-key"><p>SPX-Layer</p></div>
+                        <div className="spx-export-right">
+                            <select defaultValue={SPXGCTemplateDefinition.webplayout} onChange={(e) => handleLayerChange(e.target.value)}>
+                                <option value="-">-</option>
+                                {Array.from({length: 20}, (_, i) => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {i + 1}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
                     <hr/>
                     {SPXGCTemplateDefinition.DataFields.map((field, index) => (
                         field.ftype !== "instruction" && (
