@@ -52,7 +52,7 @@ function SpxExport() {
         }
 
         setSPXGCTemplateDefinition({ ...SPXGCTemplateDefinition, DataFields: newFields });
-        console.log(SPXGCTemplateDefinition);
+        //console.log(SPXGCTemplateDefinition);
     };
 
     const RadioButton = ({label, value, onChange}) => {
