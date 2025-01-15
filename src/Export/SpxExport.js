@@ -32,12 +32,12 @@ function SpxExport() {
 
 
     const handleInstructionChange = (event) => {
-        const {value} = event.target;
+        const { value } = event.target;
         const newFields = [...SPXGCTemplateDefinition.DataFields];
         const instructionIndex = newFields.findIndex(field => field.ftype === "instruction");
+        const newInstruction = { ftype: "instruction", value: value };
 
         if (value.trim()) {
-            const newInstruction = {ftype: "instruction", value: value.trim()};
             if (instructionIndex !== -1) {
                 newFields[instructionIndex] = newInstruction;
                 if (instructionIndex !== 0) {
@@ -51,10 +51,9 @@ function SpxExport() {
             newFields.splice(instructionIndex, 1);
         }
 
-        setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
+        setSPXGCTemplateDefinition({ ...SPXGCTemplateDefinition, DataFields: newFields });
         console.log(SPXGCTemplateDefinition);
     };
-
 
     const RadioButton = ({label, value, onChange}) => {
         return (
