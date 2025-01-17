@@ -219,6 +219,7 @@
     let playStack = [];
     let breakFrame = undefined;
     let fetchSheet = true;
+    let data = {};
 
 
     //fix and check markers
@@ -362,6 +363,7 @@
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
+        console.dir(JSON.stringify(data))
         if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
 
         lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)); //copy the "old" updated template for the update Animation
@@ -383,28 +385,31 @@
                 parsed = json;
             } else {
                 parsed = JSON.parse(rawData);
-            }
-        } else {
-            parsed = {};
-        }
-
+            } 
+        } 
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
         }
-        if (parsed) {
-            for (let key of Object.keys(parsed)) {
+        if (parsed){
+            for (let key of Object.keys(parsed)){
+                data[key] = parsed[key]
+            }
+        }
+        console.dir(JSON.stringify(data))
+        if (data) {
+            for (let key of Object.keys(data)) {
                 if (key === "_templateInfo") showInfo = true;
                 if (key === "_debug") showLogs = true;
                 if (key === "epochID") imagesPathPrefix = "";
                 if (key === "_stopFetch") fetchSheet = false;
             }
-            for (let key of Object.keys(parsed)) {
+            for (let key of Object.keys(data)) {
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
                         if ('refId' in layer) {
-                            updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, parsed[key]);
+                            updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, data[key]);
                         } else {
-                            updateLayerText(layer, parsed[key])
+                            updateLayerText(layer, data[key])
                         }
                     }
                 })
@@ -451,26 +456,27 @@
         }
         //Update when tamplate is playing
         if (playStatus === "play" && lottieState==="idle") {
+            let updateData = JSON.parse(JSON.stringify(data))
             updateCounter++;
 
             //Only for UpdateAnimations
-            if (updateExist && parsed) {
+            if (updateExist && updateData) {
                 let updateValues = [];
-                for (let key of Object.keys(parsed)) {
+                for (let key of Object.keys(updateData)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm == `${key}_update`) {
-                            parsed[`${key}_update`] = parsed[key];
-                            delete parsed[key];
+                            updateData[`${key}_update`] = updateData[key];
+                            delete updateData[key];
                         }
                     });
                 }
-                for (let key of Object.keys(parsed)) {
+                for (let key of Object.keys(updateData)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm === key) {
                             if ('refId' in layer) {
-                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, parsed[key]);
+                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, updateData[key]);
                             } else {
-                                updateLayerText(layer, parsed[key])
+                                updateLayerText(layer, updateData[key])
                             }
                         }
                     })
