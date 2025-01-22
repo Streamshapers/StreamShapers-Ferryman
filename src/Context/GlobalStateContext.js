@@ -6,7 +6,7 @@ export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
     const {user, login, serverURL} = useContext(AuthContext);
-    const [ferrymanVersion] = useState("v1.6.3 demo");
+    const [ferrymanVersion] = useState("v1.6.4 demo");
     const [serverUrl] = useState(serverURL);
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
@@ -50,7 +50,34 @@ export const GlobalStateProvider = ({children}) => {
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
-    }, []);
+
+        const getQueryParameter = (param) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        };
+
+        const loadQueryTemplate = async (id) => {
+            try {
+                const res = await api.get('/templates/' + id, {
+                    withCredentials: true,
+                });
+
+                const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+
+                await loadNewFile(blob);
+            } catch (error) {
+                console.error('Error loading file:', error);
+            }
+        };
+
+        const templateId = getQueryParameter('templateId');
+
+        if (templateId) {
+            loadQueryTemplate(templateId).then(() => {
+                console.log('Loaded template:', templateId);
+            });
+        }
+        }, []);
 
     async function parseBlobAsJson(blob) {
         try {
