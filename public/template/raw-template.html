@@ -363,7 +363,6 @@
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
-        console.dir(JSON.stringify(data))
         if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
 
         lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)); //copy the "old" updated template for the update Animation
@@ -395,7 +394,6 @@
                 data[key] = parsed[key]
             }
         }
-        console.dir(JSON.stringify(data))
         if (data) {
             for (let key of Object.keys(data)) {
                 if (key === "_templateInfo") showInfo = true;
