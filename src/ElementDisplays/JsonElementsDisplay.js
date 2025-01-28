@@ -27,7 +27,7 @@ function JsonElementsDisplay() {
         } else {
             setIsInfoOpen(false);
         }
-    }, []);
+    }, [generalAlerts]);
     
     
     if (!jsonData) {
@@ -41,7 +41,7 @@ function JsonElementsDisplay() {
                     <div className="accordion-item infos">
                         <h3 className="accordion-header" onClick={() => setIsInfoOpen(!isInfoOpen)}>
                             <FontAwesomeIcon icon={isInfoOpen ? faChevronUp : faChevronDown}/> Info
-                            {generalAlerts.length > 0 ? ` & ${generalAlerts.length} Alerts` : ""}
+                            {generalAlerts.length > 0 ? ` & ${generalAlerts.length} Alert${generalAlerts.length > 1 ? "s" : ""}` : ""}
                         </h3>
                         <div className="accordion-body" style={{display: isInfoOpen ? 'block' : 'none'}}>
                             <GeneralAlerts/>

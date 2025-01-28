@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useRef, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.4");
+    const [ferrymanVersion] = useState("v1.6.5");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -52,8 +52,14 @@ export const GlobalStateProvider = ({children}) => {
     }, [jsonFile]);
 
     //###################################### Errors / Alerts #####################################################################
-    const addGeneralAlert = (type, title, message, linkName = "", link ="") => {
-        const error = {type: type.toString(), title: title.toString(), message: message.toString(), linkName: linkName.toString(), link : link.toString()};
+    const addGeneralAlert = (type, title, message, linkName = "", link = "") => {
+        const error = {
+            type: type.toString(),
+            title: title.toString(),
+            message: message.toString(),
+            linkName: linkName.toString(),
+            link: link.toString()
+        };
         setGeneralAlerts(prevAlerts => {
             const filteredAlerts = prevAlerts.filter(alert => alert.title !== error.title);
             return [...filteredAlerts, error];
@@ -119,6 +125,20 @@ export const GlobalStateProvider = ({children}) => {
     }, [markers]);
 
     useEffect(() => {
+        if (!markers) {
+            addGeneralAlert(
+                "error",
+                "Markers missing",
+                'Your animation does not contain any markers! This could cause it not to play back correctly.',
+                "Find out how to add markers",
+                "https://streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
+            );
+        } else {
+            removeGeneralAlert("Markers missing")
+        }
+    }, [jsonData]);
+
+    useEffect(() => {
         let allUploaded = true;
         for (const font of fonts) {
             if (!uploadedFonts.hasOwnProperty(font)) {
@@ -133,7 +153,6 @@ export const GlobalStateProvider = ({children}) => {
                 'Your animation contains fonts that you haven\'t uploaded. \n This may result in some ' +
                 'fonts not being displayed as intended in the animation.\n Please close this dialog and upload' +
                 ' all fonts in the fonts Tab.',
-                
             );
         } else {
             removeGeneralAlert("Font missing");
@@ -141,19 +160,19 @@ export const GlobalStateProvider = ({children}) => {
     }, [uploadedFonts, fonts]);
 
     //Check for embedded Images
-    useEffect(()=>{
+    useEffect(() => {
         if (!jsonData) {
             return;
         }
         let missingImages = []
-        for (let asset of jsonData.assets){
-            if(asset.p){
-                if (!asset.p.startsWith("data:image")&& !asset.id.includes("video")){
+        for (let asset of jsonData.assets) {
+            if (asset.p) {
+                if (!asset.p.startsWith("data:image") && !asset.id.includes("video")) {
                     missingImages.push(asset.id)
                 }
             }
         }
-        if (missingImages.length != 0){
+        if (missingImages.length !== 0) {
             addGeneralAlert(
                 "alert",
                 `Images are missing`,
@@ -162,20 +181,20 @@ export const GlobalStateProvider = ({children}) => {
                 "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/bodymovin/dynamic-templates-export"
             );
         }
-    },[jsonData])
+    }, [jsonData])
 
     //check for video Layer
-    useEffect(()=>{
+    useEffect(() => {
         if (!jsonData) {
             return;
         }
         let foundVideos = []
-        for(let asset of jsonData.assets){
-            if(asset.id.includes("video")){
+        for (let asset of jsonData.assets) {
+            if (asset.id.includes("video")) {
                 foundVideos.push(asset.id)
             }
         }
-        if(foundVideos.length != 0){
+        if (foundVideos.length !== 0) {
             addGeneralAlert(
                 "Error",
                 `Video-Clips are not supported`,
@@ -184,8 +203,8 @@ export const GlobalStateProvider = ({children}) => {
                 "https://streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/supported-features#image-sequences"
             );
         }
-        
-    },[jsonData])
+
+    }, [jsonData])
 
     //################################# Infos ######################################################################
     useEffect(() => {
@@ -612,7 +631,7 @@ export const GlobalStateProvider = ({children}) => {
 
         if (refImages) {
             refImages.forEach(refImage => {
-                if (refImage.nm.startsWith("_")){
+                if (refImage.nm.startsWith("_")) {
                     spxExportJson.DataFields.push({
                         "field": refImage.nm,
                         "ftype": "filelist",
