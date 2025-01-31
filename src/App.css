@@ -947,7 +947,7 @@ input[type="checkbox"] {
     flex-direction: column;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     box-sizing: border-box;
     gap: 10px;
     background: var(--foreground);
@@ -963,12 +963,11 @@ input[type="checkbox"] {
 
 .jsonText .text-layer-name {
     margin: 0;
-    width: 120px;
-    border-right: 2px solid var(--primary);
-    padding-right: 10px;
+    border-bottom: 2px solid var(--primary);
     height: 100%;
     overflow: hidden;
-    flex-shrink: 0;
+    padding-bottom: 5px;
+    font-weight: bold;
 }
 
 .jsonText span {

@@ -201,9 +201,11 @@ function TextsDisplay() {
                                 </div>
                             )}
 
+                            <label className="text-layer-name"
+                                   title={textObject.layername}>{textObject.layername}</label>
+
                             <div className="textForm">
-                                <label className="text-layer-name"
-                                       title={textObject.layername}>{textObject.layername}</label>
+
                                 {textObject.type === "text" && (
                                     <input
                                         type="text"
@@ -234,7 +236,7 @@ function TextsDisplay() {
                                                 <label>Cell:
                                                     <input className="google-table-input"
                                                            type="text"
-                                                            value={textObject.cell}
+                                                           value={textObject.cell}
                                                            pattern="[A-Za-z]+[0-9]+"
                                                            onChange={(e) => handleGoogleCoordinates(textObject, e.target.value)}/>
                                                 </label>
@@ -256,7 +258,7 @@ function TextsDisplay() {
 
                                 {useExternalSources}
                                 <div className="option-button-wrapper">
-                                    <button className="option-button"
+                                    <button className="option-button" title="Options"
                                             onClick={() => setShowOptionMenuIndex(showOptionMenuIndex === i ? null : i)}>
                                         <FontAwesomeIcon icon={faEllipsisVertical}/>
                                     </button>

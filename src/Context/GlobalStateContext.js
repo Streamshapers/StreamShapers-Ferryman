@@ -5,7 +5,9 @@ import api from "../axiosInstance";
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.5");
+    const {user, serverUrl} = useContext(AuthContext);
+
+    const [ferrymanVersion] = useState("v1.6.5 Demo");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [importFerrymanJSON, setImportFerrymanJSON] = useState(null);
