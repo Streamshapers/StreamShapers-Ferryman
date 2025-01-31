@@ -37,7 +37,7 @@ function JsonElementsDisplay() {
                     <div className="accordion-item infos">
                         <h3 className={`accordion-header ${isInfoOpen ? 'open' : ''}`} onClick={() => setIsInfoOpen(!isInfoOpen)}>
                             <FontAwesomeIcon icon={isInfoOpen ? faChevronUp : faChevronDown}/> Info
-                            {generalAlerts.length > 0 ? ` & ${generalAlerts.length} Alerts` : ""}
+                            {generalAlerts.length > 0 ? ` & ${generalAlerts.length} Alert${generalAlerts.length > 1 ? "s" : ""}` : ""}
                         </h3>
                         <div className={`accordion-body ${isInfoOpen ? 'open' : ''}`}>
                             <GeneralAlerts/>

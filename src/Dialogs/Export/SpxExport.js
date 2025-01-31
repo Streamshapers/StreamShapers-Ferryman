@@ -9,6 +9,7 @@ function SpxExport() {
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
     } = useContext(GlobalStateContext);
+    const [uiColor, setUiColor] = useState("gra");
     const spxUiColors = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"]
     const templateDescription = SPXGCTemplateDefinition.description;
 
@@ -17,30 +18,26 @@ function SpxExport() {
     }*/
 
     const handleUiColorChange = (color) => {
+        setUiColor(color);
         const spxJson = {...SPXGCTemplateDefinition};
-        console.log("Color: ", color)
         spxJson.uicolor = spxUiColors.indexOf(color);
-        console.log(spxJson.uicolor)
         setSPXGCTemplateDefinition(spxJson);
     }
 
     const handleDescriptionChange = (event) => {
-        const newDescription = event.target.value;
-        if (newDescription !== SPXGCTemplateDefinition.description) {
-            setSPXGCTemplateDefinition({
-                ...SPXGCTemplateDefinition,
-                description: newDescription
-            });
-        }
-    };
+        const spxJson = {...SPXGCTemplateDefinition};
+        spxJson.description = event.target.value;
+        setSPXGCTemplateDefinition(spxJson);
+    }
+
 
     const handleInstructionChange = (event) => {
-        const {value} = event.target;
+        const { value } = event.target;
         const newFields = [...SPXGCTemplateDefinition.DataFields];
         const instructionIndex = newFields.findIndex(field => field.ftype === "instruction");
+        const newInstruction = { ftype: "instruction", value: value };
 
         if (value.trim()) {
-            const newInstruction = {ftype: "instruction", value: value.trim()};
             if (instructionIndex !== -1) {
                 newFields[instructionIndex] = newInstruction;
                 if (instructionIndex !== 0) {
@@ -54,10 +51,9 @@ function SpxExport() {
             newFields.splice(instructionIndex, 1);
         }
 
-        setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
-        console.log(SPXGCTemplateDefinition);
+        setSPXGCTemplateDefinition({ ...SPXGCTemplateDefinition, DataFields: newFields });
+        //console.log(SPXGCTemplateDefinition);
     };
-
 
     const RadioButton = ({label, value, onChange}) => {
         return (
@@ -128,13 +124,19 @@ function SpxExport() {
         setSPXGCTemplateDefinition({...SPXGCTemplateDefinition, DataFields: newFields});
     };
 
+    function handleLayerChange(value) {
+        const spxJson = {...SPXGCTemplateDefinition};
+        spxJson.webplayout = value;
+        setSPXGCTemplateDefinition(spxJson);
+    }
+
     return (
         <div className="tab-content">
             <div className="export-checkbox spx-header">
                 <h3>SPX Export Settings</h3>
                 {/*<div className="spx-checkbox">
                     <input type="checkbox" id="spx-compatible" checked={spxExport} onChange={handleCheckboxChange}/>
-                    <label htmlFor="spx-compatible">Dialogs SPX compatible</label>
+                    <label htmlFor="spx-compatible">Export SPX compatible</label>
                 </div>*/}
                 <a href="https://www.spx.graphics/" target="_blank" rel="noreferrer">
                     <img id="spx-logo" src="./SPX_logo.png" alt=""/>
@@ -165,12 +167,26 @@ function SpxExport() {
                         <div className="spx-export-right">
                             {
                                 spxUiColors.map((color, index) => (
-                                    <RadioButton key={index} value={spxUiColors[SPXGCTemplateDefinition.uicolor] === color} label={color}
+                                    <RadioButton key={index} value={uiColor === color} label={color}
                                                  onChange={() => handleUiColorChange(color)}/>
                                 ))
                             }
                         </div>
                     </div>
+                    <div className="spx-instruction spx-setting-header">
+                        <div id="spx-item-key"><p>SPX-Layer</p></div>
+                        <div className="spx-export-right">
+                            <select defaultValue={SPXGCTemplateDefinition.webplayout} onChange={(e) => handleLayerChange(e.target.value)}>
+                                <option value="-">-</option>
+                                {Array.from({length: 20}, (_, i) => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {i + 1}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
                     <hr/>
                     {SPXGCTemplateDefinition.DataFields.map((field, index) => (
                         field.ftype !== "instruction" && (

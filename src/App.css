@@ -1165,6 +1165,11 @@ input[type="checkbox"] {
     color: var(--error-content);
 }
 
+.error a{
+    color: var(--error-content);
+    text-decoration: underline;
+}
+
 .success-wrapper {
     background: var(--success);
     border: 1px solid var(--border);

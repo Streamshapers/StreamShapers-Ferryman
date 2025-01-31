@@ -218,12 +218,13 @@
     let updateCounter = 1;
     let currentFrame;
     let updateExist = false;
-    let lottieState = "stop";
+    let lottieState = "idle";
     let markers = [];
     let playStack = [];
     let breakFrame = undefined;
     let fetchSheet = true;
-    
+    let data = {};
+
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -287,6 +288,16 @@
         });
     }
 
+    function decodeHtmlEntities(encodedString) {
+        const textArea = document.createElement("textarea"); // Create auxiliary element
+        textArea.innerHTML = encodedString; // Set HTML entities
+        return textArea.value; // Return decoded text
+    }
+
+    function updateLayerText(layer,newText){
+        layer.t.d.k[0].s.t = decodeHtmlEntities(newText);
+    }
+
     //updates Images Assets by there Refid  //Credits to HeineFro  @https://github.com/HeineFro
     function updateAssetsByRefid(array, searchValue, newValue) {
         const foundObject = array.find(obj => obj['id'] === searchValue);
@@ -303,8 +314,8 @@
 
     function getMarker(markerName){
         for (let marker of lottieTemplate.markers) {
-                if (marker.cm === markerName) return marker;
-            }
+            if (marker.cm === markerName) return marker;
+        }
     }
 
 
@@ -321,7 +332,7 @@
                 if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`);
                 currentSegment = nextSegment;
                 playStack.shift();
-            } 
+            }
         },0);
     }
 
@@ -377,28 +388,30 @@
                 parsed = json;
             } else {
                 parsed = JSON.parse(rawData);
-            }
-        } else {
-            parsed = {};
-        }
-        
+            } 
+        } 
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
         }
-        if (parsed) {
-            for (let key of Object.keys(parsed)) {
+        if (parsed){
+            for (let key of Object.keys(parsed)){
+                data[key] = parsed[key]
+            }
+        }
+        if (data) {
+            for (let key of Object.keys(data)) {
                 if (key === "_templateInfo") showInfo = true;
                 if (key === "_debug") showLogs = true;
                 if (key === "epochID") imagesPathPrefix = "";
                 if (key === "_stopFetch") fetchSheet = false;
             }
-            for (let key of Object.keys(parsed)) {
+            for (let key of Object.keys(data)) {
                 lottieTemplateNew.layers.forEach((layer) => {
                     if (layer.nm === key) {
                         if ('refId' in layer) {
-                            updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, parsed[key]);
+                            updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, data[key]);
                         } else {
-                            layer.t.d.k[0].s.t = parsed[key];
+                            updateLayerText(layer, data[key])
                         }
                     }
                 })
@@ -445,26 +458,27 @@
         }
         //Update when tamplate is playing
         if (playStatus === "play" && lottieState==="idle") {
+            let updateData = JSON.parse(JSON.stringify(data))
             updateCounter++;
 
             //Only for UpdateAnimations
-            if (updateExist && parsed) {
+            if (updateExist && updateData) {
                 let updateValues = [];
-                for (let key of Object.keys(parsed)) {
+                for (let key of Object.keys(updateData)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm == `${key}_update`) {
-                            parsed[`${key}_update`] = parsed[key];
-                            delete parsed[key];
+                            updateData[`${key}_update`] = updateData[key];
+                            delete updateData[key];
                         }
                     });
                 }
-                for (let key of Object.keys(parsed)) {
+                for (let key of Object.keys(updateData)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
                         if (layer.nm === key) {
                             if ('refId' in layer) {
-                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, parsed[key]);
+                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, updateData[key]);
                             } else {
-                                layer.t.d.k[0].s.t = parsed[key];
+                                updateLayerText(layer, updateData[key])
                             }
                         }
                     })
