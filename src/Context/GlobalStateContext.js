@@ -883,7 +883,7 @@ export const GlobalStateProvider = ({children}) => {
                     key: textObject.layername,
                     cell: textObject.cell,
                     sheet: textObject.sheet,
-                    value: textObject.text
+                    //value: textObject.text
                 })
             }
         })
@@ -1006,7 +1006,7 @@ export const GlobalStateProvider = ({children}) => {
 
             if (object.id && object.sheet && object.cell) {
                 const cell = object.cell;
-                const sheetURL = `https://docs.google.com/spreadsheets/d/${object.id}/export?format=csv&gid=${object.sheet}`;
+                const sheetURL = `https://docs.google.com/spreadsheets/d/${object.id}/export?format=tsv&gid=${object.sheet}`;
 
                 let csvArray;
                 if (!sources[sheetURL]) {
