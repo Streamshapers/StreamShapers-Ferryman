@@ -621,11 +621,8 @@
 
 
     async function play() {
-        console.log("1");
         await animLoaded.promise;
-        console.log("2");
         await animReady;
-        console.log("3");
         await loadFonts();
         animation.goToAndPlay("start", true);
         playStatus = "play";
