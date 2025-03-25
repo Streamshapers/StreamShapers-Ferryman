@@ -240,7 +240,7 @@
     let newAnimation;
     let updateAnimation;
     let stopExist = false;
-    let showLogs = true;
+    let showLogs = false;
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
@@ -300,17 +300,23 @@
 
     function loadFonts() {
         return new Promise((resolve, reject) => {
-            const fonts = lottieTemplate.fonts?.list;
+
             const fontPromises = [];
 
-            if (fonts?.length > 0) {
+            if (!lottieTemplate.fonts || !lottieTemplate.fonts.list || lottieTemplate.fonts.list.length === 0) {
+                if (showLogs) console.log("No fonts found");
+                resolve("No fonts found");
+            } else{
+                const fonts = lottieTemplate.fonts.list;
                 for (const font of fonts) {
                     if (font.fPath !== '') {
                         fontPromises.push(new FontFace(font.fFamily, `url(${font.fPath})`).load());
                     }
                 }
+
+                Promise.all(fontPromises).then(() => resolve('Fonts loaded')).catch(err => reject(err));
             }
-            Promise.all(fontPromises).then(() => resolve('Fonts loaded')).catch(err => reject(err));
+
         });
     }
 
@@ -456,13 +462,17 @@
                 animationData: lottieTemplateNew,
             });
 
-            const fonts = animation.renderer.data.fonts?.list;
-            if (fonts) {
-                for (const font in fonts) {
-                    let family = fonts[font].fFamily;
-                    let fontPath = fonts[font].fPath;
-                    if (fontPath !== '') {
-                        addFont(family, fontPath);
+            if (!animation.renderer.data.fonts || !animation.renderer.data.fonts.list || animation.renderer.data.fonts.list.length === 0) {
+                if (showLogs) console.log("No fonts found");
+            } else {
+                const fonts = animation.renderer.data.fonts.list;
+                if (fonts) {
+                    for (const font in fonts) {
+                        let family = fonts[font].fFamily;
+                        let fontPath = fonts[font].fPath;
+                        if (fontPath !== '') {
+                            addFont(family, fontPath);
+                        }
                     }
                 }
             }
