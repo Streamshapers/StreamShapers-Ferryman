@@ -48,7 +48,7 @@ function InfoDialog({isOpen, onClose}) {
                 </div>
                 <div id="info-copyright">
                     <div>
-                        © StreamShapers 2024
+                        © StreamShapers 2025
                     </div>
                 </div>
                 <div className="popupButtonArea">
