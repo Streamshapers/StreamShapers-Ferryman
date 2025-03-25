@@ -542,7 +542,7 @@
                     if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(updateAnimation);
                     const updateMarker = lottieTemplateUpdate.markers.find(marker => marker.cm === "update");
-                    updateAnimation.goToAndPlay(updateMarker.tm, true);
+                    updateAnimation.goToAndPlay("update", true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
