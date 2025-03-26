@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useRef, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.7");
+    const [ferrymanVersion] = useState("v1.6.8");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -817,9 +817,9 @@ export const GlobalStateProvider = ({children}) => {
                 return null;
             }
 
-            let csvText = await response.text();
-            //console.log("CSVRaw", csvText);
-            return csvText.split('\n').map(row => row.split(','));
+            let tsvText = await response.text();
+            //console.log("TSVRaw", tsvText);
+            return tsvText.split('\n').map(row => row.split(','));
         } catch (error) {
             console.warn("Error collecting data from Google:", error);
             return null;
@@ -875,20 +875,20 @@ export const GlobalStateProvider = ({children}) => {
 
             if (object.id && object.sheet && object.cell) {
                 const cell = object.cell;
-                const sheetURL = `https://docs.google.com/spreadsheets/d/${object.id}/export?format=csv&gid=${object.sheet}`;
+                const sheetURL = `https://docs.google.com/spreadsheets/d/${object.id}/export?format=tsv&gid=${object.sheet}`;
 
-                let csvArray;
+                let tsvArray;
                 if (!sources[sheetURL]) {
-                    csvArray = await fetchDataFromGoogle(sheetURL);
-                    sources[sheetURL] = csvArray;
+                    tsvArray = await fetchDataFromGoogle(sheetURL);
+                    sources[sheetURL] = tsvArray;
                     //console.log("Sources updated:", sources);
                 } else {
-                    csvArray = sources[sheetURL];
-                    //console.log("Sheet URL already exists in sources. Using cached value:", csvArray);
+                    tsvArray = sources[sheetURL];
+                    //console.log("Sheet URL already exists in sources. Using cached value:", tsvArray);
                 }
 
-                if (csvArray && csvArray.length > 0) {
-                    const value = getCellData(object.key, cell, csvArray);
+                if (tsvArray && tsvArray.length > 0) {
+                    const value = getCellData(object.key, cell, tsvArray);
                     if (value !== undefined && value !== object.value) {
                         //console.log(`Extracted value for ${cell}: ${value}`);
                         let copiedJsonData = {...jsonData};
