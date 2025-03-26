@@ -111,7 +111,7 @@ function ExportDialog({ onClose }) {
         }
 
         try {
-            fileContent = await generateFile();
+            fileContent = await generateFile(1);
         } catch (error) {
             console.log("Error generating File", error);
         }

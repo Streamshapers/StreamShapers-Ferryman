@@ -20,15 +20,14 @@
         p {
             font-size: 30px;
             margin: 0 0 0 20px;
-            color: white;
+            color: #fff;
         }
 
         h1 {
             margin-left: 20px;
-            color: white;
+            color: #fff;
         }
     </style>
-
     ${fontFaceStyles}
 
     ${ferrymanJSON}
@@ -40,6 +39,7 @@
         let textElements = [];
 
         function updateTimeField(animationInput) {
+            resetClockIntervals();
             const animationDiv = document.getElementById(animationInput);
             if (!animationDiv) {
                 console.warn(`Element with id "${animationInput}" not found. Retrying in 1 second...`);
@@ -301,18 +301,23 @@
 
     function loadFonts() {
         return new Promise((resolve, reject) => {
-            const fonts = lottieTemplate.fonts.list;
+
             const fontPromises = [];
 
-            for (const font of fonts) {
-                if (font.fPath !== '') {
-                    fontPromises.push(new FontFace(font.fFamily, `url(${font.fPath})`).load());
+            if (!lottieTemplate.fonts || !lottieTemplate.fonts.list || lottieTemplate.fonts.list.length === 0) {
+                if (showLogs) console.log("No fonts found");
+                resolve("No fonts found");
+            } else{
+                const fonts = lottieTemplate.fonts.list;
+                for (const font of fonts) {
+                    if (font.fPath !== '') {
+                        fontPromises.push(new FontFace(font.fFamily, `url(${font.fPath})`).load());
+                    }
                 }
+
+                Promise.all(fontPromises).then(() => resolve('Fonts loaded')).catch(err => reject(err));
             }
 
-            Promise.all(fontPromises)
-                .then(() => resolve('Fonts loaded'))
-                .catch(err => reject(err));
         });
     }
 
@@ -374,6 +379,7 @@
                 }
             }
             */
+            //if (showLogs) console.log(`Current Animation Frame: ${Math.round(animation.currentFrame)}`);
             currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames;
             //if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
             if (showLogs) console.log(`Current Frame: ${currentFrame}`);
@@ -396,6 +402,7 @@
 
     async function update(rawData) {
         if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
+        if (showLogs) console.log(`Update triggered: ${rawData}`);
 
         lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)); //copy the "old" updated template for the update Animation
         lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
@@ -416,8 +423,8 @@
                 parsed = json;
             } else {
                 parsed = JSON.parse(rawData);
-            } 
-        } 
+            }
+        }
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
         }
@@ -456,12 +463,18 @@
                 animationData: lottieTemplateNew,
             });
 
-            const fonts = animation.renderer.data.fonts.list;
-            for (const font in fonts) {
-                let family = fonts[font].fFamily;
-                let fontPath = fonts[font].fPath;
-                if (fontPath !== '') {
-                    addFont(family, fontPath);
+            if (!animation.renderer.data.fonts || !animation.renderer.data.fonts.list || animation.renderer.data.fonts.list.length === 0) {
+                if (showLogs) console.log("No fonts found");
+            } else {
+                const fonts = animation.renderer.data.fonts.list;
+                if (fonts) {
+                    for (const font in fonts) {
+                        let family = fonts[font].fFamily;
+                        let fontPath = fonts[font].fPath;
+                        if (fontPath !== '') {
+                            addFont(family, fontPath);
+                        }
+                    }
                 }
             }
 
@@ -477,7 +490,7 @@
 
             updateTimeField("animation" + updateCounter);
 
-            await animReady.promise;
+            await animReady;
             animation.goToAndStop(0, true);
             playStatus = "loaded";
             currentSegment = "start";
@@ -491,10 +504,12 @@
 
             //Only for UpdateAnimations
             if (updateExist && updateData) {
-                let updateValues = [];
+                const updateStartFrame = currentFrame;
+                if (showLogs) console.log(`Update triggered at frame: ${updateStartFrame}`);
+
                 for (let key of Object.keys(updateData)) {
                     lottieTemplateUpdate.layers.forEach((layer) => {
-                        if (layer.nm == `${key}_update`) {
+                        if (layer.nm === `${key}_update`) {
                             updateData[`${key}_update`] = updateData[key];
                             delete updateData[key];
                         }
@@ -524,10 +539,10 @@
                 });
 
                 updateAnimation.addEventListener("DOMLoaded", async function () {
-                    resetClockIntervals();
                     updateTimeField("animation" + updateCounter);
                     if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(updateAnimation);
+                    const updateMarker = lottieTemplateUpdate.markers.find(marker => marker.cm === "update");
                     updateAnimation.goToAndPlay("update", true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
@@ -551,14 +566,13 @@
                         });
 
                         newAnimation.addEventListener("DOMLoaded", function () {
-                            resetClockIntervals();
                             updateTimeField("animation" + updateCounter);
                             if (showInfo) console.log("Template - updated Animation Ready");
-                            newAnimation.goToAndStop(currentFrame, true);
+                            addEvents(newAnimation);
+                            newAnimation.goToAndStop(updateStartFrame, true);
                             animation.destroy();
                             document.getElementById("animation" + (updateCounter - 1)).remove();
                             animation = newAnimation;
-                            addEvents(animation);
                             newAnimation = null;
                         });
                     });
@@ -579,7 +593,6 @@
                 });
 
                 newAnimation.addEventListener("DOMLoaded", function () {
-                    resetClockIntervals();
                     updateTimeField("animation" + updateCounter);
                     if (showInfo) console.log("Template - updated Animation Ready");
                     newAnimation.goToAndStop(currentFrame, true);
@@ -617,7 +630,6 @@
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
         if (markers.includes("start_loop")) playStack.push("start_loop");
-        resetClockIntervals();
         updateTimeField("animation" + updateCounter);
     }
 

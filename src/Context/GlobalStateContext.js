@@ -7,7 +7,7 @@ export const GlobalStateContext = createContext();
 export const GlobalStateProvider = ({children}) => {
     const {user, serverUrl} = useContext(AuthContext);
 
-    const [ferrymanVersion] = useState("v1.6.5 Demo");
+    const [ferrymanVersion] = useState("v1.6.7");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [importFerrymanJSON, setImportFerrymanJSON] = useState(null);
