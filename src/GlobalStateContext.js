@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useRef, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.5");
+    const [ferrymanVersion] = useState("v1.6.7");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);

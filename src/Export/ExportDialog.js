@@ -112,7 +112,7 @@ function ExportDialog({isOpen, onClose}) {
         const extension = "." + exportFormat;
 
         try {
-            fileContent = await generateFile();
+            fileContent = await generateFile(1);
         } catch (error) {
             console.log("Error generating File", error);
         }
