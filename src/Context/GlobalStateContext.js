@@ -5,9 +5,9 @@ import api from "../axiosInstance";
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
+    const [ferrymanVersion] = useState("v1.6.8");
     const {user, serverUrl} = useContext(AuthContext);
 
-    const [ferrymanVersion] = useState("v1.6.7");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [importFerrymanJSON, setImportFerrymanJSON] = useState(null);
@@ -760,6 +760,7 @@ export const GlobalStateProvider = ({children}) => {
             });
         }
 
+
         if (refImages) {
             refImages.forEach(refImage => {
                 if (refImage.nm.startsWith("_")) {
@@ -948,9 +949,9 @@ export const GlobalStateProvider = ({children}) => {
                 return null;
             }
 
-            let csvText = await response.text();
-            //console.log("CSVRaw", csvText);
-            return csvText.split('\n').map(row => row.split(','));
+            let tsvText = await response.text();
+            //console.log("TSVRaw", tsvText);
+            return tsvText.split('\n').map(row => row.split('\t'));
         } catch (error) {
             console.warn("Error collecting data from Google:", error);
             return null;
@@ -1008,33 +1009,30 @@ export const GlobalStateProvider = ({children}) => {
                 const cell = object.cell;
                 const sheetURL = `https://docs.google.com/spreadsheets/d/${object.id}/export?format=tsv&gid=${object.sheet}`;
 
-                let csvArray;
+                let tsvArray;
                 if (!sources[sheetURL]) {
-                    csvArray = await fetchDataFromGoogle(sheetURL);
-                    sources[sheetURL] = csvArray;
+                    tsvArray = await fetchDataFromGoogle(sheetURL);
+                    sources[sheetURL] = tsvArray;
                     //console.log("Sources updated:", sources);
                 } else {
-                    csvArray = sources[sheetURL];
-                    //console.log("Sheet URL already exists in sources. Using cached value:", csvArray);
+                    tsvArray = sources[sheetURL];
+                    //console.log("Sheet URL already exists in sources. Using cached value:", tsvArray);
                 }
 
-                if (csvArray && csvArray.length > 0) {
-                    const value = getCellData(object.key, cell, csvArray);
-                    if (value !== undefined && value !== object.value) {
+                if (tsvArray && tsvArray.length > 0) {
+                    const value = getCellData(object.key, cell, tsvArray);
+
+                    const textObject = textObjects.find(obj => obj.layername === object.key);
+                    const textIndex = textObjects.findIndex(t => t === textObject);
+
+                    if (value !== undefined && value !== textObject.text) {
                         //console.log(`Extracted value for ${cell}: ${value}`);
-                        let copiedJsonData = { ...jsonData };
-                        if (Array.isArray(copiedJsonData.layers)) {
-                            for (const layer of copiedJsonData.layers) {
-                                if (layer.nm === object.key) {
-                                    const textObject = textObjects.find(obj => obj.layername === object.key);
-                                    const textIndex = textObjects.findIndex(t => t === textObject);
-                                    updateLottieText(textIndex, value.toString());
-                                }
+                        let copiedJsonData = {...jsonData};
+                        for (const layer of copiedJsonData.layers) {
+                            if (layer.nm === object.key) {
+                                updateLottieText(textIndex, value.toString());
                             }
-                        } else {
-                            //console.error('layers ist nicht definiert oder kein Array (Google Update):', copiedJsonData.layers);
                         }
-                        object.value = value;
 
                         //setJsonData(copiedJsonData);
                     }
