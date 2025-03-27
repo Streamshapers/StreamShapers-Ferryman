@@ -752,7 +752,7 @@ export const GlobalStateProvider = ({children}) => {
                     key: textObject.layername,
                     cell: textObject.cell,
                     sheet: textObject.sheet,
-                    value: textObject.text
+                    //value: textObject.text
                 })
             }
         })
@@ -889,17 +889,18 @@ export const GlobalStateProvider = ({children}) => {
 
                 if (tsvArray && tsvArray.length > 0) {
                     const value = getCellData(object.key, cell, tsvArray);
-                    if (value !== undefined && value !== object.value) {
+
+                    const textObject = textObjects.find(obj => obj.layername === object.key);
+                    const textIndex = textObjects.findIndex(t => t === textObject);
+
+                    if (value !== undefined && value !== textObject.text) {
                         //console.log(`Extracted value for ${cell}: ${value}`);
                         let copiedJsonData = {...jsonData};
                         for (const layer of copiedJsonData.layers) {
                             if (layer.nm === object.key) {
-                                const textObject = textObjects.find(obj => obj.layername === object.key);
-                                const textIndex = textObjects.findIndex(t => t === textObject);
                                 updateLottieText(textIndex, value.toString());
                             }
                         }
-                        object.value = value;
 
                         //setJsonData(copiedJsonData);
                     }
