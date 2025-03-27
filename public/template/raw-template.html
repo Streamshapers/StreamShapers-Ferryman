@@ -151,13 +151,13 @@
                 return null;
             }
             let tsvText = await response.text();
-            return tsvText.split('\n').map(row => row.split(','));
+            return tsvText.split('\n').map(row => row.split('\t'));
         } catch (error) {
             console.error("Error collecting data from Google:", error);
             return null;
         }
     }
-
+ 
     function getCellData(cell, data) {
         try {
             const columnName = cell.match(/[A-Z]+/g)[0];

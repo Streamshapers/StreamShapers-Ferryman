@@ -819,7 +819,7 @@ export const GlobalStateProvider = ({children}) => {
 
             let tsvText = await response.text();
             //console.log("TSVRaw", tsvText);
-            return tsvText.split('\n').map(row => row.split(','));
+            return tsvText.split('\n').map(row => row.split('\t'));
         } catch (error) {
             console.warn("Error collecting data from Google:", error);
             return null;
