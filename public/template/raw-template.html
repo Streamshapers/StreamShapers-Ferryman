@@ -53,44 +53,54 @@
                 clockIntervalIds = [];
                 let clockElements = [];
 
-                function updateTime() {
-                    let frame = animationFrame;
-                    if (animation && animation.renderer && animation.renderer.elements && clockElements.length === 0) {
-                        animation.renderer.elements.forEach((element, index) => {
-                            if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
-                                clockElements.push(index);
-                            }
-                        });
-                    }
-
-                    let timeParts = getTime();
-
-                    if (timeParts.length >= 2) {
-                        clockElements.forEach((element) => {
-                            timeParts = getTime();
-                            let combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1];
-                            if (animation && animation.renderer && animation.renderer.elements[element] && animation.renderer.elements[element].updateDocumentData) {
-                                if (animation.renderer.elements[element].data.nm.endsWith("_clock2")){
-                                    combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1] + ":" + timeParts[2][0] + timeParts[2][1];
+                function updateTime(animation) {
+                    if (animation){
+                        let frame = animationFrame;
+                        if (animation && animation.renderer && animation.renderer.elements && clockElements.length === 0) {
+                            animation.renderer.elements.forEach((element, index) => {
+                                if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
+                                    clockElements.push(index);
                                 }
-                                animation.renderer.elements[element].updateDocumentData({t: combined});
+                            });
+                        }
+
+                        let timeParts = getTime();
+
+                        if (timeParts.length >= 2) {
+                            clockElements.forEach((element) => {
+                                timeParts = getTime();
+                                let combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1];
+                                if (animation && animation.renderer && animation.renderer.elements[element] && animation.renderer.elements[element].updateDocumentData) {
+                                    if (animation.renderer.elements[element].data.nm.endsWith("_clock2")){
+                                        combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1] + ":" + timeParts[2][0] + timeParts[2][1];
+                                    }
+                                    animation.renderer.elements[element].updateDocumentData({t: combined});
+                                }
+                            });
+                            if (lottieState === "idle") {
+                                let saveFrame = animation.currentFrame + currentSegmentFrames;
+                                if(animation.getDuration(1) === lottieTemplate.op){
+                                    saveFrame = animation.currentFrame;
+                                }
+                                animation.renderer.renderFrame(saveFrame + 1);
+                                animation.renderer.renderFrame(saveFrame);
                             }
-                        });
-                        if (lottieState === "idle") {
-                            let saveFrame = animation.currentFrame + currentSegmentFrames;
-                            if(animation.getDuration(1) === lottieTemplate.op){
-                                saveFrame = animation.currentFrame;
-                            }
-                            animation.renderer.renderFrame(saveFrame + 1);
-                            animation.renderer.renderFrame(saveFrame);
+
                         }
                     }
                 }
 
-                const id = setInterval(updateTime, 100);
+                const id = setInterval(()=>{
+                    updateTime(animation);
+                    updateTime(newAnimation)
+                    updateTime(updateAnimation)
+
+                }, 100);
                 clockIntervalIds.push(id);
 
-                updateTime();
+                updateTime(animation);
+                updateTime(newAnimation)
+                updateTime(updateAnimation)
             }
         }
 
@@ -112,6 +122,7 @@
             });
 
             return timeJson;
+
         }
     </script>
 </head>
@@ -490,7 +501,7 @@
 
             addEvents(animation);
 
-            if(hasClock) updateTimeField("animation" + updateCounter);
+            ;
 
             await animReady;
             animation.goToAndStop(0, true);
@@ -546,8 +557,6 @@
                 });
 
                 updateAnimation.addEventListener("DOMLoaded", async function () {
-                    if(hasClock) updateTimeField("animation" + updateCounter);
-                    if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(updateAnimation);
                     const updateMarker = lottieTemplateUpdate.markers.find(marker => marker.cm === "update");
                     updateAnimation.goToAndPlay("update", true);
@@ -574,7 +583,6 @@
                         });
 
                         newAnimation.addEventListener("DOMLoaded", function () {
-                            if(hasClock) updateTimeField("animation" + updateCounter);
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
                             newAnimation.goToAndStop(updateStartFrame, true);
@@ -606,7 +614,6 @@
                 });
 
                 newAnimation.addEventListener("DOMLoaded", function () {
-                    if(hasClock) updateTimeField("animation" + updateCounter);
                     if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(newAnimation);
                     newAnimation.goToAndStop(updateStartFrame, true);
@@ -631,7 +638,6 @@
             }
         }
         if (showInfo) info();
-        if(hasClock) updateTimeField("animation" + updateCounter);
     }
 
 
@@ -639,12 +645,12 @@
         await animLoaded.promise;
         await animReady;
         await loadFonts();
+        if(hasClock) updateTimeField()
         animation.goToAndPlay("start", true);
         playStatus = "play";
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
         if (markers.includes("start_loop")) playStack.push("start_loop");
-        if(hasClock) updateTimeField("animation" + updateCounter);
     }
 
 
