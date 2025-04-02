@@ -56,8 +56,10 @@ function AnalyzePlayer() {
         textObjects
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
-    const [lottieInstance, setLottieInstance] = useState(null);
+    const lottieInstanceRef = useRef(null);
     const progressBarRef = useRef(null);
+    const timeFieldsSetRef = useRef(false);
+    let clockIntervalIds = [];
 
     const formatTimeFromFrames = useCallback((frame, frameRate) => {
         const seconds = Math.floor(frame / frameRate);
@@ -77,6 +79,8 @@ function AnalyzePlayer() {
             animationData: jsonData,
         });
 
+        console.log("generated: ", instance);
+
         const timeoutId = setTimeout(() => {
             instance.goToAndStop(currentFrame, true);
             if (isPlaying) instance.play();
@@ -87,7 +91,7 @@ function AnalyzePlayer() {
             };
 
             instance.addEventListener('enterFrame', onEnterFrame);
-            setLottieInstance(instance);
+            lottieInstanceRef.current = instance;
             setTimeout(updateTimeFields, 500);
         }, 300);
 
@@ -108,71 +112,71 @@ function AnalyzePlayer() {
         }
     };
 
+    function getTime() {
+        let formattedTime = new Intl.DateTimeFormat("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        }).format(new Date());
+
+        return formattedTime.match(/\d{2}/g);
+    }
+
     function updateTimeFields() {
         try {
-            const animationPreviewElement = document.getElementById('animationPreview');
-            if (!animationPreviewElement) {
-                //console.log("Error updating Clock: animationPreview element not found.");
-                return;
-            }
+            if(timeFieldsSetRef.current === true) return;
+            //timeFieldsSetRef.current = true;
+            clockIntervalIds.forEach(id => clearInterval(id));
+            clockIntervalIds = [];
+            let clockElements = [];
 
-            const svgElement = animationPreviewElement.querySelector('svg');
-            if (!svgElement) {
-                console.log("Error updating Clock: SVG element not found.");
-                return;
-            }
+            function updateTime() {
+                const animationPreviewElement = document.getElementById('animationPreview');
+                if (!animationPreviewElement) {
+                    //console.log("Error updating Clock: animationPreview element not found.");
+                    return;
+                }
 
-            const gElements = svgElement.getElementsByTagName('g');
-            const formatMap = {
-                'cc:cc:cc': 'HH:mm:ss',
-                'cc:cc': 'HH:mm',
-            };
-
-            for (let g of gElements) {
-                const ariaLabel = g.getAttribute('aria-label');
-                const format = formatMap[ariaLabel];
-
-                if (format) {
-                    const textElements = Array.from(g.getElementsByTagName('text'));
-
-                    function updateTime() {
-                        let formattedTime;
-                        if (format === 'HH:mm:ss') {
-                            formattedTime = new Intl.DateTimeFormat("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: false
-                            }).format(new Date());
-                        } else if (format === 'HH:mm') {
-                            formattedTime = new Intl.DateTimeFormat("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: false
-                            }).format(new Date());
+                if (lottieInstanceRef.current && lottieInstanceRef.current.renderer && lottieInstanceRef.current.renderer.elements && clockElements.length === 0) {
+                    lottieInstanceRef.current.renderer.elements.forEach((element, index) => {
+                        if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
+                            clockElements.push(index);
                         }
+                    });
+                }
 
-                        const timeParts = formattedTime.match(/\d{2}/g);
-
-                        if (timeParts.length >= 2) {
-                            textElements[0].textContent = timeParts[0][0];
-                            textElements[1].textContent = timeParts[0][1];
-                            textElements[2].textContent = ':';
-                            textElements[3].textContent = timeParts[1][0];
-                            textElements[4].textContent = timeParts[1][1];
-
-                            if (timeParts.length === 3 && format === 'HH:mm:ss') {
-                                textElements[5].textContent = ':';
-                                textElements[6].textContent = timeParts[2][0];
-                                textElements[7].textContent = timeParts[2][1];
+                let timeParts = getTime();
+                if (timeParts.length >= 2) {
+                    clockElements.forEach((element) => {
+                        timeParts = getTime();
+                        let combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1];
+                        if (lottieInstanceRef.current && lottieInstanceRef.current.renderer && lottieInstanceRef.current.renderer.elements[element] && lottieInstanceRef.current.renderer.elements[element].updateDocumentData) {
+                            if (lottieInstanceRef.current.renderer.elements[element].data.nm.endsWith("_clock2")) {
+                                combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1] + ":" + timeParts[2][0] + timeParts[2][1];
                             }
+                            lottieInstanceRef.current.renderer.elements[element].updateDocumentData({t: combined});
+                        }
+                    });
+                    if (!isPlaying) {
+                        try {
+                            let saveFrame = currentFrame;
+                            if (lottieInstanceRef.current.getDuration(1) === jsonData.op) {
+                                saveFrame = lottieInstanceRef.current.currentFrame;
+                            }
+                            lottieInstanceRef.current.renderer.renderFrame(saveFrame + 1);
+                            lottieInstanceRef.current.renderer.renderFrame(saveFrame);
+                        }catch{
+
                         }
                     }
-
-                    setInterval(updateTime, 1000);
-                    updateTime();
                 }
             }
+
+            const id = setInterval(updateTime, 1000);
+            clockIntervalIds.push(id);
+
+            updateTime();
         } catch (e) {
             console.log("Error updating Clock: ", e);
         }
@@ -180,38 +184,38 @@ function AnalyzePlayer() {
 
 
     useEffect(() => {
-        if (!lottieInstance) return;
-        isPlaying ? lottieInstance.play() : lottieInstance.pause();
+        if (!lottieInstanceRef.current) return;
+        isPlaying ? lottieInstanceRef.current.play() : lottieInstanceRef.current.pause();
         adjustSvgWidth();
-    }, [isPlaying, lottieInstance]);
+    }, [isPlaying, lottieInstanceRef.current]);
 
     const togglePlayPause = () => {
         setIsPlaying((prevIsPlaying) => {
             const shouldPlay = !prevIsPlaying;
-            if (lottieInstance) {
-                shouldPlay ? lottieInstance.play() : lottieInstance.pause();
+            if (lottieInstanceRef.current) {
+                shouldPlay ? lottieInstanceRef.current.play() : lottieInstanceRef.current.pause();
             }
             return shouldPlay;
         });
     };
 
     const stepFrame = (direction) => {
-        if (!lottieInstance) return;
+        if (!lottieInstanceRef.current) return;
         if (isPlaying) {
             togglePlayPause();
         }
         const newFrame = Math.max(0, Math.min(currentFrame + direction, jsonData.op - 1));
-        lottieInstance.goToAndStop(newFrame, true);
+        lottieInstanceRef.current.goToAndStop(newFrame, true);
         setCurrentFrame(newFrame);
     };
 
     const goToMarker = useCallback((markerFrame) => {
-        if (lottieInstance) {
+        if (lottieInstanceRef.current) {
             setIsPlaying(false);
-            lottieInstance.goToAndStop(markerFrame, true);
+            lottieInstanceRef.current.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
         }
-    }, [lottieInstance, setCurrentFrame]);
+    }, [lottieInstanceRef.current, setCurrentFrame]);
 
     const playCurrenMarker = () => {
         const currentMarker = markers.find(marker => currentFrame >= marker.tm && currentFrame < marker.tm + marker.dr);
@@ -219,11 +223,11 @@ function AnalyzePlayer() {
             setIsPlaying(true);
 
             const checkInterval = setInterval(() => {
-                const currentFrame = Math.round(lottieInstance.currentFrame);
+                const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
                 if (currentFrame >= currentMarker.tm + currentMarker.dr - 1) {
                     clearInterval(checkInterval);
                     setIsPlaying(false);
-                    lottieInstance.goToAndStop(currentMarker.tm + currentMarker.dr - 1, true);
+                    lottieInstanceRef.current.goToAndStop(currentMarker.tm + currentMarker.dr - 1, true);
                     setCurrentFrame(currentMarker.tm + currentMarker.dr - 1);
                 }
             }, 1000 / jsonData.fr);
@@ -233,8 +237,8 @@ function AnalyzePlayer() {
     };
 
     const downloadCurrentFrame = () => {
-        if (!isPlaying && lottieInstance) {
-            const svgElement = lottieInstance.renderer.svgElement;
+        if (!isPlaying && lottieInstanceRef.current) {
+            const svgElement = lottieInstanceRef.current.renderer.svgElement;
             const serializer = new XMLSerializer();
             let svgString = serializer.serializeToString(svgElement);
             for (const face in fontFaces) {
