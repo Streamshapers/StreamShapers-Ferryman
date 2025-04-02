@@ -3,7 +3,7 @@ import React, {createContext, useEffect, useRef, useState} from 'react';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.8");
+    const [ferrymanVersion] = useState("v1.6.9 clock");
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
     const [colors, setColors] = useState([]);
@@ -785,6 +785,18 @@ export const GlobalStateProvider = ({children}) => {
         return true;
     }
 
+    const updateLottieLayername = (oldLayername, newLayername) => {
+        if (!jsonData) {
+            console.error("No valid Lottie or Data.");
+            return;
+        }
+
+        const tempJsonData = jsonData;
+        const layer = tempJsonData.layers.find(layer => layer.nm === oldLayername);
+        layer.nm = newLayername;
+
+        setJsonData(tempJsonData);
+    }
 
     useEffect(() => {
         if (textObjects && textObjects.length > 0) {
@@ -796,15 +808,35 @@ export const GlobalStateProvider = ({children}) => {
                     textObject.type = source.key;
                 }
                 if (textObject.type === "Digital Clock") {
-                    textObject.text = source.secret;
-                    updateLottieText(textObjects.findIndex(t => t === textObject), textObject.text);
+                    //textObject.text = source.secret;
+                    const updateObject = textObjects.find(obj => obj.layername === textObject.layername + "_update");
+
+                    if(source.secret === "hh:mm" && !textObject.layername.endsWith("_clock1")){
+                        updateLottieLayername(textObject.layername, textObject.layername + "_clock1");
+                        textObject.layername = textObject.layername + "_clock1";
+                        if (updateObject) {
+                            updateLottieLayername(updateObject.layername, updateObject.layername + "_clock1");
+                            updateObject.layername = updateObject.layername + "_clock1";
+                        }
+                    }
+                    if(source.secret === "hh:mm:ss" && !textObject.layername.endsWith("_clock2")){
+                        updateLottieLayername(textObject.layername, textObject.layername + "_clock2");
+                        textObject.layername = textObject.layername + "_clock2";
+                        if (updateObject) {
+                            updateLottieLayername(updateObject.layername, updateObject.layername + "_clock2");
+                            updateObject.layername = updateObject.layername + "_clock2";
+                        }
+                    }
+                    //updateLottieText(textObjects.findIndex(t => t === textObject), textObject.text);
                 }
                 if (textObject.type === "Google Sheet") {
                     textObject.text = textObject.oiginal;
                 }
             })
 
+            //console.log(updatedTextObjects);
             setTextObjects(updatedTextObjects);
+            //jsonData.layers.map(layer => {console.log(layer.nm);})
         }
     }, [externalSources, updateExternalSources]);
 
@@ -1095,17 +1127,19 @@ export const GlobalStateProvider = ({children}) => {
         }
 
         setHtmlTemplate(fileContent);
+        //console.log(jsonData);
         return fileContent;
     };
 
     useEffect(() => {
+        console.log("HTML generation");
         async function generateHTML() {
             setExportFormat("html");
             await generateFile();
         }
 
         generateHTML().then();
-    }, [jsonData]);
+    }, [jsonData, textObjects]);
 
     return (
         <GlobalStateContext.Provider value={{

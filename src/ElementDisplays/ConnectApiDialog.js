@@ -23,7 +23,7 @@ function ConnectApiDialog() {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
                 if (field === "key" && value === "Digital Clock") {
-                    const newSecret = api.secret === "" ? "cc:cc:cc" : api.secret;
+                    const newSecret = api.secret === "" ? "hh:mm:ss" : api.secret;
                     return {...api, [field]: value, secret: newSecret};
                 } else if (field === "secret" && api.key === "Google Sheet") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
@@ -33,10 +33,10 @@ function ConnectApiDialog() {
                 } else if (field === "secret" && api.key === "Digital Clock") {
                     let clockFormat;
                     if (value === "hh:mm:ss") {
-                        clockFormat = "cc:cc:cc";
+                        clockFormat = value;
                         return {...api, [field]: clockFormat};
                     } else if (value === "hh:mm") {
-                        clockFormat = "cc:cc";
+                        clockFormat = value;
                         return {...api, [field]: clockFormat};
                     }
 

@@ -35,88 +35,83 @@
 
     <script>
         let clockIntervalIds = [];
-        let textElements = [];
 
-        function updateTimeField(animationInput) {
-            resetClockIntervals();
-            const animationDiv = document.getElementById(animationInput);
-            if (!animationDiv) {
-                console.warn(`Element with id "${animationInput}" not found. Retrying in 1 second...`);
-                setTimeout(() => updateTimeField(animationInput), 500);
-                return;
-            }
-            const svgDocument = animationDiv.querySelector('svg');
-            if (!svgDocument) {
-                console.warn(`SVG not found in element "${animationInput}". Retrying in 1 second...`);
-                setTimeout(() => updateTimeField(animationInput), 500);
-                return;
-            }
-            const gElements = svgDocument.getElementsByTagName('g');
-            if (!gElements || gElements.length === 0) {
-                console.warn(`No 'g' elements found in the SVG. Retrying in 1 second...`);
-                setTimeout(() => updateTimeField(animationInput), 500);
-                return;
-            }
-            const formatMap = {
-                'cc:cc:cc': 'HH:mm:ss',
-                'cc:cc': 'HH:mm',
-            };
+        function getTime(){
+            let formattedTime =  new Intl.DateTimeFormat("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            }).format(new Date());
 
-            for (let g of gElements) {
-                const ariaLabel = g.getAttribute('aria-label');
-                const format = formatMap[ariaLabel];
+            return formattedTime.match(/\d{2}/g);
+        }
 
-                if (format) {
-                    textElements = Array.from(g.getElementsByTagName('text'));
+        function updateTimeField() {
+            if (playStatus !== "") {
+                clockIntervalIds.forEach(id => clearInterval(id));
+                clockIntervalIds = [];
+                let clockElements = [];
 
-                    function updateTime() {
-                        let formattedTime;
-
-                        if (format === 'HH:mm:ss') {
-                            formattedTime = new Intl.DateTimeFormat("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: false
-                            }).format(new Date());
-                        } else if (format === 'HH:mm') {
-                            formattedTime = new Intl.DateTimeFormat("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: false
-                            }).format(new Date());
-                        }
-
-                        const timeParts = formattedTime.match(/\d{2}/g);
-
-                        if (timeParts.length >= 2) {
-                            textElements[0].textContent = timeParts[0][0];
-                            textElements[1].textContent = timeParts[0][1];
-                            textElements[2].textContent = ':';
-                            textElements[3].textContent = timeParts[1][0];
-                            textElements[4].textContent = timeParts[1][1];
-
-                            if (timeParts.length === 3 && format === 'HH:mm:ss') {
-                                textElements[5].textContent = ':';
-                                textElements[6].textContent = timeParts[2][0];
-                                textElements[7].textContent = timeParts[2][1];
+                function updateTime() {
+                    let frame = animationFrame;
+                    if (animation && animation.renderer && animation.renderer.elements && clockElements.length === 0) {
+                        animation.renderer.elements.forEach((element, index) => {
+                            if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
+                                clockElements.push(index);
                             }
-                        }
-                        //console.log("updated Time for " + animationInput);
+                        });
                     }
 
-                    const id = setInterval(updateTime, 1000);
-                    clockIntervalIds.push(id);
+                    let timeParts = getTime();
 
-                    updateTime();
+                    if (timeParts.length >= 2) {
+                        clockElements.forEach((element) => {
+                            timeParts = getTime();
+                            let combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1];
+                            if (animation && animation.renderer && animation.renderer.elements[element] && animation.renderer.elements[element].updateDocumentData) {
+                                if (animation.renderer.elements[element].data.nm.endsWith("_clock2")){
+                                    combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1] + ":" + timeParts[2][0] + timeParts[2][1];
+                                }
+                                animation.renderer.elements[element].updateDocumentData({t: combined});
+                            }
+                        });
+                        if (lottieState === "idle") {
+                            let saveFrame = animation.currentFrame + currentSegmentFrames;
+                            if(animation.getDuration(1) === lottieTemplate.op){
+                                saveFrame = animation.currentFrame;
+                            }
+                            animation.renderer.renderFrame(saveFrame + 1);
+                            animation.renderer.renderFrame(saveFrame);
+                        }
+                    }
                 }
+
+                const id = setInterval(updateTime, 100);
+                clockIntervalIds.push(id);
+
+                updateTime();
             }
         }
 
-        function resetClockIntervals() {
-            clockIntervalIds.forEach(id => clearInterval(id));
-            clockIntervalIds = [];
-            let textElements = [];
+        let clockLayers = [];
+
+        function setClock(timeJson){
+            let updateTime = getTime();
+
+            clockLayers.forEach((layer) => {
+                console.log(layer);
+                if(timeJson.layers[layer].nm.endsWith("_clock1")){
+                    timeJson.layers[layer].t.d.k[0].s.t = updateTime[0][0] + updateTime[0][1] + ":" + updateTime[1][0] + updateTime[1][1];
+                }
+                if(timeJson.layers[layer].nm.endsWith("_clock2")){
+                    timeJson.layers[layer].t.d.k[0].s.t = updateTime[0][0] + updateTime[0][1] + ":" + updateTime[1][0] + updateTime[1][1] + ":" + updateTime[2][0] + updateTime[2][1];
+                }
+
+                console.log("Layer", timeJson.layers[layer].t.d.k[0].s.t)
+            });
+
+            return timeJson;
         }
     </script>
 </head>
@@ -157,7 +152,7 @@
             return null;
         }
     }
- 
+
     function getCellData(cell, data) {
         try {
             const columnName = cell.match(/[A-Z]+/g)[0];
@@ -240,7 +235,7 @@
     let newAnimation;
     let updateAnimation;
     let stopExist = false;
-    let showLogs = false;
+    let showLogs = true;
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
@@ -251,6 +246,7 @@
     let breakFrame = undefined;
     let fetchSheet = true;
     let data = {};
+    let hasClock = false;
 
 
     //fix and check markers
@@ -264,6 +260,12 @@
         if (name === "update") updateExist = true;
     })
 
+    lottieTemplate.layers.forEach((layer, index) => {
+        if(layer.nm.endsWith("_clock1") || layer.nm.endsWith("_clock2")){
+            clockLayers.push(index);
+            hasClock = true;
+        }
+    });
 
     function createDeferredPromise() {
         let resolver, rejecter;
@@ -368,6 +370,7 @@
         },0);
     }
 
+    let animationFrame;
     function addEvents(animation){
         animation.addEventListener("enterFrame", () => {
             currentSegmentFrames = getMarker(currentSegment).tm;
@@ -380,8 +383,10 @@
             */
             //if (showLogs) console.log(`Current Animation Frame: ${Math.round(animation.currentFrame)}`);
             currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames;
+            animationFrame = Math.round(animation.currentFrame);
             //if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
-            if (showLogs) console.log(`Current Frame: ${currentFrame}`);
+            //if (showLogs) console.log(`Current Frame: ${currentFrame}`);
+            //if (showLogs) console.log(`Real Frame: ${animationFrame}`);
         });
         animation.addEventListener("_play",()=>{
             lottieState="play";
@@ -394,9 +399,8 @@
         animation.addEventListener("_idle", ()=>{
             lottieState="idle";
         });
-
-
     }
+
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
@@ -486,8 +490,7 @@
 
             addEvents(animation);
 
-
-            updateTimeField("animation" + updateCounter);
+            if(hasClock) updateTimeField("animation" + updateCounter);
 
             await animReady;
             animation.goToAndStop(0, true);
@@ -496,14 +499,15 @@
             animLoaded.resolve("Template - Animation is Ready");
 
         }
+
         //Update when tamplate is playing
-        if (playStatus === "play" && lottieState==="idle") {
+        if (playStatus === "play" && lottieState === "idle") {
             let updateData = JSON.parse(JSON.stringify(data))
             updateCounter++;
+            const updateStartFrame = animation.currentFrame + currentSegmentFrames;
 
             //Only for UpdateAnimations
             if (updateExist && updateData) {
-                const updateStartFrame = currentFrame;
                 if (showLogs) console.log(`Update triggered at frame: ${updateStartFrame}`);
 
                 for (let key of Object.keys(updateData)) {
@@ -525,6 +529,10 @@
                         }
                     })
                 }
+
+                lottieTemplateUpdate = setClock(lottieTemplateUpdate);
+                lottieTemplateNew = setClock(lottieTemplateNew);
+
                 const newDiv = document.createElement("div");
                 newDiv.id = "animation" + updateCounter;
                 document.body.appendChild(newDiv);
@@ -538,7 +546,7 @@
                 });
 
                 updateAnimation.addEventListener("DOMLoaded", async function () {
-                    updateTimeField("animation" + updateCounter);
+                    if(hasClock) updateTimeField("animation" + updateCounter);
                     if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(updateAnimation);
                     const updateMarker = lottieTemplateUpdate.markers.find(marker => marker.cm === "update");
@@ -547,9 +555,10 @@
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
                     updateAnimation = null;
+                    //lottieTemplateNew = setClock(lottieTemplateNew);
                     animation.addEventListener("_idle", () => {
                         lottieState = "idle";
-                        if(showInfo) console.log(`LottieState: "${lottieState}`);
+                        if (showInfo) console.log(`LottieState: "${lottieState}`);
 
                         updateCounter++;
                         const newDiv = document.createElement("div");
@@ -565,7 +574,7 @@
                         });
 
                         newAnimation.addEventListener("DOMLoaded", function () {
-                            updateTimeField("animation" + updateCounter);
+                            if(hasClock) updateTimeField("animation" + updateCounter);
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
                             newAnimation.goToAndStop(updateStartFrame, true);
@@ -579,6 +588,11 @@
             }
             //only without update animation
             if (!updateExist) {
+                console.log("startframe ", updateStartFrame);
+                lottieTemplateUpdate = setClock(lottieTemplateUpdate);
+                lottieTemplateNew = setClock(lottieTemplateNew);
+                console.log("update counter: ", updateCounter)
+
                 const newDiv = document.createElement("div");
                 newDiv.id = "animation" + updateCounter;
                 document.body.appendChild(newDiv);
@@ -592,31 +606,32 @@
                 });
 
                 newAnimation.addEventListener("DOMLoaded", function () {
-                    updateTimeField("animation" + updateCounter);
+                    if(hasClock) updateTimeField("animation" + updateCounter);
                     if (showInfo) console.log("Template - updated Animation Ready");
-                    newAnimation.goToAndStop(currentFrame, true);
+                    addEvents(newAnimation);
+                    newAnimation.goToAndStop(updateStartFrame, true);
                     //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
                     //console.log("BREAK: " + breakFrame)
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
-                    animation.addEventListener("enterFrame", () => {
+                    /*animation.addEventListener("enterFrame", () => {
                         for (let marker of lottieTemplate.markers) {
                             if (marker.cm === "name:" + currentSegment) {
                                 currentSegmentFrames = marker.tm;
+                                console.log(marker.cm)
                             }
                         }
-                        currentFrame = animation.currentFrame + currentSegmentFrames;
-                        if (showLogs) console.log(`Current Frame: ${currentFrame}`);
-                    });
-
-                    addEvents(animation);
+                        currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames;
+                        if (showLogs) console.log(`Current FrameU: ${currentFrame}`);
+                    });*/
                     //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
                     newAnimation = null;
                 });
             }
         }
         if (showInfo) info();
+        if(hasClock) updateTimeField("animation" + updateCounter);
     }
 
 
@@ -629,7 +644,7 @@
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
         if (markers.includes("start_loop")) playStack.push("start_loop");
-        updateTimeField("animation" + updateCounter);
+        if(hasClock) updateTimeField("animation" + updateCounter);
     }
 
 

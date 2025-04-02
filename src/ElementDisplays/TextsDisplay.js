@@ -77,6 +77,8 @@ function TextsDisplay() {
         }
 
         setShowOptionMenuIndex(null);
+        //console.log("texts: ", textObjects);
+        //console.log("external: ", externalSources);
     };
 
     useEffect(() => {
@@ -97,7 +99,7 @@ function TextsDisplay() {
             }
             setTextObjects(updatedTextObjects);
         }
-        //console.log(textObjects);
+        console.log("Texts CHANGED:", textObjects);
     }
 
     const handleGoogleCoordinates = (object, value) => {
