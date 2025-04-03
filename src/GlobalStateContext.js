@@ -715,6 +715,10 @@ export const GlobalStateProvider = ({children}) => {
                 if (textObject.type !== "text") {
                     if (textObject.type === "Digital Clock") {
                         textObject.text = textObject.original;
+                        if (/(_clock\d+)$/.test(textObject.layername)) {
+                            updateLottieLayername(textObject.layername, textObject.layername.replace(/_clock\d+$/, ""));
+                            textObject.layername = textObject.layername.replace(/_clock\d+$/, "");
+                        }
                     }
                     return {...textObject, type: "text"};
                 }
@@ -733,6 +737,10 @@ export const GlobalStateProvider = ({children}) => {
                     updatedTextObjects[i].source = "";
                     updatedTextObjects[i].type = "text";
                     updatedTextObjects[i].text = updatedTextObjects[i].original;
+                    if (/(_clock\d+)$/.test(updatedTextObjects[i].layername)) {
+                        updateLottieLayername(updatedTextObjects[i].layername, updatedTextObjects[i].layername.replace(/_clock\d+$/, ""));
+                        updatedTextObjects[i].layername = updatedTextObjects[i].layername.replace(/_clock\d+$/, "");
+                    }
                 }
             }
             setTextObjects(updatedTextObjects);
@@ -793,6 +801,11 @@ export const GlobalStateProvider = ({children}) => {
 
         const tempJsonData = jsonData;
         const layer = tempJsonData.layers.find(layer => layer.nm === oldLayername);
+        if (/(_clock\d+)$/.test(oldLayername)){
+            const textObject = textObjects.find(obj => obj.layername === oldLayername || obj.layername === newLayername);
+            updateLottieText(textObjects.findIndex(t => t === textObject), textObject.original);
+        }
+
         layer.nm = newLayername;
 
         setJsonData(tempJsonData);
@@ -810,6 +823,15 @@ export const GlobalStateProvider = ({children}) => {
                 if (textObject.type === "Digital Clock") {
                     //textObject.text = source.secret;
                     const updateObject = textObjects.find(obj => obj.layername === textObject.layername + "_update");
+
+                    if (/(_clock\d+)$/.test(textObject.layername)) {
+                        updateLottieLayername(textObject.layername, textObject.layername.replace(/_clock\d+$/, ""));
+                        textObject.layername = textObject.layername.replace(/_clock\d+$/, "");
+                        if (updateObject && /(_clock\d+)$/.test(updateObject.layername)) {
+                            updateLottieLayername(updateObject.layername, updateObject.layername.replace(/_clock\d+$/, ""));
+                            updateObject.layername = updateObject.layername.replace(/_clock\d+$/, "");
+                        }
+                    }
 
                     if(source.secret === "hh:mm" && !textObject.layername.endsWith("_clock1")){
                         updateLottieLayername(textObject.layername, textObject.layername + "_clock1");
@@ -1209,7 +1231,8 @@ export const GlobalStateProvider = ({children}) => {
             generalAlerts,
             setGeneralAlerts,
             updateExternalSources,
-            setUpdateExternalSources
+            setUpdateExternalSources,
+            updateLottieLayername
         }}>
             {children}
         </GlobalStateContext.Provider>

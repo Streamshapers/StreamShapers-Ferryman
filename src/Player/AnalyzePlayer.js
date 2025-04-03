@@ -59,7 +59,7 @@ function AnalyzePlayer() {
     const lottieInstanceRef = useRef(null);
     const progressBarRef = useRef(null);
     const timeFieldsSetRef = useRef(false);
-    let clockIntervalIds = [];
+    const clockIntervalIdsRef = useRef([]);
 
     const formatTimeFromFrames = useCallback((frame, frameRate) => {
         const seconds = Math.floor(frame / frameRate);
@@ -70,6 +70,7 @@ function AnalyzePlayer() {
     useEffect(() => {
         if (!jsonData) return;
         let onEnterFrame;
+        clockIntervalIdsRef.current.forEach(id => clearInterval(id));
 
         const instance = lottie.loadAnimation({
             container: animationContainerRef.current,
@@ -80,6 +81,7 @@ function AnalyzePlayer() {
         });
 
         console.log("generated: ", instance);
+        console.log("texts: ", textObjects);
 
         const timeoutId = setTimeout(() => {
             instance.goToAndStop(currentFrame, true);
@@ -92,7 +94,7 @@ function AnalyzePlayer() {
 
             instance.addEventListener('enterFrame', onEnterFrame);
             lottieInstanceRef.current = instance;
-            setTimeout(updateTimeFields, 500);
+            updateTimeFields();
         }, 300);
 
         return () => {
@@ -125,10 +127,10 @@ function AnalyzePlayer() {
 
     function updateTimeFields() {
         try {
-            if(timeFieldsSetRef.current === true) return;
+            //if(timeFieldsSetRef.current === true) return;
             //timeFieldsSetRef.current = true;
-            clockIntervalIds.forEach(id => clearInterval(id));
-            clockIntervalIds = [];
+            clockIntervalIdsRef.current.forEach(id => clearInterval(id));
+            clockIntervalIdsRef.current = [];
             let clockElements = [];
 
             function updateTime() {
@@ -141,7 +143,10 @@ function AnalyzePlayer() {
                 if (lottieInstanceRef.current && lottieInstanceRef.current.renderer && lottieInstanceRef.current.renderer.elements && clockElements.length === 0) {
                     lottieInstanceRef.current.renderer.elements.forEach((element, index) => {
                         if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
-                            clockElements.push(index);
+                            if (!clockElements.includes(index)) {
+                                clockElements.push(index);
+                            }
+                            console.log("Elements: ", clockElements)
                         }
                     });
                 }
@@ -174,7 +179,7 @@ function AnalyzePlayer() {
             }
 
             const id = setInterval(updateTime, 1000);
-            clockIntervalIds.push(id);
+            clockIntervalIdsRef.current.push(id);
 
             updateTime();
         } catch (e) {

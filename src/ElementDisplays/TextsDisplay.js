@@ -15,7 +15,8 @@ function TextsDisplay() {
         externalSources,
         updateLottieText,
         updateExternalSources,
-        setUpdateExternalSources
+        setUpdateExternalSources,
+        updateLottieLayername
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [isEditingLayerNameIndex, setIsEditingLayerNameIndex] = useState(null);
@@ -63,6 +64,10 @@ function TextsDisplay() {
                 if (action === "text") {
                     updatedTextObjects[index].source = "none";
                     updatedTextObjects[index].type = "text";
+                    if (/(_clock\d+)$/.test(updatedTextObjects[index].layername)) {
+                        updateLottieLayername(updatedTextObjects[index].layername, updatedTextObjects[index].layername.replace(/_clock\d+$/, ""));
+                        updatedTextObjects[index].layername = updatedTextObjects[index].layername.replace(/_clock\d+$/, "");
+                    }
                 } else if (action === "external") {
                     updatedTextObjects[index].source = externalSources[0].index.toString();
                     updatedTextObjects[index].type = externalSources[0].key.toString();
