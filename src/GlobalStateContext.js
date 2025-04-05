@@ -1154,7 +1154,7 @@ export const GlobalStateProvider = ({children}) => {
     };
 
     useEffect(() => {
-        console.log("HTML generation");
+        //console.log("HTML generation");
         async function generateHTML() {
             setExportFormat("html");
             await generateFile();

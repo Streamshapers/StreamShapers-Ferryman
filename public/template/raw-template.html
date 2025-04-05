@@ -36,13 +36,16 @@
     <script>
         let clockIntervalIds = [];
 
-        function getTime(){
-            let formattedTime =  new Intl.DateTimeFormat("en-GB", {
+        function getTime(addSeconds = 0) {
+            let now = new Date();
+            now.setSeconds(now.getSeconds() + addSeconds);
+
+            let formattedTime = new Intl.DateTimeFormat("en-GB", {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
                 hour12: false
-            }).format(new Date());
+            }).format(now);
 
             return formattedTime.match(/\d{2}/g);
         }
@@ -54,8 +57,7 @@
                 let clockElements = [];
 
                 function updateTime(animation) {
-                    if (animation){
-                        let frame = animationFrame;
+                    if (animation && animation.isLoaded){
                         if (animation && animation.renderer && animation.renderer.elements && clockElements.length === 0) {
                             animation.renderer.elements.forEach((element, index) => {
                                 if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
@@ -82,8 +84,16 @@
                                 if(animation.getDuration(1) === lottieTemplate.op){
                                     saveFrame = animation.currentFrame;
                                 }
-                                animation.renderer.renderFrame(saveFrame + 1);
-                                animation.renderer.renderFrame(saveFrame);
+                                if (typeof animation.renderer.renderFrame === "function") {
+                                    try {
+                                        //console.log("animation: ", animation.animationData.layers);
+                                        animation.renderer.renderFrame(saveFrame + 1);
+                                        animation.renderer.renderFrame(saveFrame);
+                                    } catch (error) {
+                                        console.error("⚠️ Error while rendering Frame: ", error);
+                                    }
+                                }
+
                             }
 
                         }
@@ -95,34 +105,13 @@
                     updateTime(newAnimation)
                     updateTime(updateAnimation)
 
-                }, 100);
+                }, 10);
                 clockIntervalIds.push(id);
 
                 updateTime(animation);
                 updateTime(newAnimation)
                 updateTime(updateAnimation)
             }
-        }
-
-        let clockLayers = [];
-
-        function setClock(timeJson){
-            let updateTime = getTime();
-
-            clockLayers.forEach((layer) => {
-                console.log(layer);
-                if(timeJson.layers[layer].nm.endsWith("_clock1")){
-                    timeJson.layers[layer].t.d.k[0].s.t = updateTime[0][0] + updateTime[0][1] + ":" + updateTime[1][0] + updateTime[1][1];
-                }
-                if(timeJson.layers[layer].nm.endsWith("_clock2")){
-                    timeJson.layers[layer].t.d.k[0].s.t = updateTime[0][0] + updateTime[0][1] + ":" + updateTime[1][0] + updateTime[1][1] + ":" + updateTime[2][0] + updateTime[2][1];
-                }
-
-                console.log("Layer", timeJson.layers[layer].t.d.k[0].s.t)
-            });
-
-            return timeJson;
-
         }
     </script>
 </head>
@@ -273,7 +262,6 @@
 
     lottieTemplate.layers.forEach((layer, index) => {
         if(layer.nm.endsWith("_clock1") || layer.nm.endsWith("_clock2")){
-            clockLayers.push(index);
             hasClock = true;
         }
     });
@@ -392,12 +380,13 @@
                 }
             }
             */
-            //if (showLogs) console.log(`Current Animation Frame: ${Math.round(animation.currentFrame)}`);
             currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames;
             animationFrame = Math.round(animation.currentFrame);
+            if(animation.getDuration(1) === lottieTemplate.op){
+                currentFrame = animationFrame;
+            }
             //if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
-            //if (showLogs) console.log(`Current Frame: ${currentFrame}`);
-            //if (showLogs) console.log(`Real Frame: ${animationFrame}`);
+            if (showLogs) console.log(`Current Frame: ${currentFrame}`);
         });
         animation.addEventListener("_play",()=>{
             lottieState="play";
@@ -515,7 +504,7 @@
         if (playStatus === "play" && lottieState === "idle") {
             let updateData = JSON.parse(JSON.stringify(data))
             updateCounter++;
-            const updateStartFrame = animation.currentFrame + currentSegmentFrames;
+            const updateStartFrame = currentFrame;
 
             //Only for UpdateAnimations
             if (updateExist && updateData) {
@@ -541,14 +530,11 @@
                     })
                 }
 
-                lottieTemplateUpdate = setClock(lottieTemplateUpdate);
-                lottieTemplateNew = setClock(lottieTemplateNew);
-
                 const newDiv = document.createElement("div");
                 newDiv.id = "animation" + updateCounter;
                 document.body.appendChild(newDiv);
 
-                let updateAnimation = bodymovin.loadAnimation({
+                updateAnimation = bodymovin.loadAnimation({
                     container: document.getElementById("animation" + updateCounter),
                     renderer: "svg",
                     loop: false,
@@ -558,13 +544,11 @@
 
                 updateAnimation.addEventListener("DOMLoaded", async function () {
                     addEvents(updateAnimation);
-                    const updateMarker = lottieTemplateUpdate.markers.find(marker => marker.cm === "update");
                     updateAnimation.goToAndPlay("update", true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
                     updateAnimation = null;
-                    //lottieTemplateNew = setClock(lottieTemplateNew);
                     animation.addEventListener("_idle", () => {
                         lottieState = "idle";
                         if (showInfo) console.log(`LottieState: "${lottieState}`);
@@ -574,7 +558,7 @@
                         newDiv.id = "animation" + updateCounter;
                         document.body.appendChild(newDiv);
 
-                        let newAnimation = bodymovin.loadAnimation({
+                        newAnimation = bodymovin.loadAnimation({
                             container: document.getElementById("animation" + updateCounter),
                             renderer: "svg",
                             loop: false,
@@ -596,16 +580,11 @@
             }
             //only without update animation
             if (!updateExist) {
-                console.log("startframe ", updateStartFrame);
-                lottieTemplateUpdate = setClock(lottieTemplateUpdate);
-                lottieTemplateNew = setClock(lottieTemplateNew);
-                console.log("update counter: ", updateCounter)
-
                 const newDiv = document.createElement("div");
                 newDiv.id = "animation" + updateCounter;
                 document.body.appendChild(newDiv);
 
-                let newAnimation = bodymovin.loadAnimation({
+                newAnimation = bodymovin.loadAnimation({
                     container: document.getElementById("animation" + updateCounter),
                     renderer: "svg",
                     loop: false,

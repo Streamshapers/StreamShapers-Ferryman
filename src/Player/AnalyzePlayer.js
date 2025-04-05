@@ -80,8 +80,8 @@ function AnalyzePlayer() {
             animationData: jsonData,
         });
 
-        console.log("generated: ", instance);
-        console.log("texts: ", textObjects);
+        //console.log("generated: ", instance);
+        //console.log("texts: ", textObjects);
 
         const timeoutId = setTimeout(() => {
             instance.goToAndStop(currentFrame, true);
