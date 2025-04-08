@@ -1,11 +1,12 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import AuthContext from "./AuthContext";
 import api from "../axiosInstance";
+import JSZip from "jszip";
 
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.8");
+    const [ferrymanVersion] = useState("v1.7.0 beta2");
     const {user, serverUrl} = useContext(AuthContext);
 
     const [error, setError] = useState(null);
@@ -160,6 +161,32 @@ export const GlobalStateProvider = ({children}) => {
             };
             setFileName(file.name.replace(/\.html$/, ''));
             reader.readAsText(file);
+        } else if (fileExtension === "lottie"){
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const jsonFiles = Object.keys(zip.files).filter(path =>
+                    path.startsWith("animations/") && path.endsWith(".json")
+                );
+
+                if (jsonFiles.length === 0) {
+                    console.error("No 'json' in .lottie-File found.");
+                    return;
+                }
+                const animationFile = zip.file(jsonFiles[0]);
+
+                const animationJsonText = await animationFile.async("string");
+                const animationJson = JSON.parse(animationJsonText);
+
+                const blob = new Blob([JSON.stringify(animationJson, null, 2)], {
+                    type: 'application/json',
+                });
+                const lottieFile = new File([blob], file.name.replace(/\.lottie$/, '') + ".json", { type: "application/json" });
+
+                setJsonFile(lottieFile);
+                setFileName(file.name.replace(/\.lottie$/, ''));
+            } catch (err) {
+                console.error("Error loading .lottie-File:", err);
+            }
         } else {
             console.error("File not supported.");
         }

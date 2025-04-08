@@ -85,7 +85,7 @@ function JsonFileProcessor() {
     const resetJsonFile = () => {
         setJsonFile(null);
         setJsonData(null);
-        resetState()
+        resetState();
     }
 
     return (

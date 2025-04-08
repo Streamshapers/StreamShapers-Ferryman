@@ -50,7 +50,7 @@ function StartScreen() {
         <div id="startScreenContainer">
             <div id="startWrapper">
                 <div id="uploadWrapper">
-                    <h2>Drag & Drop JSON or HTML</h2>
+                    <h2>Drag & Drop Lottie or HTML</h2>
                     <div id="uploadIcon">
                         <FontAwesomeIcon icon={faFileArrowUp}/>
                     </div>
