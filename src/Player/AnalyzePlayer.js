@@ -146,7 +146,7 @@ function AnalyzePlayer() {
                             if (!clockElements.includes(index)) {
                                 clockElements.push(index);
                             }
-                            console.log("Elements: ", clockElements)
+                            //console.log("Elements: ", clockElements)
                         }
                     });
                 }
