@@ -1934,3 +1934,7 @@ textarea {
     border-radius: 5px;
     background: var(--background);
 }
+
+.error-message{
+    color: var(--error);
+}

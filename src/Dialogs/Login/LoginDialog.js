@@ -28,12 +28,16 @@ function LoginDialog({ onClose }) {
 
     const {loginMail, loginPassword} = loginData;
     const {registerUsername, registerMail, registerPassword} = registerData;
+
     const onLoginChange = e => setLoginData({...loginData, [e.target.name]: e.target.value});
+
     const [message, setMessage] = useState(null);
+    const [loginMessage, setLoginMessage] = useState(null);
     const [activeTab, setActiveTab] = useState('login');
 
     const handleTabChange = tabName => {
         setActiveTab(tabName);
+        setLoginMessage(null);
     };
 
     const showAlert = (msg, duration = 10000) => {
@@ -70,6 +74,7 @@ function LoginDialog({ onClose }) {
             onClose();
         } catch (error) {
             console.error('Error logging in:', error.response?.data || error.message);
+            setLoginMessage("login not possible, wrong credentials.");
         }
     };
 
@@ -112,6 +117,14 @@ function LoginDialog({ onClose }) {
     const onRegisterSubmit = async e => {
         e.preventDefault();
 
+        const isUsernameValid = validateField('registerUsername', registerUsername);
+        const isMailValid = validateField('registerMail', registerMail);
+        const isPasswordValid = validateField('registerPassword', registerPassword);
+        if (!isUsernameValid || !isMailValid || !isPasswordValid) {
+            showAlert("Please enter a valid data.");
+            return;
+        }
+
         try {
             console.log('Sending Registration-Data...');
             const response = await api.post('/auth/register', registerData, {
@@ -135,6 +148,11 @@ function LoginDialog({ onClose }) {
                                 <div className="success alert-success">{message}</div>
                             </div>
                         )}
+                    {loginMessage && (
+                        <div className="error-wrapper">
+                            <div className="error">{loginMessage}</div>
+                        </div>
+                    )}
                         <div className="mode-switch">
                             <button className={`mode-button ${activeTab === 'login' ? 'active' : ''}`}
                                     onClick={() => handleTabChange('login')}>Login
@@ -146,24 +164,20 @@ function LoginDialog({ onClose }) {
                         {activeTab === 'login' && (
                             <form className="auth-form" onSubmit={onLoginSubmit}>
                                 <div className="auth-input">
-                                    <input autoComplete="loginMail" type="loginMail" name="loginMail" value={loginMail}
-                                           onChange={onLoginChange}
-                                           required/>
+                                    <input autoComplete="email" type="email" name="loginMail" value={loginMail}
+                                           onChange={onLoginChange} required />
                                     <label className="input-label">E-Mail:</label>
                                 </div>
                                 <div className="auth-input">
-
-                                    <input autoComplete="current-loginPassword" type="loginPassword"
-                                           name="loginPassword"
-                                           value={loginPassword}
-                                           onChange={onLoginChange} required/>
+                                    <input autoComplete="current-password" type="password" name="loginPassword"
+                                           value={loginPassword} onChange={onLoginChange} required />
                                     <label className="input-label">Password:</label>
                                 </div>
                                 <button className="auth-button" type="submit">Login</button>
                             </form>
                         )}
                         {activeTab === 'register' && (
-                            <form onSubmit={e => onRegisterSubmit(e)} autoComplete="off">
+                            <form className="auth-form" onSubmit={onRegisterSubmit} autoComplete="off">
                                 <div className="auth-input">
                                     <input
                                         className={`input ${errors.registerUsername ? 'invalid' : ''}`}
@@ -176,14 +190,18 @@ function LoginDialog({ onClose }) {
                                         onBlur={() => handleBlur('registerUsername')}
                                         required
                                     />
-                                    <label
-                                        className={`input-label ${focus.registerUsername || registerUsername ? 'active' : ''}`}>Username:</label>
+                                    <label className={`input-label ${focus.registerUsername || registerUsername ? 'active' : ''}`}>
+                                        Username:
+                                    </label>
+                                    {errors.registerUsername && (
+                                        <span className="error-message">This username is not valid or already taken.</span>
+                                    )}
                                 </div>
                                 <div className="auth-input">
                                     <input
                                         className={`input ${errors.registerMail ? 'invalid' : ''}`}
                                         autoComplete="off"
-                                        type="registerMail"
+                                        type="email"
                                         name="registerMail"
                                         value={registerMail}
                                         onChange={onRegisterChange}
@@ -191,23 +209,31 @@ function LoginDialog({ onClose }) {
                                         onBlur={() => handleBlur('registerMail')}
                                         required
                                     />
-                                    <label
-                                        className={`input-label ${focus.registerMail || loginMail ? 'active' : ''}`}>Mail:</label>
+                                    <label className={`input-label ${focus.registerMail || registerMail ? 'active' : ''}`}>
+                                        Mail:
+                                    </label>
+                                    {errors.registerMail && (
+                                        <span className="error-message">Please enter a valid email address.</span>
+                                    )}
                                 </div>
                                 <div className="auth-input">
                                     <input
                                         className={`input ${errors.registerPassword ? 'invalid' : ''}`}
                                         autoComplete="off"
-                                        type="registerPassword"
+                                        type="password"
                                         name="registerPassword"
                                         value={registerPassword}
                                         onChange={onRegisterChange}
-                                        onFocus={() => handleFocus('password')}
-                                        onBlur={() => handleBlur('password')}
+                                        onFocus={() => handleFocus('registerPassword')}
+                                        onBlur={() => handleBlur('registerPassword')}
                                         required
                                     />
-                                    <label
-                                        className={`input-label ${focus.registerPassword || registerPassword ? 'active' : ''}`}>Password:</label>
+                                    <label className={`input-label ${focus.registerPassword || registerPassword ? 'active' : ''}`}>
+                                        Password:
+                                    </label>
+                                    {errors.registerPassword && (
+                                        <span className="error-message">Your Password has to be at least 6 characters long.</span>
+                                    )}
                                 </div>
 
                                 <button className="auth-button" type="submit">Register</button>
