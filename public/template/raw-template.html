@@ -77,6 +77,7 @@
                                         combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1] + ":" + timeParts[2][0] + timeParts[2][1];
                                     }
                                     animation.renderer.elements[element].updateDocumentData({t: combined});
+                                    
                                 }
                             });
                             if (lottieState === "idle") {
@@ -105,7 +106,7 @@
                     updateTime(newAnimation)
                     updateTime(updateAnimation)
 
-                }, 10);
+                }, 100);
                 clockIntervalIds.push(id);
 
                 updateTime(animation);
@@ -133,6 +134,10 @@
         cell: "A1",
         value:"default"
     })*/
+
+    function delay(ms) {
+         return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     async function parseGoogleTable() {
         return JSON.parse(googleTableCells);
@@ -546,6 +551,7 @@
 
                 updateAnimation.addEventListener("DOMLoaded", async function () {
                     addEvents(updateAnimation);
+                    await delay(100)
                     updateAnimation.goToAndPlay("update", true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
@@ -568,10 +574,11 @@
                             animationData: lottieTemplateNew,
                         });
 
-                        newAnimation.addEventListener("DOMLoaded", function () {
+                        newAnimation.addEventListener("DOMLoaded", async function () {
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
                             newAnimation.goToAndStop(updateStartFrame, true);
+                            await delay(100)
                             animation.destroy();
                             document.getElementById("animation" + (updateCounter - 1)).remove();
                             animation = newAnimation;
