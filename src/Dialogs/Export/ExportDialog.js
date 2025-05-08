@@ -6,6 +6,7 @@ import GddExport from "./GddExport";
 import GeneralAlerts from "../../GeneralAlerts";
 import AuthContext from "../../Context/AuthContext";
 import api from "../../axiosInstance";
+import OgrafExport from "./OgrafExport";
 
 function ExportDialog({ onClose }) {
     const {user} = useContext(AuthContext);
@@ -200,6 +201,11 @@ function ExportDialog({ onClose }) {
                     <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
                             onClick={() => handleTabChange('default')}>General
                     </button>
+                    {exportFormat === 'ograf' &&(
+                        <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
+                                onClick={() => handleTabChange('ograf')}>Ograf
+                        </button>
+                    )}
                     <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`}
                             onClick={() => handleTabChange('spx')}>SPX
                     </button>
@@ -213,9 +219,11 @@ function ExportDialog({ onClose }) {
                             <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                             <input type="text" id="fileNameInput" value={String(fileName)}
                                    onChange={handleFileNameChange}/>
-                            <span id="fileType">.{exportFormat}</span>
+                            {exportFormat !== 'ograf' && (
+                                <span id="fileType">.{exportFormat}</span>
+                            )}
                         </div>
-                        {refImages.length > 0 && (
+                        {refImages.length > 0 && exportFormat !== 'ograf' && (
                             <div id="image-export-options">
                                 <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
                                              onChange={handleImageExport("embed")}/>
@@ -226,6 +234,8 @@ function ExportDialog({ onClose }) {
                         <div id="export-format">
                             <RadioButton value={exportFormat === 'html'} label="HTML-Template"
                                          onChange={handleExportFormat("html")}/>
+                            <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template"
+                                         onChange={handleExportFormat("ograf")}/>
                             <RadioButton value={exportFormat === 'json'} label="JSON"
                                          onChange={handleExportFormat('json')}/>
                             {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
@@ -263,9 +273,13 @@ function ExportDialog({ onClose }) {
                         )}
                     </div>
                 )}
+                {activeTab === 'ograf' && (
+                    <OgrafExport/>
+                )}
                 {activeTab === 'spx' && (
                     <SpxExport/>
                 )}
+
                 {/*activeTab === 'gdd' && (
                     <GddExport/>
                 )*/}

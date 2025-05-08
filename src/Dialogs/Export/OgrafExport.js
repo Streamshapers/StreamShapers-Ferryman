@@ -3,12 +3,11 @@ import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
-function SpxExport() {
+function OgrafExport() {
     const {
         spxExport,
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
-        exportFormat
     } = useContext(GlobalStateContext);
     const [uiColor, setUiColor] = useState("gra");
     const spxUiColors = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"]
@@ -188,99 +187,95 @@ function SpxExport() {
                         </div>
                     </div>
 
-                    {exportFormat !== 'ograf' &&(
-                        <>
-                            <hr/>
-                            {SPXGCTemplateDefinition.DataFields.map((field, index) => (
-                                field.ftype !== "instruction" && (
-                                    <div key={index} className="spx-setting">
-                                        <div className="spx-setting-header">
-                                            <div id="spx-item-key"><p>{field.field}</p></div>
-                                            <div className="spx-export-right">
-                                                {field.ftype !== 'filelist' && (
-                                                    <label>
-                                                        fieldtype
-                                                        <select name="ftype" value={field.ftype}
-                                                                onChange={e => handleChange(index, e)}>
-                                                            <option value="textfield">Text Field</option>
-                                                            <option value="dropdown">Dropdown</option>
-                                                            <option value="textarea">Textarea</option>
-                                                            <option value="checkbox">Checkbox</option>
-                                                            <option value="color">Color</option>
-                                                        </select>
-                                                    </label>
-                                                )}
-                                                <label>
-                                                    title
-                                                    <input type="text" name="title" value={field.title}
-                                                           title="Title to identify field in SPX"
-                                                           onChange={e => handleChange(index, e)}/>
-                                                </label>
-                                                <label>
-                                                    value
-                                                    {field.ftype !== 'checkbox' && (
-                                                        <input type="text" name="value" value={field.value}
-                                                               title="Initial value of your field"
-                                                               onChange={e => handleChange(index, e)}/>
-                                                    )}
-                                                    {field.ftype === 'checkbox' && (
-                                                        <select name="value" value={field.value}
-                                                                title="Initial value of your checkbox"
-                                                                onChange={e => handleChange(index, e)}>
-                                                            <option value="0">0</option>
-                                                            <option value="1">1</option>
-                                                        </select>
-                                                    )}
-                                                </label>
-                                                {field.ftype === 'filelist' && (
-                                                    <label>
-                                                        assetfolder
-                                                        <input type="text" name="assetfolder"
-                                                               placeholder="Asset Folder Path"
-                                                               title="Path to your image folder"
-                                                               value={field.assetfolder}
-                                                               onChange={e => handleChange(index, e)}/>
-                                                    </label>
-                                                )}
-                                                {field.ftype === 'filelist' && (
-                                                    <label id="spx-export-filetype-input">
-                                                        extension
-                                                        <input type="text" name="extension" placeholder="File Extension"
-                                                               title="File Extension"
-                                                               value={field.extension}
-                                                               onChange={e => handleChange(index, e)}/>
-                                                    </label>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {field.ftype === 'dropdown' && field.items && (
-                                            <div className="dropdown-settings spx-extra-settings">
-                                                {field.items.map((item, itemIndex) => (
-                                                    <div key={itemIndex} className="dropdown-item">
-                                                        <input type="text" name="text" placeholder="Item Text"
-                                                               value={item.text}
-                                                               onChange={e => handleItemChange(index, itemIndex, e)}/>
-                                                        <input type="text" name="value" placeholder="Item Value"
-                                                               value={item.value}
-                                                               onChange={e => handleItemChange(index, itemIndex, e)}/>
-                                                        <button onClick={() => removeItem(index, itemIndex)}>Remove</button>
-                                                    </div>
-                                                ))}
-                                                <button onClick={() => addItem(index)} className="add-button">
-                                                    <FontAwesomeIcon icon={faPlus} title="Export"/>
-                                                </button>
-                                            </div>
+                    <hr/>
+                    {SPXGCTemplateDefinition.DataFields.map((field, index) => (
+                        field.ftype !== "instruction" && (
+                            <div key={index} className="spx-setting">
+                                <div className="spx-setting-header">
+                                    <div id="spx-item-key"><p>{field.field}</p></div>
+                                    <div className="spx-export-right">
+                                        {field.ftype !== 'filelist' && (
+                                            <label>
+                                                fieldtype
+                                                <select name="ftype" value={field.ftype}
+                                                        onChange={e => handleChange(index, e)}>
+                                                    <option value="textfield">Text Field</option>
+                                                    <option value="dropdown">Dropdown</option>
+                                                    <option value="textarea">Textarea</option>
+                                                    <option value="checkbox">Checkbox</option>
+                                                    <option value="color">Color</option>
+                                                </select>
+                                            </label>
+                                        )}
+                                        <label>
+                                            title
+                                            <input type="text" name="title" value={field.title}
+                                                   title="Title to identify field in SPX"
+                                                   onChange={e => handleChange(index, e)}/>
+                                        </label>
+                                        <label>
+                                            value
+                                            {field.ftype !== 'checkbox' && (
+                                                <input type="text" name="value" value={field.value}
+                                                       title="Initial value of your field"
+                                                       onChange={e => handleChange(index, e)}/>
+                                            )}
+                                            {field.ftype === 'checkbox' && (
+                                                <select name="value" value={field.value}
+                                                        title="Initial value of your checkbox"
+                                                        onChange={e => handleChange(index, e)}>
+                                                    <option value="0">0</option>
+                                                    <option value="1">1</option>
+                                                </select>
+                                            )}
+                                        </label>
+                                        {field.ftype === 'filelist' && (
+                                            <label>
+                                                assetfolder
+                                                <input type="text" name="assetfolder"
+                                                       placeholder="Asset Folder Path"
+                                                       title="Path to your image folder"
+                                                       value={field.assetfolder}
+                                                       onChange={e => handleChange(index, e)}/>
+                                            </label>
+                                        )}
+                                        {field.ftype === 'filelist' && (
+                                            <label id="spx-export-filetype-input">
+                                                extension
+                                                <input type="text" name="extension" placeholder="File Extension"
+                                                       title="File Extension"
+                                                       value={field.extension}
+                                                       onChange={e => handleChange(index, e)}/>
+                                            </label>
                                         )}
                                     </div>
-                                )
+                                </div>
+                                {field.ftype === 'dropdown' && field.items && (
+                                    <div className="dropdown-settings spx-extra-settings">
+                                        {field.items.map((item, itemIndex) => (
+                                            <div key={itemIndex} className="dropdown-item">
+                                                <input type="text" name="text" placeholder="Item Text"
+                                                       value={item.text}
+                                                       onChange={e => handleItemChange(index, itemIndex, e)}/>
+                                                <input type="text" name="value" placeholder="Item Value"
+                                                       value={item.value}
+                                                       onChange={e => handleItemChange(index, itemIndex, e)}/>
+                                                <button onClick={() => removeItem(index, itemIndex)}>Remove</button>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => addItem(index)} className="add-button">
+                                            <FontAwesomeIcon icon={faPlus} title="Export"/>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )
 
-                            ))}
-                        </>
-                )}
+                    ))}
                 </div>
             }
         </div>
     );
 }
 
-export default SpxExport;
+export default OgrafExport;
