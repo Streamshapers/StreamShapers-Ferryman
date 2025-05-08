@@ -1,10 +1,12 @@
-import './App.css';
-import './mediaQuerys.css';
+import {Routes, Route} from 'react-router-dom';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import DropJson from "./DropJson";
+import WindowTooNarrowWarning from "./WindowToNarrowWarning";
 import Header from "./Header";
 import ConverterView from "./ConverterView";
 import StartScreen from "./StartScreen/StartScreen";
-import DropJson from "./DropJson";
-import WindowTooNarrowWarning from "./WindowToNarrowWarning";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
     return (
@@ -13,8 +15,13 @@ function App() {
             <WindowTooNarrowWarning/>
             <div id="content">
                 <Header/>
-                <ConverterView/>
-                <StartScreen/>
+
+                <Routes>
+                    <Route path="/" element={<><ConverterView/><StartScreen/></>}/>
+                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
+                    <Route path="/reset-password" element={<ResetPassword/>}/>
+                    <Route path="/verify-email" element={<VerifyEmail/>}/>
+                </Routes>
             </div>
         </>
     );

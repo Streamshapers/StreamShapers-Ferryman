@@ -1,10 +1,11 @@
 import React, {useContext, useEffect, useState} from "react";
 import AuthContext from '../../Context/AuthContext';
 import api from '../../axiosInstance';
+import {Link} from "react-router-dom";
 
 function LoginDialog({ onClose }) {
     const {user, login} = useContext(AuthContext);
-
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loginData, setLoginData] = useState({
         loginMail: '',
         loginPassword: ''
@@ -102,8 +103,8 @@ function LoginDialog({ onClose }) {
             isValid = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value);
             if (!isValid) console.log('Invalid email format');
         } else if (name === 'registerPassword') {
-            isValid = value.length >= 6;
-            if (!isValid) console.log('Password must be at least 6 characters');
+            isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(registerPassword);
+            if (!isValid) console.log('Please ensure password meets all requirements');
         } else if (name === 'registerUsername') {
             isValid = value.length >= 3;
             if (!isValid) console.log('Username must be at least 3 characters');
@@ -120,7 +121,8 @@ function LoginDialog({ onClose }) {
         const isUsernameValid = validateField('registerUsername', registerUsername);
         const isMailValid = validateField('registerMail', registerMail);
         const isPasswordValid = validateField('registerPassword', registerPassword);
-        if (!isUsernameValid || !isMailValid || !isPasswordValid) {
+        const passwordsMatch = registerPassword === confirmPassword;
+        if (!isUsernameValid || !isMailValid || !isPasswordValid || !passwordsMatch) {
             showAlert("Please enter a valid data.");
             return;
         }
@@ -173,6 +175,11 @@ function LoginDialog({ onClose }) {
                                            value={loginPassword} onChange={onLoginChange} required />
                                     <label className="input-label">Password:</label>
                                 </div>
+                                <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+                                    <Link to="/forgot-password" style={{ color: '#007bff', textDecoration: 'none' }}>
+                                        Forgot your password?
+                                    </Link>
+                                </p>
                                 <button className="auth-button" type="submit">Login</button>
                             </form>
                         )}
@@ -223,7 +230,10 @@ function LoginDialog({ onClose }) {
                                         type="password"
                                         name="registerPassword"
                                         value={registerPassword}
-                                        onChange={onRegisterChange}
+                                        onChange={(e) => {
+                                            onRegisterChange(e);
+                                            validateField('registerPassword', e.target.value);
+                                        }}
                                         onFocus={() => handleFocus('registerPassword')}
                                         onBlur={() => handleBlur('registerPassword')}
                                         required
@@ -231,10 +241,35 @@ function LoginDialog({ onClose }) {
                                     <label className={`input-label ${focus.registerPassword || registerPassword ? 'active' : ''}`}>
                                         Password:
                                     </label>
-                                    {errors.registerPassword && (
-                                        <span className="error-message">Your Password has to be at least 6 characters long.</span>
-                                    )}
                                 </div>
+
+                                <ul style={{ fontSize: '0.85rem', margin: '0.5rem 0 1rem', paddingLeft: '1.2rem' }}>
+                                    <li>{registerPassword.length >= 8 ? '✅' : '❌'} at least 8 characters</li>
+                                    <li>{/[A-Z]/.test(registerPassword) ? '✅' : '❌'} one uppercase letter</li>
+                                    <li>{/[a-z]/.test(registerPassword) ? '✅' : '❌'} one lowercase letter</li>
+                                    <li>{/\d/.test(registerPassword) ? '✅' : '❌'} one number</li>
+                                    <li>{/[@$!%*?&]/.test(registerPassword) ? '✅' : '❌'} one special character (@$!%*?&)</li>
+                                </ul>
+
+                                <div className="auth-input">
+                                    <input
+                                        className={`input ${confirmPassword && confirmPassword !== registerPassword ? 'invalid' : ''}`}
+                                        autoComplete="off"
+                                        type="password"
+                                        name="confirmPassword"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
+                                    <label className="input-label active">
+                                        Confirm Password:
+                                    </label>
+                                </div>
+                                {confirmPassword && confirmPassword !== registerPassword && (
+                                    <p style={{ color: 'red', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                                        Passwords do not match.
+                                    </p>
+                                )}
 
                                 <button className="auth-button" type="submit">Register</button>
                             </form>
