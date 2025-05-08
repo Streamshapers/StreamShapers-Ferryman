@@ -37,6 +37,7 @@ export const GlobalStateProvider = ({children}) => {
     const [mimeType, setMimeType] = useState("text/html");
     const [htmlTemplate, setHtmlTemplate] = useState(null);
     const [generalAlerts, setGeneralAlerts] = useState([]);
+    const [clocks, setClocks] = useState({});
 
     const googleCellSnapshot = useRef([]);
 
@@ -709,7 +710,7 @@ export const GlobalStateProvider = ({children}) => {
 
     //############################################ External Sources ################################################################
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (!useExternalSources) {
             const updatedTextObjects = textObjects.map(textObject => {
                 if (textObject.type !== "text") {
@@ -726,7 +727,7 @@ export const GlobalStateProvider = ({children}) => {
             })
             setTextObjects(updatedTextObjects);
         }
-    }, [useExternalSources]);
+    }, [useExternalSources]);*/
 
     useEffect(() => {
         //console.log("Delete:", deleteExternalSource);
@@ -737,10 +738,7 @@ export const GlobalStateProvider = ({children}) => {
                     updatedTextObjects[i].source = "";
                     updatedTextObjects[i].type = "text";
                     updatedTextObjects[i].text = updatedTextObjects[i].original;
-                    if (/(_clock\d+)$/.test(updatedTextObjects[i].layername)) {
-                        updateLottieLayername(updatedTextObjects[i].layername, updatedTextObjects[i].layername.replace(/_clock\d+$/, ""));
-                        updatedTextObjects[i].layername = updatedTextObjects[i].layername.replace(/_clock\d+$/, "");
-                    }
+                    deleteClock(updatedTextObjects[i].layername);
                 }
             }
             setTextObjects(updatedTextObjects);
@@ -762,6 +760,11 @@ export const GlobalStateProvider = ({children}) => {
                     sheet: textObject.sheet,
                     //value: textObject.text
                 })
+            }
+            if (textObject.type === 'Digital Clock'){
+                const index = textObject.source;
+                const source = externalSources.find(obj => obj.index === parseInt(index, 10));
+                addClock(source.type, textObject.layername);
             }
         })
         //console.log(updatedGoogleTableCells);
@@ -801,15 +804,49 @@ export const GlobalStateProvider = ({children}) => {
 
         const tempJsonData = jsonData;
         const layer = tempJsonData.layers.find(layer => layer.nm === oldLayername);
-        if (/(_clock\d+)$/.test(oldLayername)){
-            const textObject = textObjects.find(obj => obj.layername === oldLayername || obj.layername === newLayername);
-            updateLottieText(textObjects.findIndex(t => t === textObject), textObject.original);
-        }
-
         layer.nm = newLayername;
 
         setJsonData(tempJsonData);
     }
+
+    const addClock = (type, layerName) => {
+        const typeToKey = {
+            "24h hh:mm": "clock1",
+            "24h hh:mm:ss": "clock2",
+            "12h hh:mm": "clock3",
+            "12h hh:mm:ss": "clock4",
+        };
+
+        const clockKey = typeToKey[type];
+        if (!clockKey) return;
+
+        const updatedClocks = { ...clocks };
+        const existing = updatedClocks[clockKey] || [];
+
+        if (!existing.includes(layerName)) {
+            updatedClocks[clockKey] = [...existing, layerName];
+            setClocks(updatedClocks);
+        }
+    };
+
+    const deleteClock = (layerName) => {
+        const updatedClocks = { ...clocks };
+        const clockKeys = ["clock1", "clock2", "clock3", "clock4"];
+
+        clockKeys.forEach((key) => {
+            if (Array.isArray(updatedClocks[key])) {
+                updatedClocks[key] = updatedClocks[key].filter(name => name !== layerName);
+
+                if (updatedClocks[key].length === 0) {
+                    delete updatedClocks[key];
+                }
+            }
+        });
+
+        setClocks(updatedClocks);
+        console.log("Updated clocks after deletion:", updatedClocks);
+    };
+
 
     useEffect(() => {
         if (textObjects && textObjects.length > 0) {
@@ -821,38 +858,10 @@ export const GlobalStateProvider = ({children}) => {
                     textObject.type = source.key;
                 }
                 if (textObject.type === "Digital Clock") {
-                    //textObject.text = source.secret;
-                    const updateObject = textObjects.find(obj => obj.layername === textObject.layername + "_update");
-
-                    if (/(_clock\d+)$/.test(textObject.layername)) {
-                        updateLottieLayername(textObject.layername, textObject.layername.replace(/_clock\d+$/, ""));
-                        textObject.layername = textObject.layername.replace(/_clock\d+$/, "");
-                        if (updateObject && /(_clock\d+)$/.test(updateObject.layername)) {
-                            updateLottieLayername(updateObject.layername, updateObject.layername.replace(/_clock\d+$/, ""));
-                            updateObject.layername = updateObject.layername.replace(/_clock\d+$/, "");
-                        }
-                    }
-
-                    if(source.secret === "hh:mm" && !textObject.layername.endsWith("_clock1")){
-                        updateLottieLayername(textObject.layername, textObject.layername + "_clock1");
-                        textObject.layername = textObject.layername + "_clock1";
-                        if (updateObject) {
-                            updateLottieLayername(updateObject.layername, updateObject.layername + "_clock1");
-                            updateObject.layername = updateObject.layername + "_clock1";
-                        }
-                    }
-                    if(source.secret === "hh:mm:ss" && !textObject.layername.endsWith("_clock2")){
-                        updateLottieLayername(textObject.layername, textObject.layername + "_clock2");
-                        textObject.layername = textObject.layername + "_clock2";
-                        if (updateObject) {
-                            updateLottieLayername(updateObject.layername, updateObject.layername + "_clock2");
-                            updateObject.layername = updateObject.layername + "_clock2";
-                        }
-                    }
-                    //updateLottieText(textObjects.findIndex(t => t === textObject), textObject.text);
+                    addClock(source.secret, textObject.layername);
                 }
                 if (textObject.type === "Google Sheet") {
-                    textObject.text = textObject.oiginal;
+                    textObject.text = textObject.original;
                 }
             })
 
@@ -1232,7 +1241,9 @@ export const GlobalStateProvider = ({children}) => {
             setGeneralAlerts,
             updateExternalSources,
             setUpdateExternalSources,
-            updateLottieLayername
+            updateLottieLayername,
+            clocks,
+            setClocks
         }}>
             {children}
         </GlobalStateContext.Provider>

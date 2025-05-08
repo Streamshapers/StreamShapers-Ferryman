@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useRef} from 'react';
 import {GlobalStateContext} from "../GlobalStateContext";
 import lottie from 'lottie-web';
 import {
@@ -53,7 +53,8 @@ function AnalyzePlayer() {
         isPlaying,
         setIsPlaying,
         fileName,
-        textObjects
+        textObjects,
+        clocks
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
     const lottieInstanceRef = useRef(null);
@@ -114,78 +115,70 @@ function AnalyzePlayer() {
         }
     };
 
-    function getTime() {
-        let formattedTime = new Intl.DateTimeFormat("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false
-        }).format(new Date());
+    function getTime(type, addSeconds = 0) {
+        let formats = {
+            clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
+            clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
+            clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
+            clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true}
+        }
 
-        return formattedTime.match(/\d{2}/g);
+        let now = new Date();
+        now.setSeconds(now.getSeconds() + addSeconds);
+
+        return new Intl.DateTimeFormat("en-GB", formats[type]).format(now)
     }
 
     function updateTimeFields() {
         try {
-            //if(timeFieldsSetRef.current === true) return;
-            //timeFieldsSetRef.current = true;
             clockIntervalIdsRef.current.forEach(id => clearInterval(id));
             clockIntervalIdsRef.current = [];
-            let clockElements = [];
 
             function updateTime() {
-                const animationPreviewElement = document.getElementById('animationPreview');
-                if (!animationPreviewElement) {
-                    //console.log("Error updating Clock: animationPreview element not found.");
-                    return;
-                }
+                const preview = document.getElementById('animationPreview');
+                if (!preview) return;
 
-                if (lottieInstanceRef.current && lottieInstanceRef.current.renderer && lottieInstanceRef.current.renderer.elements && clockElements.length === 0) {
-                    lottieInstanceRef.current.renderer.elements.forEach((element, index) => {
-                        if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2"))) {
-                            if (!clockElements.includes(index)) {
-                                clockElements.push(index);
-                            }
-                            //console.log("Elements: ", clockElements)
+                const rendererElements = lottieInstanceRef.current?.renderer?.elements;
+                if (!rendererElements) return;
+
+                Object.entries(clocks).forEach(([clockKey, layerNames]) => {
+                    const time = getTime(clockKey);
+
+                    layerNames.forEach((layerName) => {
+                        const target = rendererElements.find(
+                            (el) => el?.data?.nm === layerName && typeof el.updateDocumentData === "function"
+                        );
+                        if (target) {
+                            target.updateDocumentData({ t: time });
+                        } else {
+                            // Optional: Warnung bei fehlendem Layer
+                            // console.warn(`Layer ${layerName} not found in ${clockKey}`);
                         }
                     });
-                }
+                });
 
-                let timeParts = getTime();
-                if (timeParts.length >= 2) {
-                    clockElements.forEach((element) => {
-                        timeParts = getTime();
-                        let combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1];
-                        if (lottieInstanceRef.current && lottieInstanceRef.current.renderer && lottieInstanceRef.current.renderer.elements[element] && lottieInstanceRef.current.renderer.elements[element].updateDocumentData) {
-                            if (lottieInstanceRef.current.renderer.elements[element].data.nm.endsWith("_clock2")) {
-                                combined = timeParts[0][0] + timeParts[0][1] + ":" + timeParts[1][0] + timeParts[1][1] + ":" + timeParts[2][0] + timeParts[2][1];
-                            }
-                            lottieInstanceRef.current.renderer.elements[element].updateDocumentData({t: combined});
+                if (!isPlaying) {
+                    try {
+                        let saveFrame = currentFrame;
+                        if (lottieInstanceRef.current.getDuration(1) === jsonData.op) {
+                            saveFrame = lottieInstanceRef.current.currentFrame;
                         }
-                    });
-                    if (!isPlaying) {
-                        try {
-                            let saveFrame = currentFrame;
-                            if (lottieInstanceRef.current.getDuration(1) === jsonData.op) {
-                                saveFrame = lottieInstanceRef.current.currentFrame;
-                            }
-                            lottieInstanceRef.current.renderer.renderFrame(saveFrame + 1);
-                            lottieInstanceRef.current.renderer.renderFrame(saveFrame);
-                        }catch{
-
-                        }
+                        lottieInstanceRef.current.renderer.renderFrame(saveFrame + 1);
+                        lottieInstanceRef.current.renderer.renderFrame(saveFrame);
+                    } catch (e) {
+                        console.log("RenderFrame error:", e);
                     }
                 }
             }
 
             const id = setInterval(updateTime, 1000);
             clockIntervalIdsRef.current.push(id);
-
             updateTime();
         } catch (e) {
-            console.log("Error updating Clock: ", e);
+            console.log("Error updating Clock:", e);
         }
     }
+
 
 
     useEffect(() => {
