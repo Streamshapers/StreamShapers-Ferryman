@@ -553,6 +553,7 @@
                     addEvents(updateAnimation);
                     await delay(100)
                     updateAnimation.goToAndPlay("update", true);
+                    currentSegment = "update" 
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
@@ -578,6 +579,7 @@
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
                             newAnimation.goToAndStop(updateStartFrame, true);
+                            currentSegment = "update" 
                             await delay(100)
                             animation.destroy();
                             document.getElementById("animation" + (updateCounter - 1)).remove();
@@ -645,7 +647,8 @@
     function stop() {
         if (stopExist) {
             if (lottieState === "idle") {
-                animation.goToAndPlay("stop", true);
+                animation.goToAndPlay("stop", true); //goToAndPlay(animation, stop) eventuell ersetzten?!
+                currentSegment = "stop"
                 if (showLogs) console.log("Template - Play 'stop' Marker");
             } else {
                 //playStack.length=0
