@@ -34,67 +34,62 @@
     ${spx}
 
     <script>
+
+        
         let clockIntervalIds = [];
 
         function getTime(type, addSeconds = 0) {
-    let formats = {
-        clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
-        clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
-        clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
-        clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true}
-    }
-    
-    let now = new Date();
-    now.setSeconds(now.getSeconds() + addSeconds);
+            let formats = {
+                clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
+                clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
+                clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
+                clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true}
+            }
+            
+            let now = new Date();
+            now.setSeconds(now.getSeconds() + addSeconds);
 
-    let formattedTime = new Intl.DateTimeFormat("en-GB", formats[type]).format(now);
-    return formattedTime
-}
+            let formattedTime = new Intl.DateTimeFormat("en-GB", formats[type]).format(now);
+            return formattedTime
+        }
 
         function updateTimeField() {
             if (playStatus !== "") {
                 clockIntervalIds.forEach(id => clearInterval(id));
                 clockIntervalIds = [];
-                let clockElements = [];
 
                 function updateTime(animation) {
                     if (animation && animation.isLoaded){
-                        if (animation && animation.renderer && animation.renderer.elements && clockElements.length === 0) {
-                            animation.renderer.elements.forEach((element, index) => {
-                                if (element && element.data && element.data.nm && (element.data.nm.endsWith("_clock1") || element.data.nm.endsWith("_clock2")|| element.data.nm.endsWith("_clock3")|| element.data.nm.endsWith("_clock4"))) {
-                                    clockElements.push({
-                                        index:index,
-                                        format: element.data.nm.match(/clock\d+$/)[0]
-                                    });
-                                    console.log(clockElements)
-                                }
-                            });
-                        }
-                        clockElements.forEach((element) => {
-                            let timeParts = getTime(element.format);
-                            console.log(element.index)
-                            console.log(element.format)
-                            console.log(timeParts)
-                            if (animation && animation.renderer && animation.renderer.elements[element.index] && animation.renderer.elements[element.index].updateDocumentData) {
-                                animation.renderer.elements[element.index].updateDocumentData({t: timeParts});
-                                
-                            }
-                        });
-                        if (lottieState === "idle") {
-                            let saveFrame = animation.currentFrame + currentSegmentFrames;
-                            if(animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0){
-                                saveFrame = animation.currentFrame;
-                            }
-                            if (animation.renderer && typeof animation.renderer.renderFrame === "function") {
-                                try {
-                                    //console.log("animation: ", animation.animationData.layers);
-                                    animation.renderer.renderFrame(saveFrame + 1);
-                                    animation.renderer.renderFrame(saveFrame);
-                                } catch (error) {
-                                    console.error("⚠️ Error while rendering Frame: ", error);
-                                }
-                            }
+                        Object.keys(clocks).forEach((key)=>{
+                            let time = getTime(key);
+                            if (animation && animation.renderer && animation.renderer.elements) {
+                                animation.renderer.elements.forEach((element, index) => {
+                                    if (element && element.data && element.data.nm && element.updateDocumentData) {
+                                        clocks[key].forEach((layer)=>{
+                                            if (element.data.nm === layer){
+                                                element.updateDocumentData({t: time})
+                                            }
+                                        })
+                                    }
+                                })
+                            };
+                        })
 
+                            if (lottieState === "idle") {
+                                let saveFrame = animation.currentFrame + currentSegmentFrames;
+                                if(animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0){
+                                    saveFrame = animation.currentFrame;
+                                }
+                                if (animation.renderer && typeof animation.renderer.renderFrame === "function") {
+                                    try {
+                                        //console.log("animation: ", animation.animationData.layers);
+                                        animation.renderer.renderFrame(saveFrame + 1);
+                                        animation.renderer.renderFrame(saveFrame);
+                                    } catch (error) {
+                                        console.error("⚠️ Error while rendering Frame: ", error);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -111,7 +106,6 @@
                 updateTime(newAnimation)
                 updateTime(updateAnimation)
             }
-        }
     </script>
 </head>
 
@@ -249,7 +243,9 @@
     let breakFrame = undefined;
     let fetchSheet = true;
     let data = {};
-    let hasClock = false;
+    //let clocks = {"clock1" : ["_line1","_line2"], "clock2" : ["_line3"],"clock3" : ["_line4"],"clock4" : ["_line5"]}
+    //let clocks = {"clock2" : ["_firstLine"],"clock4" : ["_secondLine"]}
+    let clocks = {};
 
 
     //fix and check markers
@@ -264,7 +260,7 @@
     })
 
     lottieTemplate.layers.forEach((layer, index) => {
-        if(layer.nm.endsWith("_clock1") || layer.nm.endsWith("_clock2")){
+        if(layer.nm.endsWith("_clock1") || layer.nm.endsWith("_clock2")|| layer.nm.endsWith("_clock3")|| layer.nm.endsWith("_clock4")){
             hasClock = true;
         }
     });
@@ -668,7 +664,7 @@
         await animLoaded.promise;
         await animReady;
         await loadFonts();
-        if(hasClock) updateTimeField()
+        if(Object.keys(clocks).length!=0) updateTimeField()
         controlAnimation(animation,"play","start")
         //animation.goToAndPlay("start", true);
         playStatus = "play";
@@ -719,6 +715,13 @@
             nextCount++;
         }
     }
+
+
+    // Invoke functions:
+
+
+    
+
 
     function info() {
         animation.destroy();
