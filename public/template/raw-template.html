@@ -373,6 +373,50 @@
             }
         },0);
     }
+    
+
+
+    function controlAnimation(animation, action, value, force=true){
+        if(typeof value == "number" && force === false) {
+            console.log("Frames will be forced to play immediately and not be added to playStack!")
+            force = true
+        }
+        if (force){
+            if(action === "play"){
+                animation.goToAndPlay(value, true)
+            } else if(action === "stop"){
+                animation.goToAndStop(value,true)   
+            }
+            if(typeof value == "string"){
+                currentSegment = value
+                console.log(`CurrentSegment: ${currentSegment}`)
+            } else if(typeof value == "number"){    
+                lottieTemplate.markers.forEach((marker)=>{
+                    if(value >= marker.tm && value <marker.tm+marker.dr){
+                        currentSegment = marker.cm
+                        console.log(`CurrentSegment: ${currentSegment}`)
+                    }
+                }) 
+            }
+        } else if (typeof value == "string"){
+            if (lottieState === "idle") {
+                if(action === "play"){
+                animation.goToAndPlay(value, true)
+                currentSegment = value
+            } else if(action === "stop"){
+                animation.goToAndStop(value,true)
+                currentSegment = value
+            }
+            } else {
+                playStack.push(value);
+                if (markers.includes(value + "_loop")) playStack.push(value + "_loop");
+            }
+        }
+
+
+    }
+
+
 
     let animationFrame;
     function addEvents(animation){
@@ -500,9 +544,10 @@
             ;
 
             await animReady;
-            animation.goToAndStop(0, true);
+            controlAnimation(animation,"stop",0)
+            //animation.goToAndStop(0, true);
             playStatus = "loaded";
-            currentSegment = "start";
+            //currentSegment = "start";
             animLoaded.resolve("Template - Animation is Ready");
 
         }
@@ -552,8 +597,9 @@
                 updateAnimation.addEventListener("DOMLoaded", async function () {
                     addEvents(updateAnimation);
                     await delay(100)
-                    updateAnimation.goToAndPlay("update", true);
-                    currentSegment = "update" 
+                    controlAnimation(updateAnimation,"play","update")
+                    //updateAnimation.goToAndPlay("update", true);
+                    //currentSegment = "update";
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
@@ -578,8 +624,9 @@
                         newAnimation.addEventListener("DOMLoaded", async function () {
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
-                            newAnimation.goToAndStop(updateStartFrame, true);
-                            currentSegment = "update" 
+                            controlAnimation(newAnimation,"stop",updateStartFrame)
+                            //newAnimation.goToAndStop(updateStartFrame, true);
+                            currentSegment = "update" //important for right updateFrame!
                             await delay(100)
                             animation.destroy();
                             document.getElementById("animation" + (updateCounter - 1)).remove();
@@ -606,23 +653,11 @@
                 newAnimation.addEventListener("DOMLoaded", function () {
                     if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(newAnimation);
-                    newAnimation.goToAndStop(updateStartFrame, true);
-                    //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
-                    //console.log("BREAK: " + breakFrame)
+                    controlAnimation(newAnimation,"stop",updateStartFrame)
+                    //newAnimation.goToAndStop(updateStartFrame, true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
-                    /*animation.addEventListener("enterFrame", () => {
-                        for (let marker of lottieTemplate.markers) {
-                            if (marker.cm === "name:" + currentSegment) {
-                                currentSegmentFrames = marker.tm;
-                                console.log(marker.cm)
-                            }
-                        }
-                        currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames;
-                        if (showLogs) console.log(`Current FrameU: ${currentFrame}`);
-                    });*/
-                    //breakFrame = getMarker(currentSegment).tm + getMarker(currentSegment).dr
                     newAnimation = null;
                 });
             }
@@ -636,7 +671,8 @@
         await animReady;
         await loadFonts();
         if(hasClock) updateTimeField()
-        animation.goToAndPlay("start", true);
+        controlAnimation(animation,"play","start")
+        //animation.goToAndPlay("start", true);
         playStatus = "play";
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
@@ -646,6 +682,8 @@
 
     function stop() {
         if (stopExist) {
+            controlAnimation(animation,"play","stop",false)
+        /*
             if (lottieState === "idle") {
                 animation.goToAndPlay("stop", true); //goToAndPlay(animation, stop) eventuell ersetzten?!
                 currentSegment = "stop"
@@ -654,6 +692,7 @@
                 //playStack.length=0
                 playStack.push("stop");
             }
+        */
         } else {
             if (showLogs) console.log("Template - No 'stop' marker - destroy Animation");
             animation.destroy();
@@ -663,10 +702,12 @@
 
     function next() {
         if (nextCount > nextTotal && stopExist) {
-            currentSegment = "stop";
+            //currentSegment = "stop";
             stop();
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
         } else {
+            controlAnimation(animation,"play","next" + nextCount,false)
+        /*
             if (lottieState === "idle") {
                 animation.goToAndPlay("next" + nextCount, true);
                 currentSegment = "next" + nextCount;
@@ -676,6 +717,7 @@
                 playStack.push("next" + nextCount);
                 if (markers.includes("next" + nextCount + "_loop")) playStack.push("next" + nextCount + "_loop");
             }
+        */
             nextCount++;
         }
     }
