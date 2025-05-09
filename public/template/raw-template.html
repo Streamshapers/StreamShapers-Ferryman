@@ -654,9 +654,9 @@
                     animationData: lottieTemplateNew,
                 });
 
-                newAnimation.addEventListener("DOMLoaded", function () {
+                newAnimation.addEventListener("DOMLoaded", function () {   
                     if (showInfo) console.log("Template - updated Animation Ready");
-                    addEvents(newAnimation);
+                    addEvents(newAnimation);                 
                     controlAnimation(newAnimation,"stop",updateStartFrame)
                     //newAnimation.goToAndStop(updateStartFrame, true);
                     animation.destroy();
