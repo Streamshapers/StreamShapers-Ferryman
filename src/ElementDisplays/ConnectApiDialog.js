@@ -23,7 +23,7 @@ function ConnectApiDialog() {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
                 if (field === "key" && value === "Digital Clock") {
-                    const newSecret = api.secret === "" ? "hh:mm:ss" : api.secret;
+                    const newSecret = api.secret === "" ? "24h hh:mm:ss" : api.secret;
                     return {...api, [field]: value, secret: newSecret};
                 } else if (field === "secret" && api.key === "Google Sheet") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
@@ -31,15 +31,7 @@ function ConnectApiDialog() {
                     const id = match ? match[1] : null;
                     return {...api, [field]: id};
                 } else if (field === "secret" && api.key === "Digital Clock") {
-                    let clockFormat;
-                    if (value === "hh:mm:ss") {
-                        clockFormat = value;
-                        return {...api, [field]: clockFormat};
-                    } else if (value === "hh:mm") {
-                        clockFormat = value;
-                        return {...api, [field]: clockFormat};
-                    }
-
+                    return {...api, [field]: value};
                 } else {
                     return {...api, [field]: value};
                 }
@@ -90,8 +82,10 @@ function ConnectApiDialog() {
                                     <div className="external-source-clock">
                                         <div>Format:</div>
                                         <select onChange={e => handleChange(index, 'secret', e.target.value)}>
-                                            <option>hh:mm:ss</option>
-                                            <option>hh:mm</option>
+                                            <option>24h hh:mm:ss</option>
+                                            <option>24h hh:mm</option>
+                                            <option>12h hh:mm:ss</option>
+                                            <option>12h hh:mm</option>
                                         </select>
                                     </div>
                                 )}
