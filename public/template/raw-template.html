@@ -179,42 +179,48 @@
     }
 
     async function updateGoogleTableData(data) {
-        const tableData = await parseGoogleTable();
-        let sources = {};
+        try{
+            const tableData = await parseGoogleTable();
+            let sources = {};
 
-        for (const element of tableData) {
-            //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
-            const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/export?format=tsv&gid=' + element.sheet;
-            let tsvArray;
+            for (const element of tableData) {
+                //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
+                const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/export?format=tsv&gid=' + element.sheet;
+                let tsvArray;
 
-            if (!sources[sheetURL]) {
-                tsvArray = await fetchDataFromGoogle(sheetURL);
-                sources[sheetURL] = tsvArray;
-                //console.log("Sources updated:", sources);
-            } else {
-                tsvArray = sources[sheetURL];
-                //console.log("Sheet URL already exists in sources. Using cached value:", tsvArray);
-            }
+                if (!sources[sheetURL]) {
+                    tsvArray = await fetchDataFromGoogle(sheetURL);
+                    sources[sheetURL] = tsvArray;
+                    //console.log("Sources updated:", sources);
+                } else {
+                    tsvArray = sources[sheetURL];
+                    //console.log("Sheet URL already exists in sources. Using cached value:", tsvArray);
+                }
 
-            if (tsvArray && tsvArray.length > 0) {
-                const value = getCellData(element.cell, tsvArray);
-                if (!data[element.key]){
-                    data[element.key] = value;
+                if (tsvArray && tsvArray.length > 0) {
+                    const value = getCellData(element.cell, tsvArray);
+                    if (!data[element.key]){
+                        data[element.key] = value;
+                    }
                 }
             }
+            return data;
+        } catch(error){
+            console.log(error)
+            return data
         }
-        return data;
     }
 
     // Uncomment the following lines to periodically update data
-    /*
-        const fetchInterval = 2000;
-        setTimeout(() => {
+    if (fetchInterval){    
+        setTimeout(async function() {
             setInterval(() => {
-                updateGoogleTableData()
+               // await updateGoogleTableData()
+                update(lastData)
             }, fetchInterval)
-        }, 4000);
-        */
+        }, 4000);   
+    }
+
 </script>
 <script>
     "use strict"
@@ -242,10 +248,12 @@
     let playStack = [];
     let breakFrame = undefined;
     let fetchSheet = true;
+    let lastData
     let data = {};
     //let clocks = {"clock1" : ["_line1","_line2"], "clock2" : ["_line3"],"clock3" : ["_line4"],"clock4" : ["_line5"]}
     //let clocks = {"clock2" : ["_firstLine"],"clock4" : ["_secondLine"]}
     let clocks = {};
+    const fetchInterval = 2000;
 
 
     //fix and check markers
@@ -258,12 +266,6 @@
         if (name === "stop") stopExist = true;
         if (name === "update") updateExist = true;
     })
-
-    lottieTemplate.layers.forEach((layer, index) => {
-        if(layer.nm.endsWith("_clock1") || layer.nm.endsWith("_clock2")|| layer.nm.endsWith("_clock3")|| layer.nm.endsWith("_clock4")){
-            hasClock = true;
-        }
-    });
 
     function createDeferredPromise() {
         let resolver, rejecter;
@@ -449,6 +451,7 @@
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData) {
+        if (rawData) lastData = rawData
         if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
         if (showLogs) console.log(`Update triggered: ${rawData}`);
 
