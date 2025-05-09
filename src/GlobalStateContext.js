@@ -870,6 +870,10 @@ export const GlobalStateProvider = ({children}) => {
     const deleteClock = (layerName) => {
         const updatedClocks = { ...clocks.current };
         const clockKeys = ["clock1", "clock2", "clock3", "clock4", "clock5", "clock6"];
+        const updatedTextObjects = [...textObjects];
+        const textObject = updatedTextObjects.find(t => t.layername === layerName);
+        textObject.text = textObject.original;
+        updateLottieText(updatedTextObjects.indexOf(textObject), textObject.original);
 
         clockKeys.forEach((key) => {
             if (Array.isArray(updatedClocks[key])) {
@@ -882,6 +886,7 @@ export const GlobalStateProvider = ({children}) => {
         });
 
         clocks.current = updatedClocks;
+        setTextObjects(updatedTextObjects);
         console.log("Updated clocks after deletion:", updatedClocks);
     };
 
@@ -1284,6 +1289,7 @@ export const GlobalStateProvider = ({children}) => {
             setUpdateExternalSources,
             updateLottieLayername,
             clocks,
+            deleteClock
         }}>
             {children}
         </GlobalStateContext.Provider>
