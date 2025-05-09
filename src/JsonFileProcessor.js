@@ -32,6 +32,7 @@ function JsonFileProcessor() {
         setMarkers(null);
         setGeneralAlerts([]);
         setUseExternalSources(false);
+        setExternalSources([]);
     };
 
     const processJsonFile = (file) => {
