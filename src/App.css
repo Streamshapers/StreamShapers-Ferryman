@@ -659,7 +659,8 @@ input[type="checkbox"] {
 
 #jsonElements h2,
 #jsonElements h3 {
-    color: #fff;
+    color: var(--copy)
+    /*color: #fff;*/
 }
 
 #previewWrapper {
