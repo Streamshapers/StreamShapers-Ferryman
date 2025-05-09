@@ -1,5 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {GlobalStateContext} from "../GlobalStateContext";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faRotateRight} from "@fortawesome/free-solid-svg-icons";
 
 function CasparCGTemplateDemo() {
     const {htmlTemplate, textObjects, updateGoogle, setUpdateGoogle} = useContext(GlobalStateContext);
@@ -7,57 +9,66 @@ function CasparCGTemplateDemo() {
     const [clickedPlay, setClickedPlay] = useState(false);
     const [iframeKey, setIframeKey] = useState(0);
     const previewTemplate = useRef(htmlTemplate);
-    const [templateReady, setTemplateReady] = useState(false);
 
     useEffect(() => {
 
     }, []);
 
     const triggerAction = (action) => {
-        let iframe = templateRef.current;
-        if (iframe && iframe.contentWindow) {
-            let timeout;
-            if (action === "play") {
-                timeout = setTimeout(() => {
-                    iframe = templateRef.current;
-                    iframe.contentWindow.postMessage({ action }, '*');
-                    setClickedPlay(true);
-                }, 200);
-            } else if (action === "stop") {
+        const iframe = templateRef.current;
+        if (!iframe?.contentWindow) {
+            console.error("iframe not ready");
+            return;
+        }
+        switch (action) {
+            case "play":
+                // erst Daten schicken, dann Play
+                if(!clickedPlay) sendUpdateMessage();
+                iframe.contentWindow.postMessage({action: "play"}, "*");
+                setClickedPlay(true);
+                break;
+
+            case "next":
+                if (clickedPlay)
+                    iframe.contentWindow.postMessage({action: "next"}, "*");
+                break;
+
+            case "stop":
                 setClickedPlay(false);
-                iframe.contentWindow.postMessage({ action }, '*');
-            } else if (action === "next") {
-                if (clickedPlay) {
-                    iframe.contentWindow.postMessage({ action }, '*');
-                }
-            } else {
-                iframe.contentWindow.postMessage({ action }, '*');
-            }
-            return () => clearTimeout(timeout);
-        } else {
-            console.error('iframe not ready or contentWindow not accessible');
+                iframe.contentWindow.postMessage({action: "stop"}, "*");
+                break;
+
+            case "refresh":
+                previewTemplate.current = htmlTemplate;
+                setClickedPlay(false);
+                setIframeKey(k => k + 1);
+                console.log("refresh")
+                break;
+
+            default:
+                iframe.contentWindow.postMessage({action}, "*");
         }
     };
 
+
     const updateAction = async () => {
         if (!updateGoogle) setUpdateGoogle(true);
-
-        const iframe = templateRef.current;
-        let data = {};
-        for (const object of textObjects) {
-            data[object.layername] = object.text;
-        }
-
-        if (iframe && iframe.contentWindow) {
-            //console.log('Sending update message with data:', JSON.stringify(data));
-            iframe.contentWindow.postMessage({
-                action: "update",
-                data: JSON.stringify(data)
-            }, '*');
-        } else {
-            console.error('iframe not ready or contentWindow not accessible');
-        }
+        sendUpdateMessage();
     }
+
+    const sendUpdateMessage = () => {
+        const iframe = templateRef.current;
+        if (!iframe?.contentWindow) return;
+
+        const data = Object.fromEntries(
+            textObjects.map((o) => [o.layername, o.text])
+        );
+
+        iframe.contentWindow.postMessage(
+            {action: "update", data: JSON.stringify(data)},
+            "*"
+        );
+    };
 
     return (
         <div className="caspar-player">
@@ -66,9 +77,6 @@ function CasparCGTemplateDemo() {
                 ref={templateRef}
                 srcDoc={previewTemplate.current}
                 title="CasparCG Template Preview"
-                onLoad={() => {
-                    setTemplateReady(true);
-                }}
             ></iframe>
 
             <div id="previewControlContainer" className="just-buttons">
@@ -86,6 +94,10 @@ function CasparCGTemplateDemo() {
                     </div>
                     <div className="previewControlButton demo" title="Stop" onClick={() => triggerAction('stop')}>
                         Stop
+                    </div>
+                    <div className="previewControlButton demo" title="refresh sources"
+                         onClick={() => triggerAction('refresh')}>
+                        <FontAwesomeIcon icon={faRotateRight}/>
                     </div>
                 </div>
             </div>
