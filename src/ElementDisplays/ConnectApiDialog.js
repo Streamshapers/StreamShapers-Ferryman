@@ -84,6 +84,8 @@ function ConnectApiDialog() {
                                         <select onChange={e => handleChange(index, 'secret', e.target.value)}>
                                             <option>24h hh:mm:ss</option>
                                             <option>24h hh:mm</option>
+                                            <option>12h hh:mm:ss am/pm</option>
+                                            <option>12h hh:mm am/pm</option>
                                             <option>12h hh:mm:ss</option>
                                             <option>12h hh:mm</option>
                                         </select>

@@ -816,8 +816,10 @@ export const GlobalStateProvider = ({children}) => {
         const typeToKey = {
             "24h hh:mm": "clock1",
             "24h hh:mm:ss": "clock2",
-            "12h hh:mm": "clock3",
-            "12h hh:mm:ss": "clock4",
+            "12h hh:mm am/pm": "clock3",
+            "12h hh:mm:ss am/pm": "clock4",
+            "12h hh:mm": "clock5",
+            "12h hh:mm:ss": "clock6",
         };
 
         const clockKey = typeToKey[type];
@@ -841,7 +843,7 @@ export const GlobalStateProvider = ({children}) => {
 
     const deleteClock = (layerName) => {
         const updatedClocks = { ...clocks.current };
-        const clockKeys = ["clock1", "clock2", "clock3", "clock4"];
+        const clockKeys = ["clock1", "clock2", "clock3", "clock4", "clock5", "clock6"];
 
         clockKeys.forEach((key) => {
             if (Array.isArray(updatedClocks[key])) {
