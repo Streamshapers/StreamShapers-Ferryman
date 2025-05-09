@@ -13,6 +13,7 @@ function SaveDialog({ onClose }) {
     } = useContext(GlobalStateContext);
 
     const [message, setMessage] = useState(null);
+    const [serverError, setServerError] = useState('');
     const [categories, setCategories] = useState([]);
     const [newCategory, setNewCategory] = useState('');
     const [tagInput, setTagInput] = useState("");
@@ -39,12 +40,40 @@ function SaveDialog({ onClose }) {
         }, duration);
     };
 
-    const handleSaveTemplate = () => {
+    const handleSaveTemplate = async () => {
         const category = newCategory || templateCategory;
-        saveTemplate(templateName, category, templateDescription, templateTags);
-        showAlert('Template saved successfully.');
-        onClose();
+
+        try {
+            const saveMsg = await saveTemplate(templateName, category, templateDescription, templateTags);
+            console.log('saveMsg:', saveMsg);
+
+            if (saveMsg.status === 200 || saveMsg.status === 201) {
+                showAlert('Template saved successfully.');
+            } else {
+                setServerError('Unexpected server response.');
+            }
+
+        } catch (error) {
+            if (error.response) {
+                const msg = error.response.data?.error;
+                if (error.response.status === 403) {
+                    if (msg === 'Template upload limit reached.') {
+                        setServerError('You have reached the template upload limit.');
+                    } else {
+                        setServerError(msg || 'Access denied.');
+                    }
+                } else if (error.response.status === 404) {
+                    setServerError('Endpoint not found. Please contact support.');
+                } else {
+                    setServerError(`Unexpected error: ${error.response.status}`);
+                }
+            } else {
+                setServerError('No server response. Check your connection.');
+            }
+        }
+        //onClose();
     };
+
 
     const handleTagKeyDown = (e) => {
         if (e.key === "," || e.key === "Enter") {
@@ -69,7 +98,10 @@ function SaveDialog({ onClose }) {
                     <div className="success alert-success">{message}</div>
                 </div>
             )}
-            <p>{remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left. <a href="#">Upgrade Plan</a></p>
+            {serverError && <p style={{color: 'red', marginBottom: '1rem'}}>{serverError}</p>}
+            <p>{remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.
+                {/*<a href="#">Upgrade Plan</a>*/}
+            </p>
 
             <div id="save-in-account">
                 <div className="row">
@@ -125,7 +157,7 @@ function SaveDialog({ onClose }) {
                 </div>
             </div>
             <div className="popupButtonArea">
-                <button id="downloadBtn" onClick={handleSaveTemplate}>Save</button>
+                <button id='downloadBtn' onClick={handleSaveTemplate}>Save</button>
             </div>
         </>
 

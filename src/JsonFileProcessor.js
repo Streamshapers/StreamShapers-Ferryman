@@ -2,6 +2,7 @@ import React, {useContext, useEffect} from 'react';
 import {GlobalStateContext} from "./Context/GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFileArrowUp} from "@fortawesome/free-solid-svg-icons";
+import {Link} from "react-router-dom";
 
 function JsonFileProcessor() {
     const {
@@ -19,7 +20,12 @@ function JsonFileProcessor() {
         importFerrymanJSON,
         setUseExternalSources,
         setExternalSources,
-        setGeneralAlerts
+        setGeneralAlerts,
+        setSPXGCTemplateDefinition,
+        setTemplateData,
+        setGoogleTableCells,
+        setUpdateExternalSources,
+        setUpdateGoogle
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -32,7 +38,12 @@ function JsonFileProcessor() {
         setMarkers(null);
         setGeneralAlerts([]);
         setUseExternalSources(false);
-        setExternalSources([]);
+        setExternalSources([{key: 'Google Sheet', secret: '', index: 1, errors: ''}]);
+        setSPXGCTemplateDefinition({});
+        setTemplateData(null);
+        setGoogleTableCells(null);
+        setUpdateExternalSources(0);
+        setUpdateGoogle(false);
     };
 
     const processJsonFile = (file) => {
@@ -73,10 +84,10 @@ function JsonFileProcessor() {
             if (jsonData.markers && jsonData.markers.length > 0) {
                 setMarkers(jsonData.markers);
             }
-            if(importFerrymanJSON) {
-                if(importFerrymanJSON.textObjects) setTextObjects(importFerrymanJSON.textObjects);
-                if(importFerrymanJSON.useExternalSources) setUseExternalSources(importFerrymanJSON.useExternalSources);
-                if(importFerrymanJSON.externalSources) setExternalSources(importFerrymanJSON.externalSources);
+            if (importFerrymanJSON) {
+                if (importFerrymanJSON.textObjects) setTextObjects(importFerrymanJSON.textObjects);
+                if (importFerrymanJSON.useExternalSources) setUseExternalSources(importFerrymanJSON.useExternalSources);
+                if (importFerrymanJSON.externalSources) setExternalSources(importFerrymanJSON.externalSources);
             }
         } catch (error) {
             setError(`Error reading the JSON file. Please make sure it is a valid JSON file. Error: ${error.message}`);
@@ -93,10 +104,12 @@ function JsonFileProcessor() {
         <>
             {/*<input type="file" id="jsonFile" accept=".json" onChange={(e) => processJsonFile(e.target.files[0])}/>
             {error && <div className="error-message">{error}</div>}*/}
-            <div id="loadArea" className="headerButton headerButton1" onClick={resetJsonFile}>
-                <span>New </span>
-                <FontAwesomeIcon icon={faFileArrowUp} title="New File"/>
-            </div>
+            <Link to="/">
+                <div id="loadArea" className="headerButton headerButton1" onClick={resetJsonFile}>
+                    <span>New </span>
+                    <FontAwesomeIcon icon={faFileArrowUp} title="New File"/>
+                </div>
+            </Link>
         </>
     );
 }

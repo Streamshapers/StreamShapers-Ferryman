@@ -764,7 +764,7 @@ export const GlobalStateProvider = ({children}) => {
             dataformat: "json",
             uicolor: `${uiColor}`,
             steps: `${steps}`,
-            DataFields: SPXGCTemplateDefinition.DataFields ? [...SPXGCTemplateDefinition.DataFields] : []
+            DataFields: []
         };
         let spxExportJson = {...rawSpxJson};
 
@@ -1400,7 +1400,7 @@ export const GlobalStateProvider = ({children}) => {
         return streamshapersJson;
     }
 
-    const saveTemplate = (name, category, description, tags) => {
+    const saveTemplate = async (name, category, description, tags) => {
         const templateJson = generateStreamshapersJson();
         let templateName;
         let templateCategory;
@@ -1419,53 +1419,39 @@ export const GlobalStateProvider = ({children}) => {
         if (description && description !== '') templateDescription = description;
         if (tags && tags !== '') templateTags = tags;
 
-        if (templateName && templateJson) {
-            const saveTemplate = {
-                name: templateName,
-                category: templateCategory ? templateCategory : '',
-                description: templateDescription ? templateDescription : '',
-                data: templateJson,
-                tags: templateTags ? templateTags : []
-            }
-
-            if (templateData) {
-                api.put(`/templates/${templateData._id}`, saveTemplate, {withCredentials: true}).then(r => {
-                    console.log('saved template', saveTemplate);
-                    if (!user.categories.includes(templateCategory)) {
-                        api.post('/user/add-category', {
-                            category: templateCategory
-                        }, {withCredentials: true})
-                            .then(() => {
-                                console.log('New category added to user successfully');
-                            })
-                            .catch(error => {
-                                console.error('Error adding new category to user:', error);
-                            });
-                    }
-                })
-            } else {
-                api.post('/templates', saveTemplate, {
-                    withCredentials: true
-                })
-                    .then(response => {
-                        if (!user.categories.includes(templateCategory)) {
-                            api.post('/user/add-category', {
-                                category: templateCategory
-                            }, {withCredentials: true})
-                                .then(() => {
-                                    console.log('New category added to user successfully');
-                                })
-                                .catch(error => {
-                                    console.error('Error adding new category to user:', error);
-                                });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error saving template:', error);
-                    });
-            }
+        if (!templateName || !templateJson) {
+            throw new Error("Missing template name or data.");
         }
-    }
+
+        const payload = {
+            name: templateName,
+            category: templateCategory || '',
+            description: templateDescription || '',
+            data: templateJson,
+            tags: templateTags || []
+        };
+
+        let response;
+
+        if (templateData) {
+            response = await api.put(`/templates/${templateData._id}`, payload, { withCredentials: true });
+        } else {
+            response = await api.post('/templates', payload, { withCredentials: true });
+        }
+
+        if (!user.categories.includes(templateCategory)) {
+            api.post('/user/add-category', {
+                category: templateCategory
+            }, { withCredentials: true }).then(() => {
+                console.log('New category added to user successfully');
+            }).catch(err => {
+                console.warn('Category not added:', err);
+            });
+        }
+
+        return response;
+    };
+
 
     const getTemplateLimit = () => {
         if (user) {

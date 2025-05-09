@@ -203,7 +203,7 @@ function SpxExport() {
                                                     <option value="dropdown">Dropdown</option>
                                                     <option value="textarea">Textarea</option>
                                                     <option value="checkbox">Checkbox</option>
-                                                    <option value="color">Color</option>
+                                                    {/*<option value="color">Color</option>*/}
                                                 </select>
                                             </label>
                                         )}

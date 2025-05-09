@@ -211,8 +211,7 @@ hr {
 
 #samples {
     display: flex;
-
-
+    flex-wrap: wrap;
     justify-content: space-around;
     width: 100%;
     padding: 40px 0 0 0;
@@ -1102,12 +1101,28 @@ input[type="checkbox"] {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
+#downloadBtnDisabled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: var(--foreground);
+    color: var(--border);
+    font-size: 16px;
+    border: 1px solid var(--border);
+    cursor: auto;
+    border-radius: 5px;
+    text-align: center;
+    min-height: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
 #downloadArea {
     margin-right: 10px;
 }
 
 #downloadBtn:hover {
-    background-color: var(--secondary);
+    border-color: var(--secondary);
     color: var(--secondary-content);
 }
 
@@ -1814,6 +1829,7 @@ label span.bla {
 
 .template-card-header {
     display: flex;
+    gap: 10px;
     align-items: center;
     justify-content: space-between;
     font-size: 26px;
@@ -1836,6 +1852,7 @@ label span.bla {
 .template-card h3 {
     margin-top: 0;
     font-size: 18px;
+    overflow: hidden;
 }
 
 .template-card p {

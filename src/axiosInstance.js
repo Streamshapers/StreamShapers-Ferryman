@@ -12,7 +12,7 @@ api.interceptors.response.use(
             error.config._retry = true;
 
             try {
-                const refreshResponse = await axios.post('/auth/refresh', {}, {
+                const refreshResponse = await api.post('/auth/refresh', {}, {
                     withCredentials: true,
                 });
 

@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 
 function LoginDialog({ onClose }) {
     const {user, login} = useContext(AuthContext);
+    const [serverError, setServerError] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loginData, setLoginData] = useState({
         loginMail: '',
@@ -137,7 +138,12 @@ function LoginDialog({ onClose }) {
 
             await onLoginSubmit(e);
         } catch (error) {
-            console.error('Registration Error:', error.response?.data || error.message);
+            console.error('Registration Error:', error);
+            if (error.response?.status === 409) {
+                setServerError('This email is already registered.');
+            } else {
+                setServerError('An error occurred during registration.');
+            }
         }
     }
 
@@ -191,6 +197,7 @@ function LoginDialog({ onClose }) {
                         )}
                         {activeTab === 'register' && (
                             <form className="auth-form" onSubmit={onRegisterSubmit} autoComplete="off">
+                                {serverError && <p style={{color: 'red', marginBottom: '1rem'}}>{serverError}</p>}
                                 <div className="auth-input">
                                     <input
                                         className={`input ${errors.registerUsername ? 'invalid' : ''}`}
