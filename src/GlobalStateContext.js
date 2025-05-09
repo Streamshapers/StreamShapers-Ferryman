@@ -79,6 +79,8 @@ export const GlobalStateProvider = ({children}) => {
         if (markers) {
             const startExists = markers.some(event => event.cm === 'start');
             const stopExists = markers.some(event => event.cm === 'stop');
+       
+
             if (!startExists) {
                 addGeneralAlert(
                     "error",
@@ -122,6 +124,28 @@ export const GlobalStateProvider = ({children}) => {
                 removeGeneralAlert("Marker without duration");
             }
         }
+
+        //Check for duplicate markers
+        let nameList = []
+        let duplicates =[]
+        if(markers){
+            markers.forEach((marker)=>{
+                nameList.push(marker.cm)
+            })
+            duplicates = nameList.filter((item, index) => nameList.indexOf(item) !== index)
+            if (duplicates.length!== 0) {
+                addGeneralAlert(
+                    "error",
+                    "Duplicat Marker Names",
+                    'Your animation has at least two markers with the same marker name. Make shure every marker has a unique name.',
+                    "Here is the documentation",
+                    "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
+                );
+            } else {
+                removeGeneralAlert("Duplicat Marker Names")
+            }
+        }
+
     }, [markers]);
 
     useEffect(() => {
@@ -137,6 +161,8 @@ export const GlobalStateProvider = ({children}) => {
             removeGeneralAlert("Markers missing")
         }
     }, [jsonData]);
+
+
 
     useEffect(() => {
         let allUploaded = true;
