@@ -141,7 +141,7 @@ function AnalyzePlayer() {
                 const rendererElements = lottieInstanceRef.current?.renderer?.elements;
                 if (!rendererElements) return;
 
-                Object.entries(clocks).forEach(([clockKey, layerNames]) => {
+                Object.entries(clocks.current).forEach(([clockKey, layerNames]) => {
                     const time = getTime(clockKey);
 
                     layerNames.forEach((layerName) => {

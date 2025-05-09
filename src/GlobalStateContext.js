@@ -37,8 +37,7 @@ export const GlobalStateProvider = ({children}) => {
     const [mimeType, setMimeType] = useState("text/html");
     const [htmlTemplate, setHtmlTemplate] = useState(null);
     const [generalAlerts, setGeneralAlerts] = useState([]);
-    const [clocks, setClocks] = useState({});
-
+    const clocks = useRef({});
     const googleCellSnapshot = useRef([]);
 
     useEffect(() => {
@@ -748,6 +747,7 @@ export const GlobalStateProvider = ({children}) => {
 
     useEffect(() => {
         const updatedGoogleTableCells = [];
+        console.log("TextObjects: ", textObjects);
         textObjects.map(textObject => {
             if (textObject.type === 'Google Sheet' && externalSources.length > 0) {
                 const index = textObject.source;
@@ -764,7 +764,8 @@ export const GlobalStateProvider = ({children}) => {
             if (textObject.type === 'Digital Clock'){
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
-                addClock(source.type, textObject.layername);
+                console.log("NEW CLOCK: ", source.secret, textObject.layername);
+                addClock(source.secret, textObject.layername);
             }
         })
         //console.log(updatedGoogleTableCells);
@@ -779,6 +780,8 @@ export const GlobalStateProvider = ({children}) => {
         } else {
             //console.log("Keine Änderung in den Zellen");
         }
+
+        console.log("CLOCKS:", clocks.current);
 
     }, [textObjects, externalSources]);
 
@@ -820,17 +823,24 @@ export const GlobalStateProvider = ({children}) => {
         const clockKey = typeToKey[type];
         if (!clockKey) return;
 
-        const updatedClocks = { ...clocks };
-        const existing = updatedClocks[clockKey] || [];
+        const updatedClocks = { ...clocks.current };
 
-        if (!existing.includes(layerName)) {
-            updatedClocks[clockKey] = [...existing, layerName];
-            setClocks(updatedClocks);
-        }
+        Object.keys(updatedClocks).forEach((key) => {
+            updatedClocks[key] = updatedClocks[key].filter(name => name !== layerName);
+            if (updatedClocks[key].length === 0) {
+                delete updatedClocks[key];
+            }
+        });
+
+        updatedClocks[clockKey] = [...(updatedClocks[clockKey] || []), layerName];
+
+        clocks.current = updatedClocks;
+        console.log("Updated clocks after addition:", updatedClocks);
+        console.log("Sources:", externalSources);
     };
 
     const deleteClock = (layerName) => {
-        const updatedClocks = { ...clocks };
+        const updatedClocks = { ...clocks.current };
         const clockKeys = ["clock1", "clock2", "clock3", "clock4"];
 
         clockKeys.forEach((key) => {
@@ -843,7 +853,7 @@ export const GlobalStateProvider = ({children}) => {
             }
         });
 
-        setClocks(updatedClocks);
+        clocks.current = updatedClocks;
         console.log("Updated clocks after deletion:", updatedClocks);
     };
 
@@ -1093,6 +1103,8 @@ export const GlobalStateProvider = ({children}) => {
             });
         }
 
+        let clockString = JSON.stringify(clocks.current);
+
         switch (exportFormat) {
             case 'html':
                 setMimeType('text/html');
@@ -1137,7 +1149,8 @@ export const GlobalStateProvider = ({children}) => {
                         .replace('${spx}', spxTag)
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${googleTableData}', JSON.stringify(googleTableCells))
-                        .replace('</head>', playerCode);
+                        .replace('</head>', playerCode)
+                        .replace('${clocks}', clockString);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);
@@ -1243,7 +1256,6 @@ export const GlobalStateProvider = ({children}) => {
             setUpdateExternalSources,
             updateLottieLayername,
             clocks,
-            setClocks
         }}>
             {children}
         </GlobalStateContext.Provider>

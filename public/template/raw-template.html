@@ -35,7 +35,7 @@
 
     <script>
 
-        
+
         let clockIntervalIds = [];
 
         function getTime(type, addSeconds = 0) {
@@ -45,7 +45,7 @@
                 clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
                 clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true}
             }
-            
+
             let now = new Date();
             now.setSeconds(now.getSeconds() + addSeconds);
 
@@ -245,7 +245,7 @@
     let data = {};
     //let clocks = {"clock1" : ["_line1","_line2"], "clock2" : ["_line3"],"clock3" : ["_line4"],"clock4" : ["_line5"]}
     //let clocks = {"clock2" : ["_firstLine"],"clock4" : ["_secondLine"]}
-    let clocks = {};
+    let clocks = ${clocks};
 
 
     //fix and check markers
@@ -258,12 +258,6 @@
         if (name === "stop") stopExist = true;
         if (name === "update") updateExist = true;
     })
-
-    lottieTemplate.layers.forEach((layer, index) => {
-        if(layer.nm.endsWith("_clock1") || layer.nm.endsWith("_clock2")|| layer.nm.endsWith("_clock3")|| layer.nm.endsWith("_clock4")){
-            hasClock = true;
-        }
-    });
 
     function createDeferredPromise() {
         let resolver, rejecter;
@@ -367,7 +361,7 @@
             }
         },0);
     }
-    
+
 
 
     function controlAnimation(animation, action, value, force=true){
@@ -379,18 +373,18 @@
             if(action === "play"){
                 animation.goToAndPlay(value, true)
             } else if(action === "stop"){
-                animation.goToAndStop(value,true)   
+                animation.goToAndStop(value,true)
             }
             if(typeof value == "string"){
                 currentSegment = value
                 console.log(`CurrentSegment: ${currentSegment}`)
-            } else if(typeof value == "number"){    
+            } else if(typeof value == "number"){
                 lottieTemplate.markers.forEach((marker)=>{
                     if(value >= marker.tm && value <marker.tm+marker.dr){
                         currentSegment = marker.cm
                         console.log(`CurrentSegment: ${currentSegment}`)
                     }
-                }) 
+                })
             }
         } else if (typeof value == "string"){
             if (lottieState === "idle") {
@@ -720,7 +714,7 @@
     // Invoke functions:
 
 
-    
+
 
 
     function info() {
