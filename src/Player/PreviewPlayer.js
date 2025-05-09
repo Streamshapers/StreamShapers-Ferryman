@@ -6,6 +6,8 @@ function CasparCGTemplateDemo() {
     const templateRef = useRef(null);
     const [clickedPlay, setClickedPlay] = useState(false);
     const [iframeKey, setIframeKey] = useState(0);
+    const previewTemplate = useRef(htmlTemplate);
+    const [templateReady, setTemplateReady] = useState(false);
 
     useEffect(() => {
 
@@ -14,36 +16,31 @@ function CasparCGTemplateDemo() {
     const triggerAction = (action) => {
         let iframe = templateRef.current;
         if (iframe && iframe.contentWindow) {
-            //console.log(`Sending action: ${action}`);
             let timeout;
             if (action === "play") {
-                setIframeKey(prevKey => prevKey + 1);
                 timeout = setTimeout(() => {
                     iframe = templateRef.current;
-                    iframe.contentWindow.postMessage({"action": action}, '*');
+                    iframe.contentWindow.postMessage({ action }, '*');
                     setClickedPlay(true);
-                    updateAction().then()
                 }, 200);
             } else if (action === "stop") {
                 setClickedPlay(false);
-                iframe.contentWindow.postMessage({"action": action}, '*');
+                iframe.contentWindow.postMessage({ action }, '*');
             } else if (action === "next") {
                 if (clickedPlay) {
-                    iframe.contentWindow.postMessage({"action": action}, '*');
+                    iframe.contentWindow.postMessage({ action }, '*');
                 }
             } else {
-                iframe.contentWindow.postMessage({"action": action}, '*');
+                iframe.contentWindow.postMessage({ action }, '*');
             }
             return () => clearTimeout(timeout);
         } else {
             console.error('iframe not ready or contentWindow not accessible');
         }
-    }
+    };
 
     const updateAction = async () => {
-        if (!updateGoogle) {
-            setUpdateGoogle(true);
-        }
+        if (!updateGoogle) setUpdateGoogle(true);
 
         const iframe = templateRef.current;
         let data = {};
@@ -67,8 +64,11 @@ function CasparCGTemplateDemo() {
             <iframe
                 key={iframeKey}
                 ref={templateRef}
-                srcDoc={htmlTemplate}
+                srcDoc={previewTemplate.current}
                 title="CasparCG Template Preview"
+                onLoad={() => {
+                    setTemplateReady(true);
+                }}
             ></iframe>
 
             <div id="previewControlContainer" className="just-buttons">
