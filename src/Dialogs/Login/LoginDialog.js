@@ -181,6 +181,12 @@ function LoginDialog({ onClose }) {
                                     </Link>
                                 </p>
                                 <button className="auth-button" type="submit">Login</button>
+                                <p style={{ marginTop: '1rem' }}>
+                                    Don't have an account?{' '}
+                                    <a href="#" onClick={() => handleTabChange('register')}>
+                                        Sign up now
+                                    </a>
+                                </p>
                             </form>
                         )}
                         {activeTab === 'register' && (
@@ -272,6 +278,12 @@ function LoginDialog({ onClose }) {
                                 )}
 
                                 <button className="auth-button" type="submit">Register</button>
+                                <p style={{ marginTop: '1rem' }}>
+                                    Already have an account?{' '}
+                                    <a href="#" onClick={() => handleTabChange('login')}>
+                                        Log in now
+                                    </a>
+                                </p>
                             </form>
                         )}
                         {/*<div className="popupButtonArea">

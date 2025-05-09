@@ -61,11 +61,11 @@ function StartScreen() {
                 <div id="sampleWrapper">
                     <h2>Or check out one of our Samples</h2>
                     <div id="samples">
-                        <div className="sample" onClick={() => handleSampleFile("BarChart_Ver09.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("BarChart_Ver11.json")}>
                             <FontAwesomeIcon className="icon" icon={faChartSimple}/>
                             <h4>BarChart</h4>
                         </div>
-                        <div className="sample" onClick={() => handleSampleFile("PieChart_Ver09.json")}>
+                        <div className="sample" onClick={() => handleSampleFile("PieChart_Ver10.json")}>
                             <FontAwesomeIcon className="icon" icon={faChartPie}/>
                             <h4>PieChart</h4>
                         </div>
