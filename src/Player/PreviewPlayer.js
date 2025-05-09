@@ -1,5 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {GlobalStateContext} from "../Context/GlobalStateContext";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faRotateRight} from "@fortawesome/free-solid-svg-icons";
 
 function CasparCGTemplateDemo() {
     const {htmlTemplate, textObjects, updateGoogle, setUpdateGoogle} = useContext(GlobalStateContext);
