@@ -79,8 +79,6 @@ function TextsDisplay() {
         }
 
         setShowOptionMenuIndex(null);
-        console.log("texts: ", textObjects);
-        console.log("external: ", externalSources);
     };
 
     useEffect(() => {
@@ -99,9 +97,12 @@ function TextsDisplay() {
             if (type === "Digital Clock") {
                 updateLottieText(textObjects.findIndex(t => t === object), source.secret);
             }
+            if (type === "Google Sheet") {
+                deleteClock(updatedTextObjects[objectIndex].layername);
+            }
             setTextObjects(updatedTextObjects);
         }
-        console.log("Texts CHANGED:", textObjects);
+        //console.log("Texts CHANGED:", textObjects);
     }
 
     const handleGoogleCoordinates = (object, value) => {

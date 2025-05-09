@@ -64,7 +64,7 @@ export const GlobalStateProvider = ({children}) => {
                     withCredentials: true,
                 });
 
-                const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+                const blob = new Blob([JSON.stringify(res.data)], {type: 'application/json'});
 
                 await loadNewFile(blob);
             } catch (error) {
@@ -79,7 +79,7 @@ export const GlobalStateProvider = ({children}) => {
                 console.log('Loaded template:', templateId);
             });
         }
-        }, []);
+    }, []);
 
     async function parseBlobAsJson(blob) {
         try {
@@ -162,7 +162,7 @@ export const GlobalStateProvider = ({children}) => {
             };
             setFileName(file.name.replace(/\.html$/, ''));
             reader.readAsText(file);
-        } else if (fileExtension === "lottie"){
+        } else if (fileExtension === "lottie") {
             try {
                 const zip = await JSZip.loadAsync(file);
                 const jsonFiles = Object.keys(zip.files).filter(path =>
@@ -181,7 +181,7 @@ export const GlobalStateProvider = ({children}) => {
                 const blob = new Blob([JSON.stringify(animationJson, null, 2)], {
                     type: 'application/json',
                 });
-                const lottieFile = new File([blob], file.name.replace(/\.lottie$/, '') + ".json", { type: "application/json" });
+                const lottieFile = new File([blob], file.name.replace(/\.lottie$/, '') + ".json", {type: "application/json"});
 
                 setJsonFile(lottieFile);
                 setFileName(file.name.replace(/\.lottie$/, ''));
@@ -263,33 +263,32 @@ export const GlobalStateProvider = ({children}) => {
             } else {
                 removeGeneralAlert("Marker without duration");
             }
-        }
 
-        //Check for duplicate markers
-        let nameList = []
-        let duplicates =[]
-        if(markers){
-            markers.forEach((marker)=>{
-                nameList.push(marker.cm)
-            })
-            duplicates = nameList.filter((item, index) => nameList.indexOf(item) !== index)
-            if (duplicates.length!== 0) {
-                addGeneralAlert(
-                    "error",
-                    "Duplicat Marker Names",
-                    'Your animation has at least two markers with the same marker name. Make shure every marker has a unique name.',
-                    "Here is the documentation",
-                    "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
-                );
-            } else {
-                removeGeneralAlert("Duplicat Marker Names")
+            //Check for duplicate markers
+            let nameList = []
+            let duplicates = []
+            if (markers) {
+                markers.forEach((marker) => {
+                    nameList.push(marker.cm)
+                })
+                duplicates = nameList.filter((item, index) => nameList.indexOf(item) !== index)
+                if (duplicates.length !== 0) {
+                    addGeneralAlert(
+                        "error",
+                        "Duplicat Marker Names",
+                        'Your animation has at least two markers with the same marker name. Make shure every marker has a unique name.',
+                        "Here is the documentation",
+                        "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
+                    );
+                } else {
+                    removeGeneralAlert("Duplicat Marker Names")
+                }
             }
         }
-
     }, [markers]);
 
     useEffect(() => {
-        if (!markers) {
+        if (!markers && jsonData) {
             addGeneralAlert(
                 "error",
                 "Markers missing",
@@ -931,6 +930,10 @@ export const GlobalStateProvider = ({children}) => {
         const updatedGoogleTableCells = [];
         textObjects.map(textObject => {
             if (textObject.type === 'Google Sheet' && externalSources.length > 0) {
+                if (Object.values(clocks.current).some(layerList => layerList.includes(textObject.layername))) {
+                    deleteClock(textObject.layername);
+                }
+
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
                 //textObject.text = textObject.oiginal;
@@ -942,10 +945,9 @@ export const GlobalStateProvider = ({children}) => {
                     //value: textObject.text
                 })
             }
-            if (textObject.type === 'Digital Clock'){
+            if (textObject.type === 'Digital Clock') {
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
-                console.log("NEW CLOCK: ", source.secret, textObject.layername);
                 addClock(source.secret, textObject.layername);
             }
         })
@@ -961,7 +963,6 @@ export const GlobalStateProvider = ({children}) => {
         } else {
             //console.log("Keine Änderung in den Zellen");
         }
-
     }, [textObjects, externalSources]);
 
     function arraysAreEqual(arr1, arr2) {
@@ -1004,7 +1005,7 @@ export const GlobalStateProvider = ({children}) => {
         const clockKey = typeToKey[type];
         if (!clockKey) return;
 
-        const updatedClocks = { ...clocks.current };
+        const updatedClocks = {...clocks.current};
 
         Object.keys(updatedClocks).forEach((key) => {
             updatedClocks[key] = updatedClocks[key].filter(name => name !== layerName);
@@ -1016,12 +1017,10 @@ export const GlobalStateProvider = ({children}) => {
         updatedClocks[clockKey] = [...(updatedClocks[clockKey] || []), layerName];
 
         clocks.current = updatedClocks;
-        console.log("Updated clocks after addition:", updatedClocks);
-        console.log("Sources:", externalSources);
-    };
+    }
 
     const deleteClock = (layerName) => {
-        const updatedClocks = { ...clocks.current };
+        const updatedClocks = {...clocks.current};
         const clockKeys = ["clock1", "clock2", "clock3", "clock4", "clock5", "clock6"];
         const updatedTextObjects = [...textObjects];
         const textObject = updatedTextObjects.find(t => t.layername === layerName);
@@ -1040,7 +1039,6 @@ export const GlobalStateProvider = ({children}) => {
 
         clocks.current = updatedClocks;
         setTextObjects(updatedTextObjects);
-        console.log("Updated clocks after deletion:", updatedClocks);
     };
 
 
@@ -1445,7 +1443,7 @@ export const GlobalStateProvider = ({children}) => {
                             });
                     }
                 })
-            } else{
+            } else {
                 api.post('/templates', saveTemplate, {
                     withCredentials: true
                 })

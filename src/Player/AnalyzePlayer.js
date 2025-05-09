@@ -85,8 +85,11 @@ function AnalyzePlayer() {
         //console.log("texts: ", textObjects);
 
         const timeoutId = setTimeout(() => {
-            instance.goToAndStop(currentFrame, true);
-            if (isPlaying) instance.play();
+            if (isPlaying) {
+                instance.play();
+            } else {
+                instance.goToAndStop(currentFrame, true);
+            }
 
 
             onEnterFrame = (e) => {
@@ -117,12 +120,12 @@ function AnalyzePlayer() {
 
     function getTime(type, addSeconds = 0) {
         const formats = {
-            clock1: { hour: "2-digit", minute: "2-digit", hour12: false },
-            clock2: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false },
-            clock3: { hour: "2-digit", minute: "2-digit", hour12: true },
-            clock4: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
-            clock5: { hour: "2-digit", minute: "2-digit", hour12: true },
-            clock6: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
+            clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
+            clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
+            clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
+            clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
+            clock5: {hour: "2-digit", minute: "2-digit", hour12: true},
+            clock6: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
         };
 
         let now = new Date();
@@ -158,7 +161,7 @@ function AnalyzePlayer() {
                             (el) => el?.data?.nm === layerName && typeof el.updateDocumentData === "function"
                         );
                         if (target) {
-                            target.updateDocumentData({ t: time });
+                            target.updateDocumentData({t: time});
                         } else {
                             // Optional: Warnung bei fehlendem Layer
                             // console.warn(`Layer ${layerName} not found in ${clockKey}`);
@@ -187,7 +190,6 @@ function AnalyzePlayer() {
             console.log("Error updating Clock:", e);
         }
     }
-
 
 
     useEffect(() => {
@@ -325,7 +327,8 @@ function AnalyzePlayer() {
                         <FontAwesomeIcon icon={faForwardStep}/>
                     </div>
                     {jsonData.markers && jsonData.markers.length > 0 &&
-                        <div className="previewControlButton" title="Play current Marker and stop" onClick={playCurrenMarker}>
+                        <div className="previewControlButton" title="Play current Marker and stop"
+                             onClick={playCurrenMarker}>
                             <FontAwesomeIcon icon={faForwardFast}/>
                         </div>
                     }
