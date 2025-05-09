@@ -116,18 +116,27 @@ function AnalyzePlayer() {
     };
 
     function getTime(type, addSeconds = 0) {
-        let formats = {
-            clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
-            clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
-            clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
-            clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true}
-        }
+        const formats = {
+            clock1: { hour: "2-digit", minute: "2-digit", hour12: false },
+            clock2: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false },
+            clock3: { hour: "2-digit", minute: "2-digit", hour12: true },
+            clock4: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
+            clock5: { hour: "2-digit", minute: "2-digit", hour12: true },
+            clock6: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
+        };
 
         let now = new Date();
         now.setSeconds(now.getSeconds() + addSeconds);
 
-        return new Intl.DateTimeFormat("en-GB", formats[type]).format(now)
+        let formatted = new Intl.DateTimeFormat("en-GB", formats[type]).format(now);
+
+        if (type === "clock5" || type === "clock6") {
+            formatted = formatted.replace(/\s?(AM|PM)$/i, '');
+        }
+
+        return formatted;
     }
+
 
     function updateTimeFields() {
         try {
