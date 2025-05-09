@@ -27,8 +27,8 @@ function ConnectApiDialog() {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
                 if (field === "key" && value === "Digital Clock") {
-                    const newSecret = api.secret === "" ? "cc:cc:cc" : api.secret;
-                    return { ...api, [field]: value, secret: newSecret };
+                    const newSecret = api.secret === "" ? "24h hh:mm:ss" : api.secret;
+                    return {...api, [field]: value, secret: newSecret};
                 } else if (field === "secret" && api.key === "Google Sheet") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
                     const match = value.match(regex);
@@ -36,14 +36,7 @@ function ConnectApiDialog() {
                     let finalValue = match ? match[1] : value;
                     return { ...api, [field]: finalValue, errors: error };
                 } else if (field === "secret" && api.key === "Digital Clock") {
-                    let clockFormat;
-                    if (value === "hh:mm:ss") {
-                        clockFormat = "cc:cc:cc";
-                        return { ...api, [field]: clockFormat };
-                    } else if (value === "hh:mm") {
-                        clockFormat = "cc:cc";
-                        return { ...api, [field]: clockFormat };
-                    }
+                    return {...api, [field]: value};
                 } else {
                     return { ...api, [field]: value };
                 }
@@ -85,29 +78,33 @@ function ConnectApiDialog() {
                                         <b>Invalid Source:</b> - Please make sure to use a valid GoogleSheets URL!</p>
                                 </div>
                             )}
-                            <div className="api-dialog" key={index}>
-                                <div>{api.index.toString() + "."}</div>
-                                <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
-                                    <option>Google Sheet</option>
-                                    <option>Digital Clock</option>
-                                </select>
-                                <div className="external-source-fields">
-                                    {api.key === "Google Sheet" && (
-                                        <input
-                                            type="text"
-                                            value={api.secret}
-                                            onChange={e => handleChange(index, 'secret', e.target.value)}
-                                            placeholder="put your spreadsheet url here..."/>
-                                    )}
-                                    {api.key === "Digital Clock" && (
-                                        <div className="external-source-clock">
-                                            <div>Format:</div>
-                                            <select onChange={e => handleChange(index, 'secret', e.target.value)}>
-                                                <option>hh:mm:ss</option>
-                                                <option>hh:mm</option>
-                                            </select>
-                                        </div>
-                                    )}
+                        <div className="api-dialog" key={index}>
+                            <div>{api.index.toString() + "."}</div>
+                            <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
+                                <option>Google Sheet</option>
+                                <option>Digital Clock</option>
+                            </select>
+                            <div className="external-source-fields">
+                                {api.key === "Google Sheet" && (
+                                    <input
+                                        type="text"
+                                        value={api.secret}
+                                        onChange={e => handleChange(index, 'secret', e.target.value)}
+                                        placeholder="put your spreadsheet url here..."/>
+                                )}
+                                {api.key === "Digital Clock" && (
+                                    <div className="external-source-clock">
+                                        <div>Format:</div>
+                                        <select onChange={e => handleChange(index, 'secret', e.target.value)}>
+                                            <option>24h hh:mm:ss</option>
+                                            <option>24h hh:mm</option>
+                                            <option>12h hh:mm:ss am/pm</option>
+                                            <option>12h hh:mm am/pm</option>
+                                            <option>12h hh:mm:ss</option>
+                                            <option>12h hh:mm</option>
+                                        </select>
+                                    </div>
+                                )}
 
                                     <div className="div-button remove-button" onClick={() => handleRemoveApi(index)}>
                                         <FontAwesomeIcon icon={faXmark}/>

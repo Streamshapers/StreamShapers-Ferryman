@@ -53,11 +53,14 @@ function AnalyzePlayer() {
         isPlaying,
         setIsPlaying,
         fileName,
-        textObjects
+        textObjects,
+        clocks
     } = useContext(GlobalStateContext);
     const animationContainerRef = useRef(null);
-    const [lottieInstance, setLottieInstance] = useState(null);
+    const lottieInstanceRef = useRef(null);
     const progressBarRef = useRef(null);
+    const timeFieldsSetRef = useRef(false);
+    const clockIntervalIdsRef = useRef([]);
 
     const formatTimeFromFrames = useCallback((frame, frameRate) => {
         const seconds = Math.floor(frame / frameRate);
@@ -68,6 +71,7 @@ function AnalyzePlayer() {
     useEffect(() => {
         if (!jsonData) return;
         let onEnterFrame;
+        clockIntervalIdsRef.current.forEach(id => clearInterval(id));
 
         const instance = lottie.loadAnimation({
             container: animationContainerRef.current,
@@ -76,6 +80,9 @@ function AnalyzePlayer() {
             autoplay: isPlaying,
             animationData: jsonData,
         });
+
+        //console.log("generated: ", instance);
+        //console.log("texts: ", textObjects);
 
         const timeoutId = setTimeout(() => {
             instance.goToAndStop(currentFrame, true);
@@ -87,8 +94,8 @@ function AnalyzePlayer() {
             };
 
             instance.addEventListener('enterFrame', onEnterFrame);
-            setLottieInstance(instance);
-            setTimeout(updateTimeFields, 500);
+            lottieInstanceRef.current = instance;
+            updateTimeFields();
         }, 300);
 
         return () => {
@@ -108,110 +115,114 @@ function AnalyzePlayer() {
         }
     };
 
+    function getTime(type, addSeconds = 0) {
+        const formats = {
+            clock1: { hour: "2-digit", minute: "2-digit", hour12: false },
+            clock2: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false },
+            clock3: { hour: "2-digit", minute: "2-digit", hour12: true },
+            clock4: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
+            clock5: { hour: "2-digit", minute: "2-digit", hour12: true },
+            clock6: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
+        };
+
+        let now = new Date();
+        now.setSeconds(now.getSeconds() + addSeconds);
+
+        let formatted = new Intl.DateTimeFormat("en-GB", formats[type]).format(now);
+
+        if (type === "clock5" || type === "clock6") {
+            formatted = formatted.replace(/\s?(AM|PM)$/i, '');
+        }
+
+        return formatted;
+    }
+
+
     function updateTimeFields() {
         try {
-            const animationPreviewElement = document.getElementById('animationPreview');
-            if (!animationPreviewElement) {
-                //console.log("Error updating Clock: animationPreview element not found.");
-                return;
-            }
+            clockIntervalIdsRef.current.forEach(id => clearInterval(id));
+            clockIntervalIdsRef.current = [];
 
-            const svgElement = animationPreviewElement.querySelector('svg');
-            if (!svgElement) {
-                console.log("Error updating Clock: SVG element not found.");
-                return;
-            }
+            function updateTime() {
+                const preview = document.getElementById('animationPreview');
+                if (!preview) return;
 
-            const gElements = svgElement.getElementsByTagName('g');
-            const formatMap = {
-                'cc:cc:cc': 'HH:mm:ss',
-                'cc:cc': 'HH:mm',
-            };
+                const rendererElements = lottieInstanceRef.current?.renderer?.elements;
+                if (!rendererElements) return;
 
-            for (let g of gElements) {
-                const ariaLabel = g.getAttribute('aria-label');
-                const format = formatMap[ariaLabel];
+                Object.entries(clocks.current).forEach(([clockKey, layerNames]) => {
+                    const time = getTime(clockKey);
 
-                if (format) {
-                    const textElements = Array.from(g.getElementsByTagName('text'));
-
-                    function updateTime() {
-                        let formattedTime;
-                        if (format === 'HH:mm:ss') {
-                            formattedTime = new Intl.DateTimeFormat("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: false
-                            }).format(new Date());
-                        } else if (format === 'HH:mm') {
-                            formattedTime = new Intl.DateTimeFormat("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: false
-                            }).format(new Date());
+                    layerNames.forEach((layerName) => {
+                        const target = rendererElements.find(
+                            (el) => el?.data?.nm === layerName && typeof el.updateDocumentData === "function"
+                        );
+                        if (target) {
+                            target.updateDocumentData({ t: time });
+                        } else {
+                            // Optional: Warnung bei fehlendem Layer
+                            // console.warn(`Layer ${layerName} not found in ${clockKey}`);
                         }
+                    });
+                });
 
-                        const timeParts = formattedTime.match(/\d{2}/g);
-
-                        if (timeParts.length >= 2) {
-                            textElements[0].textContent = timeParts[0][0];
-                            textElements[1].textContent = timeParts[0][1];
-                            textElements[2].textContent = ':';
-                            textElements[3].textContent = timeParts[1][0];
-                            textElements[4].textContent = timeParts[1][1];
-
-                            if (timeParts.length === 3 && format === 'HH:mm:ss') {
-                                textElements[5].textContent = ':';
-                                textElements[6].textContent = timeParts[2][0];
-                                textElements[7].textContent = timeParts[2][1];
-                            }
+                if (!isPlaying) {
+                    try {
+                        let saveFrame = currentFrame;
+                        if (lottieInstanceRef.current.getDuration(1) === jsonData.op) {
+                            saveFrame = lottieInstanceRef.current.currentFrame;
                         }
+                        lottieInstanceRef.current.renderer.renderFrame(saveFrame + 1);
+                        lottieInstanceRef.current.renderer.renderFrame(saveFrame);
+                    } catch (e) {
+                        console.log("RenderFrame error:", e);
                     }
-
-                    setInterval(updateTime, 1000);
-                    updateTime();
                 }
             }
+
+            const id = setInterval(updateTime, 1000);
+            clockIntervalIdsRef.current.push(id);
+            updateTime();
         } catch (e) {
-            console.log("Error updating Clock: ", e);
+            console.log("Error updating Clock:", e);
         }
     }
 
 
+
     useEffect(() => {
-        if (!lottieInstance) return;
-        isPlaying ? lottieInstance.play() : lottieInstance.pause();
+        if (!lottieInstanceRef.current) return;
+        isPlaying ? lottieInstanceRef.current.play() : lottieInstanceRef.current.pause();
         adjustSvgWidth();
-    }, [isPlaying, lottieInstance]);
+    }, [isPlaying, lottieInstanceRef.current]);
 
     const togglePlayPause = () => {
         setIsPlaying((prevIsPlaying) => {
             const shouldPlay = !prevIsPlaying;
-            if (lottieInstance) {
-                shouldPlay ? lottieInstance.play() : lottieInstance.pause();
+            if (lottieInstanceRef.current) {
+                shouldPlay ? lottieInstanceRef.current.play() : lottieInstanceRef.current.pause();
             }
             return shouldPlay;
         });
     };
 
     const stepFrame = (direction) => {
-        if (!lottieInstance) return;
+        if (!lottieInstanceRef.current) return;
         if (isPlaying) {
             togglePlayPause();
         }
         const newFrame = Math.max(0, Math.min(currentFrame + direction, jsonData.op - 1));
-        lottieInstance.goToAndStop(newFrame, true);
+        lottieInstanceRef.current.goToAndStop(newFrame, true);
         setCurrentFrame(newFrame);
     };
 
     const goToMarker = useCallback((markerFrame) => {
-        if (lottieInstance) {
+        if (lottieInstanceRef.current) {
             setIsPlaying(false);
-            lottieInstance.goToAndStop(markerFrame, true);
+            lottieInstanceRef.current.goToAndStop(markerFrame, true);
             setCurrentFrame(markerFrame);
         }
-    }, [lottieInstance, setCurrentFrame]);
+    }, [lottieInstanceRef.current, setCurrentFrame]);
 
     const playCurrenMarker = () => {
         const currentMarker = markers.find(marker => currentFrame >= marker.tm && currentFrame < marker.tm + marker.dr);
@@ -219,11 +230,11 @@ function AnalyzePlayer() {
             setIsPlaying(true);
 
             const checkInterval = setInterval(() => {
-                const currentFrame = Math.round(lottieInstance.currentFrame);
+                const currentFrame = Math.round(lottieInstanceRef.current.currentFrame);
                 if (currentFrame >= currentMarker.tm + currentMarker.dr - 1) {
                     clearInterval(checkInterval);
                     setIsPlaying(false);
-                    lottieInstance.goToAndStop(currentMarker.tm + currentMarker.dr - 1, true);
+                    lottieInstanceRef.current.goToAndStop(currentMarker.tm + currentMarker.dr - 1, true);
                     setCurrentFrame(currentMarker.tm + currentMarker.dr - 1);
                 }
             }, 1000 / jsonData.fr);
@@ -233,8 +244,8 @@ function AnalyzePlayer() {
     };
 
     const downloadCurrentFrame = () => {
-        if (!isPlaying && lottieInstance) {
-            const svgElement = lottieInstance.renderer.svgElement;
+        if (!isPlaying && lottieInstanceRef.current) {
+            const svgElement = lottieInstanceRef.current.renderer.svgElement;
             const serializer = new XMLSerializer();
             let svgString = serializer.serializeToString(svgElement);
             for (const face in fontFaces) {
