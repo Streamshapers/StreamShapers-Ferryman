@@ -360,7 +360,7 @@
         setTimeout(()=>{
             if (showLogs) console.log(`LottieState: ${lottieState}`);
             if (currentSegment === "stop") {
-                animation.destroy();
+                //animation.destroy();
             }
             if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment);
             if (playStack[0]) {
