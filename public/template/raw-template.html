@@ -88,7 +88,6 @@
                                 }
                                 if (animation.renderer && typeof animation.renderer.renderFrame === "function") {
                                     try {
-                                        //console.log("animation: ", animation.animationData.layers);
                                         animation.renderer.renderFrame(saveFrame + 1);
                                         animation.renderer.renderFrame(saveFrame);
                                     } catch (error) {
@@ -197,10 +196,8 @@
                 if (!sources[sheetURL]) {
                     tsvArray = await fetchDataFromGoogle(sheetURL);
                     sources[sheetURL] = tsvArray;
-                    //console.log("Sources updated:", sources);
                 } else {
                     tsvArray = sources[sheetURL];
-                    //console.log("Sheet URL already exists in sources. Using cached value:", tsvArray);
                 }
 
                 if (tsvArray && tsvArray.length > 0) {
@@ -258,8 +255,6 @@
     let fetchSheet = true;
     let lastData
     let data = {};
-    //let clocks = {"clock1" : ["_line1","_line2"], "clock2" : ["_line3"],"clock3" : ["_line4"],"clock4" : ["_line5"]}
-    //let clocks = {"clock2" : ["_firstLine"],"clock4" : ["_secondLine"]}
     let clocks = ${clocks};
     const fetchInterval = 2000;
 
@@ -393,12 +388,12 @@
             }
             if(typeof value == "string"){
                 currentSegment = value
-                console.log(`CurrentSegment: ${currentSegment}`)
+                if (showLogs) console.log(`CurrentSegment: ${currentSegment}`)
             } else if(typeof value == "number"){
                 lottieTemplate.markers.forEach((marker)=>{
                     if(value >= marker.tm && value <marker.tm+marker.dr){
                         currentSegment = marker.cm
-                        console.log(`CurrentSegment: ${currentSegment}`)
+                        if (showLogs) console.log(`CurrentSegment: ${currentSegment}`)
                     }
                 })
             }
@@ -437,9 +432,8 @@
             animationFrame = Math.round(animation.currentFrame);
             if(animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0){
                 currentFrame = animationFrame;
-                console.log("animationFrame: " + animationFrame + " LottiePlayerDuration: " + animation.getDuration(1) + " TemplateCompleteLength: " + lottieTemplate.op + " CurrentSegmentStart: " + currentSegmentFrames);
+                if (showLogs)console.log("animationFrame: " + animationFrame + " LottiePlayerDuration: " + animation.getDuration(1) + " TemplateCompleteLength: " + lottieTemplate.op + " CurrentSegmentStart: " + currentSegmentFrames);
             } else {
-                //if (currentFrame === breakFrame) console.log("!!!!!!!!!!!!!") //triggerPlayStack()
                 if (showLogs) console.log("currentFrame: " + animationFrame + " LottiePlayerDuration: " + animation.getDuration(1) + " TemplateCompleteLength: " + lottieTemplate.op + " CurrentSegmentStart: " + currentSegmentFrames);
             }
         });
@@ -550,9 +544,7 @@
 
             await animReady;
             controlAnimation(animation,"stop",0)
-            //animation.goToAndStop(0, true);
             playStatus = "loaded";
-            //currentSegment = "start";
             animLoaded.resolve("Template - Animation is Ready");
 
         }
@@ -603,8 +595,6 @@
                     addEvents(updateAnimation);
                     await delay(100)
                     controlAnimation(updateAnimation,"play","update")
-                    //updateAnimation.goToAndPlay("update", true);
-                    //currentSegment = "update";
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
@@ -630,7 +620,6 @@
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
                             controlAnimation(newAnimation,"stop",updateStartFrame)
-                            //newAnimation.goToAndStop(updateStartFrame, true);
                             currentSegment = "update" //important for right updateFrame!
                             await delay(100)
                             animation.destroy();
@@ -660,7 +649,6 @@
                     addEvents(newAnimation);     
                     await delay(100)            
                     controlAnimation(newAnimation,"stop",updateStartFrame)
-                    //newAnimation.goToAndStop(updateStartFrame, true);
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
@@ -679,7 +667,6 @@
         await loadFonts();
         if(Object.keys(clocks).length!=0) updateTimeField()
         controlAnimation(animation,"play","start")
-        //animation.goToAndPlay("start", true);
         playStatus = "play";
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
@@ -690,16 +677,6 @@
     function stop() {
         if (stopExist) {
             controlAnimation(animation,"play","stop",false)
-        /*
-            if (lottieState === "idle") {
-                animation.goToAndPlay("stop", true); //goToAndPlay(animation, stop) eventuell ersetzten?!
-                currentSegment = "stop"
-                if (showLogs) console.log("Template - Play 'stop' Marker");
-            } else {
-                //playStack.length=0
-                playStack.push("stop");
-            }
-        */
         } else {
             if (showLogs) console.log("Template - No 'stop' marker - destroy Animation");
             animation.destroy();
@@ -709,22 +686,10 @@
 
     function next() {
         if (nextCount > nextTotal && stopExist) {
-            //currentSegment = "stop";
             stop();
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
         } else {
             controlAnimation(animation,"play","next" + nextCount,false)
-        /*
-            if (lottieState === "idle") {
-                animation.goToAndPlay("next" + nextCount, true);
-                currentSegment = "next" + nextCount;
-                if (showLogs) console.log("Template - Play 'next" + nextCount + "' Marker");
-            } else {
-                //playStack.shift()
-                playStack.push("next" + nextCount);
-                if (markers.includes("next" + nextCount + "_loop")) playStack.push("next" + nextCount + "_loop");
-            }
-        */
             nextCount++;
         }
     }
