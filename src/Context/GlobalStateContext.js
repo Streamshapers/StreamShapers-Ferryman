@@ -275,13 +275,13 @@ export const GlobalStateProvider = ({children}) => {
                 if (duplicates.length !== 0) {
                     addGeneralAlert(
                         "error",
-                        "Duplicat Marker Names",
-                        'Your animation has at least two markers with the same marker name. Make shure every marker has a unique name.',
+                        "Duplicate Marker Names",
+                        'Your animation has at least two markers with the same marker name. Make shure every marker has an unique name.',
                         "Here is the documentation",
                         "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
                     );
                 } else {
-                    removeGeneralAlert("Duplicat Marker Names")
+                    removeGeneralAlert("Duplicate Marker Names")
                 }
             }
         }
