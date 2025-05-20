@@ -75,6 +75,10 @@
         gap: 5px;
     }
 
+    #login-button span{
+        display: none;
+    }
+
     .container {
         height: auto;
     }

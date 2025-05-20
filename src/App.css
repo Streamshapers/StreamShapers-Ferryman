@@ -1,5 +1,5 @@
-/* Initialy written by Richard */
-/*@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');*/
+/* Initially written by Richard */
+/* @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'); */
 
 :root {
     --primary: #4ba1e2;
@@ -1362,6 +1362,18 @@ input[type="checkbox"] {
     align-items: center;
 }
 
+.header-profile-image {
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--foreground);
+    transition: box-shadow 0.2s;
+    vertical-align: middle;
+    margin-left: -5px;
+}
+
 button {
     background: var(--background);
     border: 1px solid var(--border);
@@ -1724,6 +1736,12 @@ label span.bla {
     padding: 10px;
     width: 80%;
     border: none;
+    cursor: pointer;
+    transition: transform 0.5s ease;
+}
+
+.auth-button:hover {
+    transform: scale(1.05);
 }
 
 .close-icon {
@@ -1955,4 +1973,26 @@ textarea {
 
 .error-message{
     color: var(--error);
+}
+
+.link{
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.password-check-list {
+    font-size: 0.85rem;
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.2rem;
+    list-style: none;
+}
+
+.password-check-list li {
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    background: var(--foreground);
 }

@@ -8,6 +8,7 @@ export const GlobalStateContext = createContext();
 export const GlobalStateProvider = ({children}) => {
     const [ferrymanVersion] = useState("v2.0.0");
     const {user, serverUrl} = useContext(AuthContext);
+    const streamshapersUrl = "https://hosting.streamshapers.com";
 
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
@@ -1400,22 +1401,19 @@ export const GlobalStateProvider = ({children}) => {
         return streamshapersJson;
     }
 
-    const saveTemplate = async (name, category, description, tags) => {
+    const saveTemplate = async (name, projectId, description, tags) => {
         const templateJson = generateStreamshapersJson();
-        let templateName;
-        let templateCategory;
-        let templateDescription;
-        let templateTags;
+        let templateName, templateDescription, templateTags, templateProjectId;
 
         if (templateData) {
             templateName = templateData.name;
-            templateCategory = templateData.category;
+            templateProjectId  = templateData.category;
             templateDescription = templateData.description;
             templateTags = templateData.tags;
         }
 
         if (name && name !== '') templateName = name;
-        if (category && category !== '') templateCategory = category;
+        if (projectId !== undefined) templateProjectId = projectId; // Auch "" (kein Projekt) zulassen
         if (description && description !== '') templateDescription = description;
         if (tags && tags !== '') templateTags = tags;
 
@@ -1425,7 +1423,7 @@ export const GlobalStateProvider = ({children}) => {
 
         const payload = {
             name: templateName,
-            category: templateCategory || '',
+            projectId: templateProjectId || null,
             description: templateDescription || '',
             data: templateJson,
             tags: templateTags || []
@@ -1433,20 +1431,10 @@ export const GlobalStateProvider = ({children}) => {
 
         let response;
 
-        if (templateData) {
-            response = await api.put(`/templates/${templateData._id}`, payload, { withCredentials: true });
+        if (templateData && templateData._id) {
+            response = await api.put(`/templates/${templateData._id}`, payload);
         } else {
-            response = await api.post('/templates', payload, { withCredentials: true });
-        }
-
-        if (!user.categories.includes(templateCategory)) {
-            api.post('/user/add-category', {
-                category: templateCategory
-            }, { withCredentials: true }).then(() => {
-                console.log('New category added to user successfully');
-            }).catch(err => {
-                console.warn('Category not added:', err);
-            });
+            response = await api.post('/templates', payload);
         }
 
         return response;
@@ -1470,6 +1458,7 @@ export const GlobalStateProvider = ({children}) => {
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
             serverUrl,
+            streamshapersUrl,
             jsonData,
             setJsonData,
             colors,

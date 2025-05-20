@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import AuthContext from "../../Context/AuthContext";
+import api from "../../axiosInstance";
 
 function SaveDialog({ onClose }) {
     const {user} = useContext(AuthContext);
@@ -14,22 +15,22 @@ function SaveDialog({ onClose }) {
 
     const [message, setMessage] = useState(null);
     const [serverError, setServerError] = useState('');
-    const [categories, setCategories] = useState([]);
-    const [newCategory, setNewCategory] = useState('');
     const [tagInput, setTagInput] = useState("");
 
     const [templateName, setTemplateName] = useState(String(templateData?.name || fileName));
-    const [templateCategory, setTemplateCategory] = useState(String(templateData?.category || ""));
     const [templateDescription, setTemplateDescription] = useState(String(templateData?.description || ""));
     const [templateTags, setTemplateTags] = useState(templateData?.tags || []);
+
+    const [projects, setProjects] = useState([]);
+    const [selectedProjectId, setSelectedProjectId] = useState(templateData?.projectId || "");
+
 
     useEffect(() => {
         if (user) {
             getTemplateLimit();
-
-            if (user.categories) {
-                setCategories(user.categories);
-            }
+            api.get('/projects')
+                .then(res => setProjects(res.data))
+                .catch(() => setProjects([]));
         }
     }, []);
 
@@ -41,18 +42,19 @@ function SaveDialog({ onClose }) {
     };
 
     const handleSaveTemplate = async () => {
-        const category = newCategory || templateCategory;
-
         try {
-            const saveMsg = await saveTemplate(templateName, category, templateDescription, templateTags);
-            console.log('saveMsg:', saveMsg);
+            const saveMsg = await saveTemplate(
+                templateName,
+                selectedProjectId || null,
+                templateDescription,
+                templateTags
+            );
 
             if (saveMsg.status === 200 || saveMsg.status === 201) {
                 showAlert('Template saved successfully.');
             } else {
                 setServerError('Unexpected server response.');
             }
-
         } catch (error) {
             if (error.response) {
                 const msg = error.response.data?.error;
@@ -64,6 +66,8 @@ function SaveDialog({ onClose }) {
                     }
                 } else if (error.response.status === 404) {
                     setServerError('Endpoint not found. Please contact support.');
+                } else if (error.response.status === 413) {
+                    setServerError('Your Template is too large. (Limit: 5MB)');
                 } else {
                     setServerError(`Unexpected error: ${error.response.status}`);
                 }
@@ -71,8 +75,7 @@ function SaveDialog({ onClose }) {
                 setServerError('No server response. Check your connection.');
             }
         }
-        //onClose();
-    };
+    }
 
 
     const handleTagKeyDown = (e) => {
@@ -84,7 +87,7 @@ function SaveDialog({ onClose }) {
             }
             setTagInput("");
         }
-    };
+    }
 
     const removeTag = (indexToRemove) => {
         setTemplateTags(templateTags.filter((_, index) => index !== indexToRemove));
@@ -98,43 +101,40 @@ function SaveDialog({ onClose }) {
                     <div className="success alert-success">{message}</div>
                 </div>
             )}
-            {serverError && <p style={{color: 'red', marginBottom: '1rem'}}>{serverError}</p>}
-            <p>{remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.
-                {/*<a href="#">Upgrade Plan</a>*/}
-            </p>
+            {serverError && <p style={{ color: 'red', marginBottom: '1rem' }}>{serverError}</p>}
+            <p>{remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.</p>
 
             <div id="save-in-account">
                 <div className="row">
                     <span>Name:</span>
-                    <input type="text" placeholder="Name..." value={templateName}
-                           onChange={(e) => setTemplateName(e.target.value)}/>
-                </div>
-                <div className="row">
-                    <span>Category:</span>
-                    {categories.length > 0 ? (
-                        <>
-                            <select id="category-select" onChange={(e) => setTemplateCategory(e.target.value)} disabled={newCategory !== ''}>
-                                <option value={templateCategory}>{templateCategory ? templateCategory : 'select category'}</option>
-                                {categories.map((cat, index) => (
-                                    <option key={index} value={cat}>{cat}</option>
-                                ))}
-                            </select>
-                            <span>or</span>
-                        </>
-                    ) : (
-                        <></>
-                    )}
                     <input
                         type="text"
-                        placeholder="New Category"
-                        id="category"
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value)}/>
+                        placeholder="Name..."
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}
+                    />
+                </div>
+                <div className="row">
+                    <span>Project:</span>
+                    <select
+                        value={selectedProjectId}
+                        onChange={e => setSelectedProjectId(e.target.value)}
+                    >
+                        <option value="">No project</option>
+                        {projects.map(project => (
+                            <option key={project._id} value={project._id}>
+                                {project.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
                 <div className="row">
                     <span>Description:</span>
-                    <textarea value={templateDescription} placeholder="Template description..."
-                              onChange={(e) => setTemplateDescription(e.target.value)}></textarea>
+                    <textarea
+                        value={templateDescription}
+                        placeholder="Template description..."
+                        onChange={(e) => setTemplateDescription(e.target.value)}
+                    ></textarea>
                 </div>
                 <div className="row">
                     <span>Tags:</span>
@@ -160,7 +160,6 @@ function SaveDialog({ onClose }) {
                 <button id='downloadBtn' onClick={handleSaveTemplate}>Save</button>
             </div>
         </>
-
     );
 }
 

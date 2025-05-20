@@ -1,10 +1,12 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import AuthContext from '../../Context/AuthContext';
 import api from '../../axiosInstance';
 import {Link} from "react-router-dom";
+import {GlobalStateContext} from "../../Context/GlobalStateContext";
 
-function LoginDialog({ onClose }) {
+function LoginDialog({onClose}) {
     const {user, login} = useContext(AuthContext);
+    const {streamshapersUrl} = useContext(GlobalStateContext);
     const [serverError, setServerError] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loginData, setLoginData] = useState({
@@ -51,21 +53,20 @@ function LoginDialog({ onClose }) {
 
     const onLoginSubmit = async e => {
         e.preventDefault();
+        setLoginMessage(null);
         try {
             console.log('Sending Login-Data...');
             const response = await api.post('/auth/login', loginData, {
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 withCredentials: true,
             });
 
-            const { accessToken } = response.data;
-
+            const {accessToken} = response.data;
             localStorage.setItem('accessToken', accessToken);
-
             console.log('Login successful, token stored.');
 
             const userResponse = await api.get('/auth/me', {
-                headers: { 'Authorization': `Bearer ${accessToken}` },
+                headers: {Authorization: `Bearer ${accessToken}`},
                 withCredentials: true,
             });
 
@@ -75,10 +76,26 @@ function LoginDialog({ onClose }) {
             login(user);
             onClose();
         } catch (error) {
-            console.error('Error logging in:', error.response?.data || error.message);
-            setLoginMessage("login not possible, wrong credentials.");
+            const errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
+            console.error('Error logging in:', errorMessage);
+
+            if (errorMessage.toLowerCase().includes("verify your email")) {
+                setLoginMessage(
+                    <>
+                        <p>{errorMessage}</p>
+                        <p>
+                            <a href={streamshapersUrl +"/verify-email"}
+                                className="link">
+                                Click here to verify your email
+                            </a>
+                        </p>
+                    </>
+                );
+            } else {
+                setLoginMessage(errorMessage);
+            }
         }
-    };
+    }
 
     const onRegisterChange = (e) => setRegisterData({...registerData, [e.target.name]: e.target.value});
 
@@ -131,12 +148,12 @@ function LoginDialog({ onClose }) {
         try {
             console.log('Sending Registration-Data...');
             const response = await api.post('/auth/register', registerData, {
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
             });
 
             console.log('Registration successful:', response.data);
 
-            await onLoginSubmit(e);
+            showAlert('Registration successful, please log in.');
         } catch (error) {
             console.error('Registration Error:', error);
             if (error.response?.status === 409) {
@@ -151,149 +168,152 @@ function LoginDialog({ onClose }) {
             {!user && (
                 <>
                     <h2>{activeTab === 'login' ? 'Login' : 'Register'}</h2>
-                        {message && (
-                            <div className="success-wrapper">
-                                <div className="success alert-success">{message}</div>
-                            </div>
-                        )}
+                    {message && (
+                        <div className="success-wrapper">
+                            <div className="success alert-success">{message}</div>
+                        </div>
+                    )}
                     {loginMessage && (
                         <div className="error-wrapper">
                             <div className="error">{loginMessage}</div>
                         </div>
                     )}
-                        <div className="mode-switch">
-                            <button className={`mode-button ${activeTab === 'login' ? 'active' : ''}`}
-                                    onClick={() => handleTabChange('login')}>Login
-                            </button>
-                            <button className={`mode-button ${activeTab === 'register' ? 'active' : ''}`}
-                                    onClick={() => handleTabChange('register')}>Register
-                            </button>
-                        </div>
-                        {activeTab === 'login' && (
-                            <form className="auth-form" onSubmit={onLoginSubmit}>
-                                <div className="auth-input">
-                                    <input autoComplete="email" type="email" name="loginMail" value={loginMail}
-                                           onChange={onLoginChange} required />
-                                    <label className="input-label">E-Mail:</label>
-                                </div>
-                                <div className="auth-input">
-                                    <input autoComplete="current-password" type="password" name="loginPassword"
-                                           value={loginPassword} onChange={onLoginChange} required />
-                                    <label className="input-label">Password:</label>
-                                </div>
-                                <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-                                    <Link to="/forgot-password" style={{ color: '#007bff', textDecoration: 'none' }}>
-                                        Forgot your password?
-                                    </Link>
-                                </p>
-                                <button className="auth-button" type="submit">Login</button>
-                                <p style={{ marginTop: '1rem' }}>
-                                    Don't have an account?{' '}
-                                    <a href="#" onClick={() => handleTabChange('register')}>
-                                        Sign up now
-                                    </a>
-                                </p>
-                            </form>
-                        )}
-                        {activeTab === 'register' && (
-                            <form className="auth-form" onSubmit={onRegisterSubmit} autoComplete="off">
-                                {serverError && <p style={{color: 'red', marginBottom: '1rem'}}>{serverError}</p>}
-                                <div className="auth-input">
-                                    <input
-                                        className={`input ${errors.registerUsername ? 'invalid' : ''}`}
-                                        autoComplete="off"
-                                        type="text"
-                                        name="registerUsername"
-                                        value={registerUsername}
-                                        onChange={onRegisterChange}
-                                        onFocus={() => handleFocus('registerUsername')}
-                                        onBlur={() => handleBlur('registerUsername')}
-                                        required
-                                    />
-                                    <label className={`input-label ${focus.registerUsername || registerUsername ? 'active' : ''}`}>
-                                        Username:
-                                    </label>
-                                    {errors.registerUsername && (
-                                        <span className="error-message">This username is not valid or already taken.</span>
-                                    )}
-                                </div>
-                                <div className="auth-input">
-                                    <input
-                                        className={`input ${errors.registerMail ? 'invalid' : ''}`}
-                                        autoComplete="off"
-                                        type="email"
-                                        name="registerMail"
-                                        value={registerMail}
-                                        onChange={onRegisterChange}
-                                        onFocus={() => handleFocus('registerMail')}
-                                        onBlur={() => handleBlur('registerMail')}
-                                        required
-                                    />
-                                    <label className={`input-label ${focus.registerMail || registerMail ? 'active' : ''}`}>
-                                        Mail:
-                                    </label>
-                                    {errors.registerMail && (
-                                        <span className="error-message">Please enter a valid email address.</span>
-                                    )}
-                                </div>
-                                <div className="auth-input">
-                                    <input
-                                        className={`input ${errors.registerPassword ? 'invalid' : ''}`}
-                                        autoComplete="off"
-                                        type="password"
-                                        name="registerPassword"
-                                        value={registerPassword}
-                                        onChange={(e) => {
-                                            onRegisterChange(e);
-                                            validateField('registerPassword', e.target.value);
-                                        }}
-                                        onFocus={() => handleFocus('registerPassword')}
-                                        onBlur={() => handleBlur('registerPassword')}
-                                        required
-                                    />
-                                    <label className={`input-label ${focus.registerPassword || registerPassword ? 'active' : ''}`}>
-                                        Password:
-                                    </label>
-                                </div>
-
-                                <ul style={{ fontSize: '0.85rem', margin: '0.5rem 0 1rem', paddingLeft: '1.2rem' }}>
-                                    <li>{registerPassword.length >= 8 ? '✅' : '❌'} at least 8 characters</li>
-                                    <li>{/[A-Z]/.test(registerPassword) ? '✅' : '❌'} one uppercase letter</li>
-                                    <li>{/[a-z]/.test(registerPassword) ? '✅' : '❌'} one lowercase letter</li>
-                                    <li>{/\d/.test(registerPassword) ? '✅' : '❌'} one number</li>
-                                    <li>{/[@$!%*?&]/.test(registerPassword) ? '✅' : '❌'} one special character (@$!%*?&)</li>
-                                </ul>
-
-                                <div className="auth-input">
-                                    <input
-                                        className={`input ${confirmPassword && confirmPassword !== registerPassword ? 'invalid' : ''}`}
-                                        autoComplete="off"
-                                        type="password"
-                                        name="confirmPassword"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        required
-                                    />
-                                    <label className="input-label active">
-                                        Confirm Password:
-                                    </label>
-                                </div>
-                                {confirmPassword && confirmPassword !== registerPassword && (
-                                    <p style={{ color: 'red', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                                        Passwords do not match.
-                                    </p>
+                    <div className="mode-switch">
+                        <button className={`mode-button ${activeTab === 'login' ? 'active' : ''}`}
+                                onClick={() => handleTabChange('login')}>Login
+                        </button>
+                        <button className={`mode-button ${activeTab === 'register' ? 'active' : ''}`}
+                                onClick={() => handleTabChange('register')}>Register
+                        </button>
+                    </div>
+                    {activeTab === 'login' && (
+                        <form className="auth-form" onSubmit={onLoginSubmit}>
+                            <div className="auth-input">
+                                <input autoComplete="email" type="email" name="loginMail" value={loginMail}
+                                       onChange={onLoginChange} required/>
+                                <label className="input-label">E-Mail:</label>
+                            </div>
+                            <div className="auth-input">
+                                <input autoComplete="current-password" type="password" name="loginPassword"
+                                       value={loginPassword} onChange={onLoginChange} required/>
+                                <label className="input-label">Password:</label>
+                            </div>
+                            <p>
+                                <a href={streamshapersUrl + "/forgot-password"} className="link">
+                                    Forgot your password?
+                                </a>
+                            </p>
+                            <button className="auth-button" type="submit">Login</button>
+                            <p>
+                                Don't have an account?{' '}
+                                <a href="#" className="link" onClick={() => handleTabChange('register')}>
+                                    Sign up now
+                                </a>
+                            </p>
+                        </form>
+                    )}
+                    {activeTab === 'register' && (
+                        <form className="auth-form" onSubmit={onRegisterSubmit} autoComplete="off">
+                            {serverError && <p className="error-message">{serverError}</p>}
+                            <div className="auth-input">
+                                <input
+                                    className={`input ${errors.registerUsername ? 'invalid' : ''}`}
+                                    autoComplete="off"
+                                    type="text"
+                                    name="registerUsername"
+                                    value={registerUsername}
+                                    onChange={onRegisterChange}
+                                    onFocus={() => handleFocus('registerUsername')}
+                                    onBlur={() => handleBlur('registerUsername')}
+                                    required
+                                />
+                                <label
+                                    className={`input-label ${focus.registerUsername || registerUsername ? 'active' : ''}`}>
+                                    Username:
+                                </label>
+                                {errors.registerUsername && (
+                                    <span className="error-message">This username is not valid or already taken.</span>
                                 )}
+                            </div>
+                            <div className="auth-input">
+                                <input
+                                    className={`input ${errors.registerMail ? 'invalid' : ''}`}
+                                    autoComplete="off"
+                                    type="email"
+                                    name="registerMail"
+                                    value={registerMail}
+                                    onChange={onRegisterChange}
+                                    onFocus={() => handleFocus('registerMail')}
+                                    onBlur={() => handleBlur('registerMail')}
+                                    required
+                                />
+                                <label className={`input-label ${focus.registerMail || registerMail ? 'active' : ''}`}>
+                                    Mail:
+                                </label>
+                                {errors.registerMail && (
+                                    <span className="error-message">Please enter a valid email address.</span>
+                                )}
+                            </div>
+                            <div className="auth-input">
+                                <input
+                                    className={`input ${errors.registerPassword ? 'invalid' : ''}`}
+                                    autoComplete="off"
+                                    type="password"
+                                    name="registerPassword"
+                                    value={registerPassword}
+                                    onChange={(e) => {
+                                        onRegisterChange(e);
+                                        validateField('registerPassword', e.target.value);
+                                    }}
+                                    onFocus={() => handleFocus('registerPassword')}
+                                    onBlur={() => handleBlur('registerPassword')}
+                                    required
+                                />
+                                <label
+                                    className={`input-label ${focus.registerPassword || registerPassword ? 'active' : ''}`}>
+                                    Password:
+                                </label>
+                            </div>
 
-                                <button className="auth-button" type="submit">Register</button>
-                                <p style={{ marginTop: '1rem' }}>
-                                    Already have an account?{' '}
-                                    <a href="#" onClick={() => handleTabChange('login')}>
-                                        Log in now
-                                    </a>
+                            <ul className="password-check-list">
+                                <li>{registerPassword.length >= 8 ? '✅' : '❌'} at least 8 characters</li>
+                                <li>{/[A-Z]/.test(registerPassword) ? '✅' : '❌'} one uppercase letter</li>
+                                <li>{/[a-z]/.test(registerPassword) ? '✅' : '❌'} one lowercase letter</li>
+                                <li>{/\d/.test(registerPassword) ? '✅' : '❌'} one number</li>
+                                <li>{/[@$!%*?&]/.test(registerPassword) ? '✅' : '❌'} one special character (@$!%*?&)
+                                </li>
+                            </ul>
+
+                            <div className="auth-input">
+                                <input
+                                    className={`input ${confirmPassword && confirmPassword !== registerPassword ? 'invalid' : ''}`}
+                                    autoComplete="off"
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    required
+                                />
+                                <label className="input-label active">
+                                    Confirm Password:
+                                </label>
+                            </div>
+                            {confirmPassword && confirmPassword !== registerPassword && (
+                                <p style={{color: 'red', fontSize: '0.85rem', marginTop: '0.25rem'}}>
+                                    Passwords do not match.
                                 </p>
-                            </form>
-                        )}
-                        {/*<div className="popupButtonArea">
+                            )}
+
+                            <button className="auth-button" type="submit">Register</button>
+                            <p style={{marginTop: '1rem'}}>
+                                Already have an account?{' '}
+                                <a href="#" className="link" onClick={() => handleTabChange('login')}>
+                                    Log in now
+                                </a>
+                            </p>
+                        </form>
+                    )}
+                    {/*<div className="popupButtonArea">
                     <button id="downloadBtn" onClick={onClose}>Close</button>
                     <button id="downloadBtn" onClick={downloadFile}>Download File</button>
                 </div>*/}

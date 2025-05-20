@@ -1,12 +1,9 @@
 import {Routes, Route} from 'react-router-dom';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
 import DropJson from "./DropJson";
 import WindowTooNarrowWarning from "./WindowToNarrowWarning";
 import Header from "./Header";
 import ConverterView from "./ConverterView";
 import StartScreen from "./StartScreen/StartScreen";
-import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
     return (
@@ -18,9 +15,6 @@ function App() {
 
                 <Routes>
                     <Route path="/" element={<><ConverterView/><StartScreen/></>}/>
-                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
-                    <Route path="/reset-password" element={<ResetPassword/>}/>
-                    <Route path="/verify-email" element={<VerifyEmail/>}/>
                 </Routes>
             </div>
         </>

@@ -17,12 +17,7 @@ function ExportDialog({ onClose }) {
         uploadedFonts,
         fonts,
         imagePath,
-        setImagePath,
-        markers,
         refImages,
-        SPXGCTemplateDefinition,
-        spxExport,
-        googleTableCells,
         imageEmbed,
         setImageEmbed,
         exportFormat,
@@ -37,14 +32,16 @@ function ExportDialog({ onClose }) {
     const [base64Images, setBase64Images] = useState([]);
     const [message, setMessage] = useState(null);
     const [activeTab, setActiveTab] = useState('default');
-    const [categories, setCategories] = useState([]);
-    const [newCategory, setNewCategory] = useState('');
+    const [projects, setProjects] = useState([]);
+    const [selectedProjectId, setSelectedProjectId] = useState("");
     const [saveToAccount, setSaveToAccount] = useState(false);
 
     useEffect(() => {
         getTemplateLimit();
-        if (user && user.categories) {
-            setCategories(user.categories);
+        if (user) {
+            api.get('/projects')
+                .then(res => setProjects(res.data))
+                .catch(() => setProjects([]));
         }
     }, []);
 
@@ -180,14 +177,10 @@ function ExportDialog({ onClose }) {
         setSaveToAccount(!saveToAccount);
     };
 
-    const handleNewCategoryChange = (e) => {
-        setNewCategory(e.target.value);
+    const handleSaveTemplate = () => {
+        saveTemplate(fileName, selectedProjectId || null);
     };
 
-    const handleSaveTemplate = () => {
-        const category = newCategory || document.getElementById('category-select').value;
-        saveTemplate(fileName, category);
-    };
 
     return (<>
             <h2>Export</h2>
@@ -241,24 +234,22 @@ function ExportDialog({ onClose }) {
                                 </div>
                                 {saveToAccount && (
                                     <div className="row">
-                                        <span>Optional: Category</span>
-                                        {categories.length > 0 ? (
-                                            <>
-                                                <select id="category-select">
-                                                    <option value="">Select Category</option>
-                                                    {categories.map((cat, index) => (
-                                                        <option key={index} value={cat}>{cat}</option>
-                                                    ))}
-                                                </select>
-                                                <p>or</p>
-                                            </>
-                                        ) : (
-                                            <></>
-                                        )}
-                                        <input type="text" placeholder="New Category" id="category" value={newCategory}
-                                               onChange={handleNewCategoryChange}/>
+                                        <span>Project</span>
+                                        <select
+                                            id="project-select"
+                                            value={selectedProjectId}
+                                            onChange={e => setSelectedProjectId(e.target.value)}
+                                        >
+                                            <option value="">No project</option>
+                                            {projects.map(project => (
+                                                <option key={project._id} value={project._id}>
+                                                    {project.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 )}
+
                             </div>
                         )}
                     </div>
