@@ -60,8 +60,16 @@ function LastUploads() {
 
     const handleMouseLeave = (templateId) => {
         setHoveredTemplateId(null);
-        if (playerRefs.current[templateId]) {
-            playerRefs.current[templateId].pause();
+        const ref = playerRefs.current[templateId];
+        const template = templates.find(t => t._id === templateId);
+        const marker = template?.data?.templateJson?.markers?.find(m => m.cm === "start");
+
+        if (marker && ref) {
+            const endFrame = marker.tm + marker.dr;
+            ref.setSeeker(endFrame);
+            ref.pause();
+        } else {
+            ref.stop();
         }
     };
 
@@ -80,6 +88,20 @@ function LastUploads() {
             console.error("Error loading file:", error);
         }
     };
+
+    useEffect(() => {
+        templates.forEach(template => {
+            const ref = playerRefs.current[template._id];
+            const marker = template?.data?.templateJson?.markers?.find(m => m.cm === "start");
+            if (marker && ref && ref.setSeeker) {
+                setTimeout(() => {
+                    const endFrame = marker.tm + marker.dr;
+                    ref.setSeeker(endFrame);
+                    ref.pause();
+                }, 300);
+            }
+        });
+    }, [templates]);
 
     return (
         <>
