@@ -12,10 +12,11 @@ import ThemeSwitch from "./Theme/ThemeSwitch";
 import {GlobalStateContext} from "./Context/GlobalStateContext";
 import AuthContext from "./Context/AuthContext";
 import Dialog from "./Dialogs/Dialog";
+import {Link} from "react-router-dom";
 
 function Header() {
     const {user, handleLogout} = useContext(AuthContext);
-    const {jsonFile, theme} = useContext(GlobalStateContext);
+    const {jsonFile, theme, streamshapersUrl} = useContext(GlobalStateContext);
     const [isExportDialogOpen, setExportDialogOpen] = useState(false);
     const [isInfoDialogOpen, setInfoDialogOpen] = useState(false);
     const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
@@ -133,14 +134,24 @@ function Header() {
                     </div>
                     <div id="login-button" className="headerButton headerButton1" title="Login"
                          onClick={!user ? openLoginDialog : toggleDropdown}>
-                        <FontAwesomeIcon icon={faUser}/>
+                        {user && user.profileImage ? (
+                            <img
+                                src={`https://server.streamshapers.com${user.profileImage}`}
+                                alt="Profile"
+                                className="header-profile-image"
+                            />
+                        ) : (
+                            <FontAwesomeIcon icon={faUser} title="Account" />
+                        )}
                         <span>{user ? user.username : 'Login'}</span>
                         {dropdownOpen && (
                             <div className={`user-dropdown-content ${dropdownOpen ? 'open' : ''}`} ref={dropdownRef}>
-                                {/*{user &&(
-                                <a href="https://streamshapers.com" className="user-dropdown-item"
-                                   onClick={test}>Settings</a>
-                                )}*/}
+                                {user &&(
+                                <>
+                                    <a href={streamshapersUrl + "/dashboard"} className="user-dropdown-item" target="_blank">Dashboard</a>
+                                    <a href={streamshapersUrl + "/settings"} className="user-dropdown-item" target="_blank">Account Settings</a>
+                                </>
+                                )}
                                 {user &&(
                                 <div className="user-dropdown-item logout" onClick={handleLogout}>
                                     Logout

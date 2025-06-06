@@ -1,5 +1,5 @@
-/* Initialy written by Richard */
-/*@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');*/
+/* Initially written by Richard */
+/* @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'); */
 
 :root {
     --primary: #4ba1e2;
@@ -211,8 +211,7 @@ hr {
 
 #samples {
     display: flex;
-
-
+    flex-wrap: wrap;
     justify-content: space-around;
     width: 100%;
     padding: 40px 0 0 0;
@@ -659,7 +658,8 @@ input[type="checkbox"] {
 
 #jsonElements h2,
 #jsonElements h3 {
-    color: #fff;
+    color: var(--copy)
+    /*color: #fff;*/
 }
 
 #previewWrapper {
@@ -1101,12 +1101,28 @@ input[type="checkbox"] {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
+#downloadBtnDisabled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: var(--foreground);
+    color: var(--border);
+    font-size: 16px;
+    border: 1px solid var(--border);
+    cursor: auto;
+    border-radius: 5px;
+    text-align: center;
+    min-height: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
 #downloadArea {
     margin-right: 10px;
 }
 
 #downloadBtn:hover {
-    background-color: var(--secondary);
+    border-color: var(--secondary);
     color: var(--secondary-content);
 }
 
@@ -1344,6 +1360,18 @@ input[type="checkbox"] {
     gap: 10px;
     justify-content: center;
     align-items: center;
+}
+
+.header-profile-image {
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--foreground);
+    transition: box-shadow 0.2s;
+    vertical-align: middle;
+    margin-left: -5px;
 }
 
 button {
@@ -1708,6 +1736,12 @@ label span.bla {
     padding: 10px;
     width: 80%;
     border: none;
+    cursor: pointer;
+    transition: transform 0.5s ease;
+}
+
+.auth-button:hover {
+    transform: scale(1.05);
 }
 
 .close-icon {
@@ -1813,6 +1847,7 @@ label span.bla {
 
 .template-card-header {
     display: flex;
+    gap: 10px;
     align-items: center;
     justify-content: space-between;
     font-size: 26px;
@@ -1835,6 +1870,7 @@ label span.bla {
 .template-card h3 {
     margin-top: 0;
     font-size: 18px;
+    overflow: hidden;
 }
 
 .template-card p {
@@ -1933,4 +1969,30 @@ textarea {
     padding: 10px;
     border-radius: 5px;
     background: var(--background);
+}
+
+.error-message{
+    color: var(--error);
+}
+
+.link{
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.password-check-list {
+    font-size: 0.85rem;
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.2rem;
+    list-style: none;
+}
+
+.password-check-list li {
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    background: var(--foreground);
 }

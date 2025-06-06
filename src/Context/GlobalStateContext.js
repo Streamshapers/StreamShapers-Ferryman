@@ -1,12 +1,14 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import AuthContext from "./AuthContext";
 import api from "../axiosInstance";
+import JSZip from "jszip";
 
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v1.6.8");
+    const [ferrymanVersion] = useState("v2.0.0");
     const {user, serverUrl} = useContext(AuthContext);
+    const streamshapersUrl = "https://hosting.streamshapers.com";
 
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
@@ -43,6 +45,7 @@ export const GlobalStateProvider = ({children}) => {
     const [mimeType, setMimeType] = useState("text/html");
     const [htmlTemplate, setHtmlTemplate] = useState(null);
     const [generalAlerts, setGeneralAlerts] = useState([]);
+    const clocks = useRef({});
     const [templateData, setTemplateData] = useState(null);
     const [remainingUploads, setRemainingUploads] = useState(null);
     const [ografManifest, setOgrafManifest] = useState(null);
@@ -161,6 +164,32 @@ export const GlobalStateProvider = ({children}) => {
             };
             setFileName(file.name.replace(/\.html$/, ''));
             reader.readAsText(file);
+        } else if (fileExtension === "lottie") {
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const jsonFiles = Object.keys(zip.files).filter(path =>
+                    path.startsWith("animations/") && path.endsWith(".json")
+                );
+
+                if (jsonFiles.length === 0) {
+                    console.error("No 'json' in .lottie-File found.");
+                    return;
+                }
+                const animationFile = zip.file(jsonFiles[0]);
+
+                const animationJsonText = await animationFile.async("string");
+                const animationJson = JSON.parse(animationJsonText);
+
+                const blob = new Blob([JSON.stringify(animationJson, null, 2)], {
+                    type: 'application/json',
+                });
+                const lottieFile = new File([blob], file.name.replace(/\.lottie$/, '') + ".json", {type: "application/json"});
+
+                setJsonFile(lottieFile);
+                setFileName(file.name.replace(/\.lottie$/, ''));
+            } catch (err) {
+                console.error("Error loading .lottie-File:", err);
+            }
         } else {
             console.error("File not supported.");
         }
@@ -236,11 +265,32 @@ export const GlobalStateProvider = ({children}) => {
             } else {
                 removeGeneralAlert("Marker without duration");
             }
+
+            //Check for duplicate markers
+            let nameList = []
+            let duplicates = []
+            if (markers) {
+                markers.forEach((marker) => {
+                    nameList.push(marker.cm)
+                })
+                duplicates = nameList.filter((item, index) => nameList.indexOf(item) !== index)
+                if (duplicates.length !== 0) {
+                    addGeneralAlert(
+                        "error",
+                        "Duplicate Marker Names",
+                        'Your animation has at least two markers with the same marker name. Make shure every marker has an unique name.',
+                        "Here is the documentation",
+                        "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/prepare-for-ferryman#add-start-and-stop-markers"
+                    );
+                } else {
+                    removeGeneralAlert("Duplicate Marker Names")
+                }
+            }
         }
     }, [markers]);
 
     useEffect(() => {
-        if (!markers) {
+        if (!markers && jsonData) {
             addGeneralAlert(
                 "error",
                 "Markers missing",
@@ -716,7 +766,7 @@ export const GlobalStateProvider = ({children}) => {
             dataformat: "json",
             uicolor: `${uiColor}`,
             steps: `${steps}`,
-            DataFields: SPXGCTemplateDefinition.DataFields ? [...SPXGCTemplateDefinition.DataFields] : []
+            DataFields: []
         };
         let spxExportJson = {...rawSpxJson};
 
@@ -842,12 +892,16 @@ export const GlobalStateProvider = ({children}) => {
 
     //############################################ External Sources ################################################################
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (!useExternalSources) {
             const updatedTextObjects = textObjects.map(textObject => {
                 if (textObject.type !== "text") {
                     if (textObject.type === "Digital Clock") {
                         textObject.text = textObject.original;
+                        if (/(_clock\d+)$/.test(textObject.layername)) {
+                            updateLottieLayername(textObject.layername, textObject.layername.replace(/_clock\d+$/, ""));
+                            textObject.layername = textObject.layername.replace(/_clock\d+$/, "");
+                        }
                     }
                     return {...textObject, type: "text"};
                 }
@@ -855,7 +909,7 @@ export const GlobalStateProvider = ({children}) => {
             })
             setTextObjects(updatedTextObjects);
         }
-    }, [useExternalSources]);
+    }, [useExternalSources]);*/
 
     useEffect(() => {
         //console.log("Delete:", deleteExternalSource);
@@ -866,6 +920,7 @@ export const GlobalStateProvider = ({children}) => {
                     updatedTextObjects[i].source = "";
                     updatedTextObjects[i].type = "text";
                     updatedTextObjects[i].text = updatedTextObjects[i].original;
+                    deleteClock(updatedTextObjects[i].layername);
                 }
             }
             setTextObjects(updatedTextObjects);
@@ -877,6 +932,10 @@ export const GlobalStateProvider = ({children}) => {
         const updatedGoogleTableCells = [];
         textObjects.map(textObject => {
             if (textObject.type === 'Google Sheet' && externalSources.length > 0) {
+                if (Object.values(clocks.current).some(layerList => layerList.includes(textObject.layername))) {
+                    deleteClock(textObject.layername);
+                }
+
                 const index = textObject.source;
                 const source = externalSources.find(obj => obj.index === parseInt(index, 10));
                 //textObject.text = textObject.oiginal;
@@ -887,6 +946,11 @@ export const GlobalStateProvider = ({children}) => {
                     sheet: textObject.sheet,
                     //value: textObject.text
                 })
+            }
+            if (textObject.type === 'Digital Clock') {
+                const index = textObject.source;
+                const source = externalSources.find(obj => obj.index === parseInt(index, 10));
+                addClock(source.secret, textObject.layername);
             }
         })
         //console.log(updatedGoogleTableCells);
@@ -901,7 +965,6 @@ export const GlobalStateProvider = ({children}) => {
         } else {
             //console.log("Keine Änderung in den Zellen");
         }
-
     }, [textObjects, externalSources]);
 
     function arraysAreEqual(arr1, arr2) {
@@ -918,6 +981,68 @@ export const GlobalStateProvider = ({children}) => {
         return true;
     }
 
+    const updateLottieLayername = (oldLayername, newLayername) => {
+        if (!jsonData) {
+            console.error("No valid Lottie or Data.");
+            return;
+        }
+
+        const tempJsonData = jsonData;
+        const layer = tempJsonData.layers.find(layer => layer.nm === oldLayername);
+        layer.nm = newLayername;
+
+        setJsonData(tempJsonData);
+    }
+
+    const addClock = (type, layerName) => {
+        const typeToKey = {
+            "24h hh:mm": "clock1",
+            "24h hh:mm:ss": "clock2",
+            "12h hh:mm am/pm": "clock3",
+            "12h hh:mm:ss am/pm": "clock4",
+            "12h hh:mm": "clock5",
+            "12h hh:mm:ss": "clock6",
+        };
+
+        const clockKey = typeToKey[type];
+        if (!clockKey) return;
+
+        const updatedClocks = {...clocks.current};
+
+        Object.keys(updatedClocks).forEach((key) => {
+            updatedClocks[key] = updatedClocks[key].filter(name => name !== layerName);
+            if (updatedClocks[key].length === 0) {
+                delete updatedClocks[key];
+            }
+        });
+
+        updatedClocks[clockKey] = [...(updatedClocks[clockKey] || []), layerName];
+
+        clocks.current = updatedClocks;
+    }
+
+    const deleteClock = (layerName) => {
+        const updatedClocks = {...clocks.current};
+        const clockKeys = ["clock1", "clock2", "clock3", "clock4", "clock5", "clock6"];
+        const updatedTextObjects = [...textObjects];
+        const textObject = updatedTextObjects.find(t => t.layername === layerName);
+        textObject.text = textObject.original;
+        updateLottieText(updatedTextObjects.indexOf(textObject), textObject.original);
+
+        clockKeys.forEach((key) => {
+            if (Array.isArray(updatedClocks[key])) {
+                updatedClocks[key] = updatedClocks[key].filter(name => name !== layerName);
+
+                if (updatedClocks[key].length === 0) {
+                    delete updatedClocks[key];
+                }
+            }
+        });
+
+        clocks.current = updatedClocks;
+        setTextObjects(updatedTextObjects);
+    };
+
 
     useEffect(() => {
         if (textObjects && textObjects.length > 0) {
@@ -929,15 +1054,16 @@ export const GlobalStateProvider = ({children}) => {
                     textObject.type = source.key;
                 }
                 if (textObject.type === "Digital Clock") {
-                    textObject.text = source.secret;
-                    updateLottieText(textObjects.findIndex(t => t === textObject), textObject.text);
+                    addClock(source.secret, textObject.layername);
                 }
                 if (textObject.type === "Google Sheet") {
-                    textObject.text = textObject.oiginal;
+                    textObject.text = textObject.original;
                 }
             })
 
+            //console.log(updatedTextObjects);
             setTextObjects(updatedTextObjects);
+            //jsonData.layers.map(layer => {console.log(layer.nm);})
         }
     }, [externalSources, updateExternalSources]);
 
@@ -1183,6 +1309,8 @@ export const GlobalStateProvider = ({children}) => {
             ferrymanJson = "<script type=\"text/javascript\">window.ferrymanTemplateJSON = " + JSON.stringify(ferrymanTemplateJSON) + ";</script>";
         }
 
+        let clockString = JSON.stringify(clocks.current);
+
         switch (exportFormat) {
             case 'html':
                 setMimeType('text/html');
@@ -1219,7 +1347,8 @@ export const GlobalStateProvider = ({children}) => {
                         .replace('${googleTableData}', JSON.stringify(googleTableCells))
                         .replace('</head>', playerCode)
                         // eslint-disable-next-line no-template-curly-in-string
-                        .replace('${ferrymanJSON}', ferrymanJson);
+                        .replace('${ferrymanJSON}', ferrymanJson)
+                        .replace('${clocks}', clockString);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);
@@ -1275,13 +1404,14 @@ export const GlobalStateProvider = ({children}) => {
     };
 
     useEffect(() => {
+        //console.log("HTML generation");
         async function generateHTML() {
             setExportFormat("html");
             await generateFile();
         }
 
         generateHTML().then();
-    }, [jsonData]);
+    }, [jsonData, textObjects]);
 
     //################################## FerrymanTemplateJSON ##########################################################
     useEffect(() => {
@@ -1308,72 +1438,45 @@ export const GlobalStateProvider = ({children}) => {
         return streamshapersJson;
     }
 
-    const saveTemplate = (name, category, description, tags) => {
+    const saveTemplate = async (name, projectId, description, tags) => {
         const templateJson = generateStreamshapersJson();
-        let templateName;
-        let templateCategory;
-        let templateDescription;
-        let templateTags;
+        let templateName, templateDescription, templateTags, templateProjectId;
 
         if (templateData) {
             templateName = templateData.name;
-            templateCategory = templateData.category;
+            templateProjectId  = templateData.category;
             templateDescription = templateData.description;
             templateTags = templateData.tags;
         }
 
         if (name && name !== '') templateName = name;
-        if (category && category !== '') templateCategory = category;
+        if (projectId !== undefined) templateProjectId = projectId; // Auch "" (kein Projekt) zulassen
         if (description && description !== '') templateDescription = description;
         if (tags && tags !== '') templateTags = tags;
 
-        if (templateName && templateJson) {
-            const saveTemplate = {
-                name: templateName,
-                category: templateCategory ? templateCategory : '',
-                description: templateDescription ? templateDescription : '',
-                data: templateJson,
-                tags: templateTags ? templateTags : []
-            }
-
-            if (templateData) {
-                api.put(`/templates/${templateData._id}`, saveTemplate, {withCredentials: true}).then(r => {
-                    console.log('saved template', saveTemplate);
-                    if (!user.categories.includes(templateCategory)) {
-                        api.post('/user/add-category', {
-                            category: templateCategory
-                        }, {withCredentials: true})
-                            .then(() => {
-                                console.log('New category added to user successfully');
-                            })
-                            .catch(error => {
-                                console.error('Error adding new category to user:', error);
-                            });
-                    }
-                })
-            } else {
-                api.post('/templates', saveTemplate, {
-                    withCredentials: true
-                })
-                    .then(response => {
-                        if (!user.categories.includes(templateCategory)) {
-                            api.post('/user/add-category', {
-                                category: templateCategory
-                            }, {withCredentials: true})
-                                .then(() => {
-                                    console.log('New category added to user successfully');
-                                })
-                                .catch(error => {
-                                    console.error('Error adding new category to user:', error);
-                                });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error saving template:', error);
-                    });
-            }
+        if (!templateName || !templateJson) {
+            throw new Error("Missing template name or data.");
         }
-    }
+
+        const payload = {
+            name: templateName,
+            projectId: templateProjectId || null,
+            description: templateDescription || '',
+            data: templateJson,
+            tags: templateTags || []
+        };
+
+        let response;
+
+        if (templateData && templateData._id) {
+            response = await api.put(`/templates/${templateData._id}`, payload);
+        } else {
+            response = await api.post('/templates', payload);
+        }
+
+        return response;
+    };
+
 
     //################################### Ograf ########################################################################
 
@@ -1452,6 +1555,7 @@ export const GlobalStateProvider = ({children}) => {
         <GlobalStateContext.Provider value={{
             ferrymanVersion,
             serverUrl,
+            streamshapersUrl,
             jsonData,
             setJsonData,
             colors,
@@ -1530,6 +1634,9 @@ export const GlobalStateProvider = ({children}) => {
             remainingUploads,
             setRemainingUploads,
             getTemplateLimit,
+            updateLottieLayername,
+            clocks,
+            deleteClock,
             ografManifest,
             generateJsonWithoutImages
         }}>

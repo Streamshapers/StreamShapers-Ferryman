@@ -15,7 +15,8 @@ function TextsDisplay() {
         externalSources,
         updateLottieText,
         updateExternalSources,
-        setUpdateExternalSources
+        setUpdateExternalSources,
+        deleteClock
     } = useContext(GlobalStateContext);
     const [showOptionMenuIndex, setShowOptionMenuIndex] = useState(null);
     const [isEditingLayerNameIndex, setIsEditingLayerNameIndex] = useState(null);
@@ -63,6 +64,7 @@ function TextsDisplay() {
                 if (action === "text") {
                     updatedTextObjects[index].source = "none";
                     updatedTextObjects[index].type = "text";
+                    deleteClock(updatedTextObjects[index].layername);
                 } else if (action === "external") {
                     updatedTextObjects[index].source = externalSources[0].index.toString();
                     updatedTextObjects[index].type = externalSources[0].key.toString();
@@ -95,9 +97,12 @@ function TextsDisplay() {
             if (type === "Digital Clock") {
                 updateLottieText(textObjects.findIndex(t => t === object), source.secret);
             }
+            if (type === "Google Sheet") {
+                deleteClock(updatedTextObjects[objectIndex].layername);
+            }
             setTextObjects(updatedTextObjects);
         }
-        //console.log(textObjects);
+        //console.log("Texts CHANGED:", textObjects);
     }
 
     const handleGoogleCoordinates = (object, value) => {

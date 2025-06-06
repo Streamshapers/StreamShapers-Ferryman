@@ -8,7 +8,7 @@ const api = axios.create({
 api.interceptors.response.use(
     response => response,
     async error => {
-        if (error.response?.status === 403 && !error.config._retry) {
+        if (error.response?.status === 401 && !error.config._retry) {
             error.config._retry = true;
 
             try {

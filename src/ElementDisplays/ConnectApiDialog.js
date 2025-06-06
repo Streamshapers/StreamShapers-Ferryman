@@ -26,34 +26,44 @@ function ConnectApiDialog() {
     const handleChange = (index, field, value) => {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
-                if (field === "key" && value === "Digital Clock") {
-                    const newSecret = api.secret === "" ? "cc:cc:cc" : api.secret;
-                    return { ...api, [field]: value, secret: newSecret };
-                } else if (field === "secret" && api.key === "Google Sheet") {
+                // Wenn der API-Typ geändert wird
+                if (field === "key") {
+                    let newSecret = '';
+                    if (value === "Digital Clock") {
+                        newSecret = "24h hh:mm:ss";
+                    }
+                    return {
+                        ...api,
+                        key: value,
+                        secret: newSecret,
+                        errors: ''
+                    };
+                }
+
+                // Wenn das Secret für Google Sheet geändert wird
+                if (field === "secret" && api.key === "Google Sheet") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
                     const match = value.match(regex);
-                    let error = match ? '' : 'invalid source';
-                    let finalValue = match ? match[1] : value;
-                    return { ...api, [field]: finalValue, errors: error };
-                } else if (field === "secret" && api.key === "Digital Clock") {
-                    let clockFormat;
-                    if (value === "hh:mm:ss") {
-                        clockFormat = "cc:cc:cc";
-                        return { ...api, [field]: clockFormat };
-                    } else if (value === "hh:mm") {
-                        clockFormat = "cc:cc";
-                        return { ...api, [field]: clockFormat };
-                    }
-                } else {
-                    return { ...api, [field]: value };
+                    const error = match ? '' : 'invalid source';
+                    const finalValue = match ? match[1] : value;
+                    return {...api, secret: finalValue, errors: error};
                 }
+
+                // Wenn das Secret für Digital Clock geändert wird
+                if (field === "secret" && api.key === "Digital Clock") {
+                    return {...api, secret: value};
+                }
+
+                // Default-Fall für alle anderen Änderungen
+                return {...api, [field]: value};
             }
+
             return api;
         });
-        setExternalSources(newApis);
-        //console.log("Aktualisierte Quellen:", newApis);
 
-    };
+        setExternalSources(newApis);
+    }
+
 
     const handleRemoveApi = index => {
         const source = externalSources[index].index;
@@ -103,8 +113,12 @@ function ConnectApiDialog() {
                                         <div className="external-source-clock">
                                             <div>Format:</div>
                                             <select onChange={e => handleChange(index, 'secret', e.target.value)}>
-                                                <option>hh:mm:ss</option>
-                                                <option>hh:mm</option>
+                                                <option>24h hh:mm:ss</option>
+                                                <option>24h hh:mm</option>
+                                                <option>12h hh:mm:ss am/pm</option>
+                                                <option>12h hh:mm am/pm</option>
+                                                <option>12h hh:mm:ss</option>
+                                                <option>12h hh:mm</option>
                                             </select>
                                         </div>
                                     )}

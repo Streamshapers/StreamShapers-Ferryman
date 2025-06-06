@@ -8,7 +8,6 @@ function SpxExport() {
         spxExport,
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
-        exportFormat
     } = useContext(GlobalStateContext);
     const [uiColor, setUiColor] = useState("gra");
     const spxUiColors = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"]
@@ -206,7 +205,7 @@ function SpxExport() {
                                                             <option value="dropdown">Dropdown</option>
                                                             <option value="textarea">Textarea</option>
                                                             <option value="checkbox">Checkbox</option>
-                                                            <option value="color">Color</option>
+                                                            {/*<option value="color">Color</option>*/}
                                                         </select>
                                                     </label>
                                                 )}

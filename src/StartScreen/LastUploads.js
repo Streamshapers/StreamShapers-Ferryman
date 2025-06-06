@@ -60,8 +60,16 @@ function LastUploads() {
 
     const handleMouseLeave = (templateId) => {
         setHoveredTemplateId(null);
-        if (playerRefs.current[templateId]) {
-            playerRefs.current[templateId].pause();
+        const ref = playerRefs.current[templateId];
+        const template = templates.find(t => t._id === templateId);
+        const marker = template?.data?.templateJson?.markers?.find(m => m.cm === "start");
+
+        if (marker && ref) {
+            const endFrame = marker.tm + marker.dr;
+            ref.setSeeker(endFrame);
+            ref.pause();
+        } else {
+            ref.stop();
         }
     };
 
@@ -74,64 +82,82 @@ function LastUploads() {
             const res = await api.get('/templates/' + id, {
                 withCredentials: true
             });
-            const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(res.data)], {type: 'application/json'});
             loadNewFile(blob);
         } catch (error) {
             console.error("Error loading file:", error);
         }
     };
 
+    useEffect(() => {
+        templates.forEach(template => {
+            const ref = playerRefs.current[template._id];
+            const marker = template?.data?.templateJson?.markers?.find(m => m.cm === "start");
+            if (marker && ref && ref.setSeeker) {
+                setTimeout(() => {
+                    const endFrame = marker.tm + marker.dr;
+                    ref.setSeeker(endFrame);
+                    ref.pause();
+                }, 300);
+            }
+        });
+    }, [templates]);
+
     return (
         <>
             {user && (
                 <div className="last-uploaded-container">
-                    <h2>Your last edited Templates</h2>
-                    <div className="template-grid">
-                        {loading ? (
-                            <p>Loading Templates...</p>
-                        ) : error ? (
-                            <p>{error}</p>
-                        ) : (
-                            templates
-                                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-                                .slice(0, 3)
-                                .map(template => (
-                                    <div
-                                        className="template-card"
-                                        key={template._id}
-                                        onMouseEnter={() => handleMouseEnter(template._id)}
-                                        onMouseLeave={() => handleMouseLeave(template._id)}
-                                    >
-                                        <div className="template-card-header">
-                                            <div></div>
-                                            <h3>{template.name}</h3>
-                                            <FontAwesomeIcon
-                                                className="template-card-more"
-                                                icon={faEllipsisVertical}
-                                                onClick={() => handleDropdownToggle(template._id)}
-                                            />
-                                            {showDropdown === template._id && (
-                                                <div className="template-card-dropdown-menu" ref={dropdownRef}>
-                                                    <button
-                                                        onClick={() => handleLoadInFerryman(template._id)}>Open
-                                                        in Ferryman
-                                                    </button>
+                    {loading ? (
+                        <p>Loading Templates...</p>
+                    ) : error ? (
+                        <p>{error}</p>
+                    ) : templates.length !== 0 ? (
+                        <>
+                            <h2>Your last edited Templates</h2>
+                            <div className="template-grid">
+                                {templates
+                                    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                                    .slice(0, 3)
+                                    .map(template => (
+                                        <div
+                                            className="template-card"
+                                            key={template._id}
+                                            onMouseEnter={() => handleMouseEnter(template._id)}
+                                            onMouseLeave={() => handleMouseLeave(template._id)}
+                                        >
+                                            <div className="template-card-header">
+                                                <div></div>
+                                                <h3>{template.name}</h3>
+                                                <FontAwesomeIcon
+                                                    className="template-card-more"
+                                                    icon={faEllipsisVertical}
+                                                    onClick={() => handleDropdownToggle(template._id)}
+                                                />
+                                                {showDropdown === template._id && (
+                                                    <div className="template-card-dropdown-menu" ref={dropdownRef}>
+                                                        <button
+                                                            onClick={() => handleLoadInFerryman(template._id)}>Open
+                                                            in Ferryman
+                                                        </button>
 
-                                                </div>
-                                            )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="template-card-body">
+                                                <Player
+                                                    ref={el => playerRefs.current[template._id] = el}
+                                                    src={template.data.templateJson}
+                                                    style={{height: 'auto', width: '100%'}}
+                                                    loop
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="template-card-body">
-                                            <Player
-                                                ref={el => playerRefs.current[template._id] = el}
-                                                src={template.data.templateJson}
-                                                style={{height: 'auto', width: '100%'}}
-                                                loop
-                                            />
-                                        </div>
-                                    </div>
-                                ))
-                        )}
-                    </div>
+                                    ))}
+                            </div>
+                        </>
+                    ) : (
+                        <div></div>
+                    )}
                 </div>
             )}
         </>

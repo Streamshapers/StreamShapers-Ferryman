@@ -35,14 +35,16 @@ function ExportDialog({ onClose }) {
     const [base64Images, setBase64Images] = useState([]);
     const [message, setMessage] = useState(null);
     const [activeTab, setActiveTab] = useState('default');
-    const [categories, setCategories] = useState([]);
-    const [newCategory, setNewCategory] = useState('');
+    const [projects, setProjects] = useState([]);
+    const [selectedProjectId, setSelectedProjectId] = useState("");
     const [saveToAccount, setSaveToAccount] = useState(false);
 
     useEffect(() => {
         getTemplateLimit();
-        if (user && user.categories) {
-            setCategories(user.categories);
+        if (user) {
+            api.get('/projects')
+                .then(res => setProjects(res.data))
+                .catch(() => setProjects([]));
         }
     }, []);
 
@@ -225,13 +227,8 @@ function ExportDialog({ onClose }) {
         setSaveToAccount(!saveToAccount);
     };
 
-    const handleNewCategoryChange = (e) => {
-        setNewCategory(e.target.value);
-    };
-
     const handleSaveTemplate = () => {
-        const category = newCategory || document.getElementById('category-select').value;
-        saveTemplate(fileName, category);
+        saveTemplate(fileName, selectedProjectId || null);
     };
 
     return (<>
@@ -291,26 +288,23 @@ function ExportDialog({ onClose }) {
                                            checked={saveToAccount}
                                            disabled={remainingUploads <= 0} onChange={handleSaveToAccountCheckbox}/>
                                     <label htmlFor="save-in-account">Save to StreamShapers Account on Export</label>
-                                    <span className="remaining-uploads"> ({remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left. Upgrade Plan)</span>
+                                    <span className="remaining-uploads"> ({remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.)</span>
                                 </div>
                                 {saveToAccount && (
                                     <div className="row">
-                                        <span>Optional: Category</span>
-                                        {categories.length > 0 ? (
-                                            <>
-                                                <select id="category-select">
-                                                    <option value="">Select Category</option>
-                                                    {categories.map((cat, index) => (
-                                                        <option key={index} value={cat}>{cat}</option>
-                                                    ))}
-                                                </select>
-                                                <p>or</p>
-                                            </>
-                                        ) : (
-                                            <></>
-                                        )}
-                                        <input type="text" placeholder="New Category" id="category" value={newCategory}
-                                               onChange={handleNewCategoryChange}/>
+                                        <span>Project</span>
+                                        <select
+                                            id="project-select"
+                                            value={selectedProjectId}
+                                            onChange={e => setSelectedProjectId(e.target.value)}
+                                        >
+                                            <option value="">No project</option>
+                                            {projects.map(project => (
+                                                <option key={project._id} value={project._id}>
+                                                    {project.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 )}
                             </div>
@@ -323,7 +317,6 @@ function ExportDialog({ onClose }) {
                 {activeTab === 'spx' && (
                     <SpxExport/>
                 )}
-
                 {/*activeTab === 'gdd' && (
                     <GddExport/>
                 )*/}
