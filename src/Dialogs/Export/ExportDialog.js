@@ -18,12 +18,9 @@ function ExportDialog({ onClose }) {
         uploadedFonts,
         fonts,
         imagePath,
-        setImagePath,
-        markers,
+        ografManifest,
         refImages,
-        SPXGCTemplateDefinition,
-        spxExport,
-        googleTableCells,
+        generateJsonWithoutImages,
         imageEmbed,
         setImageEmbed,
         exportFormat,
@@ -102,47 +99,50 @@ function ExportDialog({ onClose }) {
         );
     };
 
+    const triggerDownload = (blob, downloadName) => {
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = downloadName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(url);
+    };
+
     const downloadFile = async () => {
         let fileContent;
-        const zip = new JSZip();
         const extension = "." + exportFormat;
+        const fileNameWithExt = `${fileName}${extension}`;
+        const zip = new JSZip();
 
         if (user && saveToAccount && remainingUploads > 0) {
             handleSaveTemplate();
         }
 
-        try {
-            fileContent = await generateFile(1);
-        } catch (error) {
-            console.log("Error generating File", error);
-        }
-
         if (exportFormat === 'html' || exportFormat === 'json') {
+            try {
+                fileContent = await generateFile(1);
+            } catch (error) {
+                console.log("Error generating File", error);
+                showAlert("File generation failed!");
+                return;
+            }
+
             if (imageEmbed === "extra") {
-                zip.file(`${fileName}${extension}`, fileContent, {type: mimeType});
-
-                let imageFolderName;
-                if (imagePath.endsWith("/")) {
-                    imageFolderName = imagePath.slice(0, -1);
-                } else {
-                    imageFolderName = imagePath;
-                }
-
+                const imageFolderName = imagePath.endsWith("/")
+                    ? imagePath.slice(0, -1)
+                    : imagePath;
                 const imgFolder = zip.folder(imageFolderName);
 
-                base64Images.forEach((file, index) => {
+                base64Images.forEach(file => {
                     imgFolder.file(file.name, file);
                 });
 
-                zip.generateAsync({type: "blob"}).then(function (content) {
-                    const url = URL.createObjectURL(content);
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = url;
-                    downloadLink.download = `${fileName}.zip`;
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
-                    URL.revokeObjectURL(url);
+                zip.file(fileNameWithExt, fileContent, {type: mimeType});
+
+                zip.generateAsync({type: "blob"}).then(blob => {
+                    triggerDownload(blob, `${fileName}.zip`);
                     showAlert("Download started!");
                 });
 
@@ -150,18 +150,62 @@ function ExportDialog({ onClose }) {
             }
         }
 
-        const blob = new Blob([fileContent], {type: mimeType});
-        const url = URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = url;
-        downloadLink.download = fileName + extension;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(url);
-        showAlert("Download started!");
+        if (exportFormat === "ograf") {
+            try {
+                const graphicFile = await generateFile(1);
+                const lottieTemplateFile = JSON.stringify(generateJsonWithoutImages());
+                const lottiePlayerText = await (await fetch('/template/Ograf/lib/lottie-player.js')).text();
+                const manifestText = JSON.stringify(ografManifest);
+
+                const libFolder = zip.folder('lib');
+
+                const imageFolderName = imagePath.endsWith("/")
+                    ? imagePath.slice(0, -1)
+                    : imagePath;
+                const imgFolder = libFolder.folder(imageFolderName.toString());
+
+                base64Images.forEach(file => {
+                    imgFolder.file(file.name, file);
+                });
+
+                libFolder.file("lottie-player.js", lottiePlayerText);
+                libFolder.file("lottie-template.json", lottieTemplateFile);
+                zip.file("graphic.mjs", graphicFile, {type: mimeType});
+                zip.file("manifest.json", manifestText);
+
+                //zip.file(fileNameWithExt, fileContent, {type: mimeType});
+
+                zip.generateAsync({type: "blob"}).then(blob => {
+                    triggerDownload(blob, `${fileName}.zip`);
+                    showAlert("Download started!");
+                });
+
+                return;
+                // Beispiel: OGraf benötigt meist mehrere Dateien in ZIP
+                // zip.file("main.mjs", graphicFile, {type: "text/javascript"});
+                // ... weitere Dateien/Manifest einfügen ...
+                // Dann wie oben: triggerDownload(blob, ...)
+            } catch (error) {
+                console.log("Error generating OGraf File", error);
+                showAlert("OGraf export failed!");
+                return;
+            }
+            // return nicht vergessen, falls asynchron!
+            return;
+        }
+
+        // Standard-Download (HTML, JSON)
+        try {
+            const blob = new Blob([fileContent], {type: mimeType});
+            triggerDownload(blob, fileNameWithExt);
+            showAlert("Download started!");
+        } catch (error) {
+            console.log("Error during download", error);
+            showAlert("Download failed!");
+        }
         onClose();
     };
+
 
     const handleExportFormat = (format) => () => {
         setExportFormat(format);
