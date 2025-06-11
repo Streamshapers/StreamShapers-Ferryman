@@ -1529,6 +1529,32 @@ label span.bla {
     width: 100%;
 }
 
+.external-sources-fetch-control{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    width: 100%;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.source-fetch-item{
+    display: flex;
+    border: 1px solid var(--border);
+    padding: 5px 10px;
+    gap: 10px;
+    align-items: center;
+    border-radius: 5px;
+    height: 30px;
+    font-size: 0.95rem;
+}
+
+input.source-fetch-item{
+    max-width: 80px;
+}
+
 .sources-placeholder {
     width: 30px;
 }
@@ -1547,8 +1573,22 @@ label span.bla {
 .api-dialog {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     width: 100%;
+}
+
+.api-dialog-content{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    flex-grow: inherit;
+}
+
+.api-select{
+    max-width: 200px;
 }
 
 .external-source-fields {
@@ -1556,9 +1596,7 @@ label span.bla {
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    width: 100%;
-    padding-left: 10px;
-    border-left: 2px solid var(--primary);
+    flex-grow: 1;
 }
 
 .api-dialog input {

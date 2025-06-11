@@ -2,11 +2,12 @@ import React, {createContext, useContext, useEffect, useRef, useState} from 'rea
 import AuthContext from "./AuthContext";
 import api from "../axiosInstance";
 import JSZip from "jszip";
+import {replace} from "react-router-dom";
 
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.0");
+    const [ferrymanVersion] = useState("v2.0.0 beta");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://hosting.streamshapers.com";
 
@@ -39,6 +40,8 @@ export const GlobalStateProvider = ({children}) => {
     const [googleTableCells, setGoogleTableCells] = useState([]);
     const [updateGoogle, setUpdateGoogle] = useState(false);
     const [updateExternalSources, setUpdateExternalSources] = useState(0);
+    const [fetchSourcesPeriodically, setFetchSourcesPeriodically] = useState(false);
+    const [sourcesFetchInterval, setSourcesFetchInterval] = useState(5000);
     const updateTextRef = useRef(null);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
@@ -1323,6 +1326,9 @@ export const GlobalStateProvider = ({children}) => {
                         ferrymanJson = "<script type=\"text/javascript\">window.ferrymanTemplateJSON = " + JSON.stringify(ferrymanTemplateJSON) + ";</script>";
                     }
 
+                    let fetchInterval = 'const fetchInterval = 0;';
+                    if (fetchSourcesPeriodically && sourcesFetchInterval !== 0) fetchInterval = 'const fetchInterval = ' + sourcesFetchInterval + ';';
+
                     fileContent = template
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${jsonData}', jsonDataString)
@@ -1341,7 +1347,8 @@ export const GlobalStateProvider = ({children}) => {
                         .replace('</head>', playerCode)
                         // eslint-disable-next-line no-template-curly-in-string
                         .replace('${ferrymanJSON}', ferrymanJson)
-                        .replace('${clocks}', clockString);
+                        .replace('${clocks}', clockString)
+                        .replace('const fetchInterval = 0;', fetchInterval);
 
                 } catch (error) {
                     console.error('Error loading the template:', error);
@@ -1407,7 +1414,7 @@ export const GlobalStateProvider = ({children}) => {
 
         if (templateData) {
             templateName = templateData.name;
-            templateProjectId  = templateData.category;
+            templateProjectId = templateData.category;
             templateDescription = templateData.description;
             templateTags = templateData.tags;
         }
@@ -1539,7 +1546,11 @@ export const GlobalStateProvider = ({children}) => {
             getTemplateLimit,
             updateLottieLayername,
             clocks,
-            deleteClock
+            deleteClock,
+            fetchSourcesPeriodically,
+            setFetchSourcesPeriodically,
+            sourcesFetchInterval,
+            setSourcesFetchInterval
         }}>
             {children}
         </GlobalStateContext.Provider>

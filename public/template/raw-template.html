@@ -215,16 +215,14 @@
     }
 
     // Uncomment the following lines to periodically update data
-    /*
-    if (fetchInterval){    
+    if (fetchInterval && fetchInterval !== 0) {
         setTimeout(async function() {
             setInterval(() => {
                // await updateGoogleTableData()
                 update(lastData)
             }, fetchInterval)
-        }, 4000);   
+        }, 4000);
     }
-        */
 
 </script>
 <script>
@@ -253,11 +251,10 @@
     let playStack = [];
     let breakFrame = undefined;
     let fetchSheet = true;
-    let lastData
+    let lastData;
     let data = {};
     let clocks = ${clocks};
-    const fetchInterval = 2000;
-
+    const fetchInterval = 0;
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -355,7 +352,6 @@
         }
     }
 
-
     function triggerPlayStack(){
         setTimeout(()=>{
             if (showLogs) console.log(`LottieState: ${lottieState}`);
@@ -372,8 +368,6 @@
             }
         },0);
     }
-
-
 
     function controlAnimation(animation, action, value, force=true){
         if(typeof value == "number" && force === false) {
@@ -414,8 +408,6 @@
 
 
     }
-
-
 
     let animationFrame;
     function addEvents(animation){
@@ -644,10 +636,10 @@
                     animationData: lottieTemplateNew,
                 });
 
-                newAnimation.addEventListener("DOMLoaded", async function () {   
+                newAnimation.addEventListener("DOMLoaded", async function () {
                     if (showInfo) console.log("Template - updated Animation Ready");
-                    addEvents(newAnimation);     
-                    await delay(100)            
+                    addEvents(newAnimation);
+                    await delay(100)
                     controlAnimation(newAnimation,"stop",updateStartFrame)
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();

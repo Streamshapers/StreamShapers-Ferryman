@@ -9,7 +9,11 @@ function ConnectApiDialog() {
         externalSources,
         setExternalSources,
         setDeleteExternalSource,
-        setUpdateGoogle
+        setUpdateGoogle,
+        fetchSourcesPeriodically,
+        setFetchSourcesPeriodically,
+        sourcesFetchInterval,
+        setSourcesFetchInterval
     } = useContext(GlobalStateContext);
     const [externalSourceIndex, setExternalSourceIndex] = useState(2)
 
@@ -76,6 +80,21 @@ function ConnectApiDialog() {
         setUpdateGoogle(true);
     }
 
+    const toggleFetchPeriodically = () => {
+        setFetchSourcesPeriodically(!fetchSourcesPeriodically);
+    }
+
+    const setNewFetchInterval = (value) => {
+        const seconds = parseInt(value, 10);
+
+        if (isNaN(seconds) || seconds <= 0) {
+            return;
+        }
+
+        setSourcesFetchInterval(seconds * 1000);
+    };
+
+
     return (
         <>
             {useExternalSources && (
@@ -87,6 +106,35 @@ function ConnectApiDialog() {
                             <FontAwesomeIcon icon={faRotateRight}/>
                         </div>
                     </div>
+
+                    <div className="external-sources-fetch-control">
+                        <div className="source-fetch-item">
+                            <label htmlFor="api-dialog-fetch-p">Fetch Periodically</label>
+                            <input
+                                type="checkbox"
+                                title="Fetch Periodically"
+                                id="api-dialog-fetch-p"
+                                checked={fetchSourcesPeriodically}
+                                onChange={toggleFetchPeriodically}
+                            />
+                        </div>
+                        {fetchSourcesPeriodically && (
+                            <>
+                                <p>Fetch every</p>
+                                <input
+                                    className="source-fetch-item"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    title="Fetch Interval"
+                                    value={sourcesFetchInterval / 1000}
+                                    onChange={e => setNewFetchInterval(e.target.value)}
+                                />
+                                <p>seconds</p>
+                            </>
+                        )}
+                    </div>
+
                     {externalSources.map((api, index) => (
                         <div className="api-wrapper" key={api.index}>
                             {api.errors === 'invalid source' && (
@@ -97,35 +145,39 @@ function ConnectApiDialog() {
                             )}
                             <div className="api-dialog" key={index}>
                                 <div>{api.index.toString() + "."}</div>
-                                <select value={api.key} onChange={e => handleChange(index, 'key', e.target.value)}>
-                                    <option>Google Sheet</option>
-                                    <option>Digital Clock</option>
-                                </select>
-                                <div className="external-source-fields">
-                                    {api.key === "Google Sheet" && (
-                                        <input
-                                            type="text"
-                                            value={api.secret}
-                                            onChange={e => handleChange(index, 'secret', e.target.value)}
-                                            placeholder="put your spreadsheet url here..."/>
-                                    )}
-                                    {api.key === "Digital Clock" && (
-                                        <div className="external-source-clock">
-                                            <div>Format:</div>
-                                            <select onChange={e => handleChange(index, 'secret', e.target.value)}>
-                                                <option>24h hh:mm:ss</option>
-                                                <option>24h hh:mm</option>
-                                                <option>12h hh:mm:ss am/pm</option>
-                                                <option>12h hh:mm am/pm</option>
-                                                <option>12h hh:mm:ss</option>
-                                                <option>12h hh:mm</option>
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    <div className="div-button remove-button" onClick={() => handleRemoveApi(index)}>
-                                        <FontAwesomeIcon icon={faXmark}/>
+                                <div className="api-dialog-content">
+                                    <select className="api-select" value={api.key}
+                                            onChange={e => handleChange(index, 'key', e.target.value)}>
+                                        <option>Google Sheet</option>
+                                        <option>Digital Clock</option>
+                                    </select>
+                                    <div className="external-source-fields">
+                                        {api.key === "Google Sheet" && (
+                                            <input
+                                                type="text"
+                                                value={api.secret}
+                                                onChange={e => handleChange(index, 'secret', e.target.value)}
+                                                placeholder="put your spreadsheet url here..."
+                                            />
+                                        )}
+                                        {api.key === "Digital Clock" && (
+                                            <div className="external-source-clock">
+                                                <div>Format:</div>
+                                                <select onChange={e => handleChange(index, 'secret', e.target.value)}>
+                                                    <option>24h hh:mm:ss</option>
+                                                    <option>24h hh:mm</option>
+                                                    <option>12h hh:mm:ss am/pm</option>
+                                                    <option>12h hh:mm am/pm</option>
+                                                    <option>12h hh:mm:ss</option>
+                                                    <option>12h hh:mm</option>
+                                                </select>
+                                            </div>
+                                        )}
                                     </div>
+                                </div>
+                                <div className="div-button remove-button"
+                                     onClick={() => handleRemoveApi(index)}>
+                                    <FontAwesomeIcon icon={faXmark}/>
                                 </div>
                             </div>
                         </div>
