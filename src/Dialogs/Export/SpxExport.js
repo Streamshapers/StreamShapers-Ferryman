@@ -8,6 +8,7 @@ function SpxExport() {
         spxExport,
         SPXGCTemplateDefinition,
         setSPXGCTemplateDefinition,
+        exportFormat
     } = useContext(GlobalStateContext);
     const [uiColor, setUiColor] = useState("gra");
     const spxUiColors = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"]

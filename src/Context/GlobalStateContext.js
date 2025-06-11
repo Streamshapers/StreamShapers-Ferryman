@@ -1278,6 +1278,8 @@ export const GlobalStateProvider = ({children}) => {
             correctPath = imagePath;
         }
 
+        if (exportFormat === "ograf") correctPath = "lib/" + correctPath;
+
         try {
             const response = await fetch(lottieScriptUrl);
             if (!response.ok) throw new Error('CDN not answering');
