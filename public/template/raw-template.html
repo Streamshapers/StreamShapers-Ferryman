@@ -214,15 +214,6 @@
         }
     }
 
-    // Uncomment the following lines to periodically update data
-    if (fetchInterval && fetchInterval !== 0) {
-        setTimeout(async function() {
-            setInterval(() => {
-               // await updateGoogleTableData()
-                update(lastData)
-            }, fetchInterval)
-        }, 4000);
-    }
 
 </script>
 <script>
@@ -719,6 +710,19 @@
         document.body.appendChild(nameElement);
         document.body.appendChild(br);
     }
+
+
+        // Uncomment the following lines to periodically update data
+        if (fetchInterval && fetchInterval !== 0) {
+        setTimeout(async function() {
+            setInterval(() => {
+               // await updateGoogleTableData()
+                update(lastData)
+            }, fetchInterval)
+        }, 4000);
+    }
+
+
 </script>
 <!-- Lottie.js-->
 <script>
