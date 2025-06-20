@@ -96,14 +96,13 @@ export const GlobalStateProvider = ({children}) => {
     }
 
     const loadNewFile = async (file) => {
-        const fileName = file.name || '';
-        const fileExtension = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+        const newFileName = file.name || '';
+        const fileExtension = newFileName.includes('.') ? newFileName.split('.').pop().toLowerCase() : '';
 
         if (file.type === "application/json" || fileExtension === "json") {
             if (fileExtension === '') {
                 const parsedFile = await parseBlobAsJson(file);
                 setTemplateData(parsedFile);
-                //console.log(parsedFile);
 
                 const blob = new Blob([JSON.stringify(parsedFile.data.templateJson, null, 2)], {
                     type: 'application/json',
@@ -111,7 +110,7 @@ export const GlobalStateProvider = ({children}) => {
                 const lottieFile = new File([blob], parsedFile.name + ".json", {type: "application/json"});
                 setJsonFile(lottieFile);
 
-                if (parsedFile.data.name) setFileName(parsedFile.name);
+                if (parsedFile.name) setFileName(parsedFile.name)
                 if (parsedFile.data.ferrymanJson.textObjects) setTextObjects(parsedFile.data.ferrymanJson.textObjects);
                 if (parsedFile.data.ferrymanJson.externalSources) setExternalSources(parsedFile.data.ferrymanJson.externalSources);
                 if (parsedFile.data.ferrymanJson.useExternalSources) setUseExternalSources(parsedFile.data.ferrymanJson.useExternalSources);
@@ -343,8 +342,8 @@ export const GlobalStateProvider = ({children}) => {
             addGeneralAlert(
                 "alert",
                 `Images are missing`,
-                'You don\'t have embedded you images in your lottie file. Please check the documentation:  ',
-                "See here",
+                'There are Images that are not embedded in the lottie file. Please check the ',
+                "Documentation",
                 "https://www.streamshapers.com/docs/documentation/streamshapers-ferryman/aftereffects-for-html/bodymovin/dynamic-templates-export"
             );
         }

@@ -5,6 +5,7 @@ import './index.css';
 import './mediaQuerys.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import {ThemeProvider} from './Theme/ThemeContext';
 import {GlobalStateProvider} from "./Context/GlobalStateContext";
 import {AuthProvider} from "./Context/AuthContext";
@@ -27,3 +28,6 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+serviceWorkerRegistration.register();
+

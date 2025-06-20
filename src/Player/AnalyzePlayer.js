@@ -332,7 +332,7 @@ function AnalyzePlayer() {
                             <FontAwesomeIcon icon={faForwardFast}/>
                         </div>
                     }
-                    <div className="previewControlButton" title="<Save current Frame>" onClick={downloadCurrentFrame}>
+                    <div className="previewControlButton" title="Save current Frame" onClick={downloadCurrentFrame}>
                         <FontAwesomeIcon icon={faCamera}/>
                     </div>
                 </div>

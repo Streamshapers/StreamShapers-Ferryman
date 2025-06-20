@@ -26,6 +26,7 @@
     --success-content: #282828;
     --warning-content: #282828;
     --error-content: #fafafa;
+    --grey: #494949;
 }
 
 .light {
@@ -796,12 +797,13 @@ input[type="checkbox"] {
 }
 
 .previewControlButton.grey {
-    background-color: var(--foreground);
+    color: var(--grey);
 }
 
 .previewControlButton.grey:hover {
-    background-color: var(--foreground);
+    color: var(--grey);
     cursor: default;
+    border-color: var(--border);
 }
 
 .previewControlButton.demo {
@@ -811,7 +813,6 @@ input[type="checkbox"] {
 
 .previewControlButton:hover {
     border-color: var(--primary);
-
 }
 
 .previewControlButton:hover svg{
@@ -1166,6 +1167,11 @@ input[type="checkbox"] {
 
 .alert {
     color: var(--warning-content);
+}
+
+.alert a{
+    color: var(--warning-content);
+    text-decoration: underline;
 }
 
 .error-wrapper {
@@ -1535,6 +1541,7 @@ label span.bla {
     gap: 10px;
     border: 1px solid var(--border);
     background: var(--background);
+    border-radius: 5px;
     width: 100%;
     padding: 10px;
     flex-wrap: wrap;

@@ -1,0 +1,21 @@
+{
+  "name": "Ferryman by StreamShapers",
+  "short_name": "Ferryman",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#363636",
+  "theme_color": "#4ba1e2",
+  "description": "Convert and manage HTML broadcast templates.",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

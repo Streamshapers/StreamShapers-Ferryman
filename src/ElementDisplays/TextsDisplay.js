@@ -68,6 +68,8 @@ function TextsDisplay() {
                 } else if (action === "external") {
                     updatedTextObjects[index].source = externalSources[0].index.toString();
                     updatedTextObjects[index].type = externalSources[0].key.toString();
+                    const isCellValue = /^[A-Z]+[1-9][0-9]*$/i.test(updatedTextObjects[index].text);
+                    if (isCellValue) updatedTextObjects[index].cell = updatedTextObjects[index].text.toUpperCase();
                 }
                 setTextObjects(updatedTextObjects);
             }

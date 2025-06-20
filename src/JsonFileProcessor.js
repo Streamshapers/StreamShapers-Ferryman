@@ -25,7 +25,8 @@ function JsonFileProcessor() {
         setTemplateData,
         setGoogleTableCells,
         setUpdateExternalSources,
-        setUpdateGoogle
+        setUpdateGoogle,
+        clocks
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -44,6 +45,7 @@ function JsonFileProcessor() {
         setGoogleTableCells(null);
         setUpdateExternalSources(0);
         setUpdateGoogle(false);
+        clocks.current = {};
     };
 
     const processJsonFile = (file) => {
