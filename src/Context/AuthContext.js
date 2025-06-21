@@ -38,7 +38,7 @@ export const AuthProvider = ({children}) => {
                 const newAccessToken = refreshResponse.data.accessToken;
 
                 localStorage.setItem('accessToken', newAccessToken);
-                console.log('Access token refreshed:', newAccessToken);
+                //console.log('Access token refreshed:', newAccessToken);
 
                 const response = await api.get('/auth/me', {
                     headers: { 'Authorization': `Bearer ${newAccessToken}` },

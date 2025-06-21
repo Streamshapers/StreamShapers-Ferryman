@@ -4,7 +4,7 @@ export function register(config) {
             navigator.serviceWorker
                 .register('/service-worker.js')
                 .then(registration => {
-                    console.log('✅ Service Worker registriert:', registration);
+                    //console.log('✅ Service Worker registriert:', registration);
                     if (config?.onSuccess) config.onSuccess(registration);
                 })
                 .catch(error => {

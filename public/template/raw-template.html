@@ -55,7 +55,7 @@
     let newAnimation;
     let updateAnimation;
     let stopExist = false;
-    let showLogs = true;
+    let showLogs = false;
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
@@ -287,7 +287,6 @@
         }
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
-            console.log("google fetched: ", parsed);
         }
         if (parsed) {
             for (let key of Object.keys(parsed)) {
@@ -642,7 +641,6 @@
                 return null;
             }
             let tsvText = await response.text();
-            console.log("tsv from sheets", tsvText);
             return tsvText.split('\n').map(row => row.split('\t'));
         } catch (error) {
             console.error("Error collecting data from Google:", error);
@@ -671,7 +669,6 @@
             if (cellValue) {
                 cellValue = cellValue.replace(/\r/g, '').replace(/\n/g, '');
             }
-            console.log("returned cell value: ", cellValue);
             return cellValue;
         } catch (error) {
             console.log("Error getCellData from GoogleSheet:", error);
@@ -680,7 +677,6 @@
 
     async function updateGoogleTableData(data) {
         try {
-            console.log('dada before: ', data);
             const tableData = await parseGoogleTable();
             let sources = {};
 
@@ -700,7 +696,6 @@
                     data[element.key] = value;
                 }
             }
-            console.log('dada after: ', data);
             return data;
         } catch (error) {
             console.log(error)

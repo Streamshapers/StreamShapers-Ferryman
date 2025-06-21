@@ -2,6 +2,7 @@ import React, {createContext, useContext, useEffect, useRef, useState} from 'rea
 import AuthContext from "./AuthContext";
 import api from "../axiosInstance";
 import JSZip from "jszip";
+import isEqual from 'lodash/isEqual';
 import {replace} from "react-router-dom";
 
 export const GlobalStateContext = createContext();
@@ -137,7 +138,7 @@ export const GlobalStateProvider = ({children}) => {
                         const lottieFile = new File([blob], file.name.replace(/\.html$/, '') + ".json", {type: "application/json"});
 
                         setJsonFile(lottieFile);
-                        setFileName(file.name.replace(/\\.html$/, ''));
+                        setFileName(file.name.replace(/\.html$/, ''));
                         //console.log("set new JSON file:", lottieFile);
                     } catch (err) {
                         console.error("Error parsing lottieTemplate:", err);
@@ -754,82 +755,111 @@ export const GlobalStateProvider = ({children}) => {
     //############################################ SPX ############################################################
 
     useEffect(() => {
-        const steps = markers ? markers.length - 1 : 0;
-        const description = SPXGCTemplateDefinition.description ? SPXGCTemplateDefinition.description : '';
-        const uiColor = SPXGCTemplateDefinition.uicolor ? SPXGCTemplateDefinition.uicolor : '0';
-        const rawSpxJson = {
-            description: `${description}`,
-            playserver: "OVERLAY",
-            playchannel: "1",
-            playlayer: "5",
-            webplayout: "5",
-            out: "manual",
-            dataformat: "json",
-            uicolor: `${uiColor}`,
-            steps: `${steps}`,
-            DataFields: []
-        };
-        let spxExportJson = {...rawSpxJson};
-
-        if (fileName && spxExportJson.description === '') {
-            spxExportJson.description = fileName;
+        if (
+            (!textObjects || textObjects.length === 0) &&
+            (!refImages   || refImages.length === 0)
+        ) {
+            return;
         }
 
-        let textsWithNames = {};
+        const steps       = markers ? markers.length - 1 : 0;
+        const description = SPXGCTemplateDefinition?.description || '';
+        const uiColor     = SPXGCTemplateDefinition?.uicolor     || '0';
 
-        if (textObjects) {
-            for (let i = 0; i < textObjects.length; i++) {
-                if (
-                    textObjects[i].layername.startsWith('_') &&
-                    textObjects[i].type === "text" &&
-                    !(textObjects[i].layername.includes("_update"))
-                ) {
-                    textsWithNames[textObjects[i].layername] = textObjects[i].text;
-                }
+        const textsWithNames = {};
+        textObjects?.forEach(obj => {
+            if (
+                obj.layername.startsWith('_') &&
+                obj.type === 'text' &&
+                !obj.layername.includes('_update')
+            ) {
+                textsWithNames[obj.layername] = obj.text;
             }
-        }
+        });
 
-        // Helper function to find and update DataFields
-        const updateOrAddField = (dataFields, newField) => {
-            const existingField = dataFields.find(field => field.field === newField.field);
-            if (existingField) {
-                existingField.value = newField.value;
-                if (newField.title) existingField.title = newField.title;
-                if (newField.field) existingField.field = newField.field;
+        const imageFields = {};
+        refImages?.forEach(img => {
+            if (img.nm?.startsWith('_')) {
+                imageFields[img.nm] = `/media/images/${img.refId}.png`;
+            }
+        });
+
+        const allExpectedFields = { ...textsWithNames, ...imageFields };
+
+        const originalFields = SPXGCTemplateDefinition?.DataFields ?? [];
+        const isEmpty       = originalFields.length === 0;
+
+        const spxExportJson = isEmpty
+            ? {
+                description : fileName || description,
+                playserver  : 'OVERLAY',
+                playchannel : '1',
+                playlayer   : '5',
+                webplayout  : '5',
+                out         : 'manual',
+                dataformat  : 'json',
+                uicolor     : `${uiColor}`,
+                steps       : `${steps}`,
+                DataFields  : []
+            }
+            : {
+                ...SPXGCTemplateDefinition,
+                description : fileName || SPXGCTemplateDefinition.description,
+                uicolor     : `${uiColor}`,
+                steps       : `${steps}`,
+                DataFields  : [...SPXGCTemplateDefinition.DataFields]
+            };
+
+        const updateOrAddField = (arr, newField) => {
+            const tgt = arr.find(f => f.field === newField.field);
+            if (tgt) {
+                tgt.value = newField.value;
+                if (newField.title && newField.title !== tgt.title) {
+                    tgt.title = newField.title;
+                }
             } else {
-                dataFields.push(newField); // Add new field
+                arr.push(newField);
             }
         };
 
-        if (Object.keys(textsWithNames).length > 0) {
-            Object.keys(textsWithNames).forEach(key => {
-                updateOrAddField(spxExportJson.DataFields, {
-                    field: key,
-                    ftype: "textfield",
-                    title: key,
-                    value: textsWithNames[key]
-                });
+        Object.entries(textsWithNames).forEach(([field, value]) => {
+            const orig = originalFields.find(f => f.field === field);
+            updateOrAddField(spxExportJson.DataFields, {
+                field,
+                ftype : orig?.ftype || 'textfield',
+                title : orig?.title || field,
+                value,
+                ...(orig?.items ? { items: orig.items } : {})
             });
+        });
+
+        Object.entries(imageFields).forEach(([field, value]) => {
+            const orig = originalFields.find(f => f.field === field);
+            updateOrAddField(spxExportJson.DataFields, {
+                field,
+                ftype       : orig?.ftype || 'filelist',
+                title       : orig?.title || 'Choose Image',
+                assetfolder : orig?.assetfolder || '/media/images/',
+                extension   : orig?.extension   || 'png',
+                value
+            });
+        });
+
+        spxExportJson.DataFields = spxExportJson.DataFields.filter(f =>
+            allExpectedFields.hasOwnProperty(f.field)
+        );
+
+        if (!isEqual(spxExportJson, SPXGCTemplateDefinition)) {
+            setSPXGCTemplateDefinition(spxExportJson);
         }
 
-
-        if (refImages) {
-            refImages.forEach(refImage => {
-                if (refImage.nm.startsWith("_")) {
-                    updateOrAddField(spxExportJson.DataFields, {
-                        field: refImage.nm,
-                        ftype: "filelist",
-                        title: "Choose Image",
-                        assetfolder: `/media/images/`,
-                        extension: "png",
-                        value: `/media/images/${refImage.refId}.png`
-                    });
-                }
-            });
-        }
-        //console.log(spxExportJson);
-        setSPXGCTemplateDefinition(spxExportJson);
-    }, [fileName, textObjects, jsonData, refImages, markers]);
+    }, [
+        fileName,
+        textObjects,
+        refImages,
+        markers,
+        SPXGCTemplateDefinition
+    ]);
 
     //############################################ GDD ################################################################
 
@@ -1175,6 +1205,26 @@ export const GlobalStateProvider = ({children}) => {
         }
     }, [googleTableCells, updateGoogle]);
 
+    /*
+    Fetch periodically in Analyze player
+
+    useEffect(() => {
+        let intervalId;
+
+        if (fetchSourcesPeriodically) {
+            setUpdateGoogle(true);
+
+            intervalId = setInterval(() => {
+                setUpdateGoogle(true);
+            }, sourcesFetchInterval);
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [sourcesFetchInterval, fetchSourcesPeriodically]);*/
 
     /*useEffect(() => {
         if(updateMarkerReady){
