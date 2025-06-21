@@ -28,194 +28,17 @@
             color: #fff;
         }
     </style>
+
     ${fontFaceStyles}
 
     ${ferrymanJSON}
 
     ${spx}
-
-    <script>
-
-
-        let clockIntervalIds = [];
-
-        function getTime(type, addSeconds = 0) {
-            let formats = {
-                clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
-                clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
-                clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
-                clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
-                clock5: {hour: "2-digit", minute: "2-digit", hour12: true },
-                clock6: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
-            }
-
-            let now = new Date();
-            now.setSeconds(now.getSeconds() + addSeconds);
-
-            let formattedTime = new Intl.DateTimeFormat("en-GB", formats[type]).format(now);
-            if (type === "clock5" || type === "clock6") {
-                formattedTime = formattedTime.replace(/\s?(AM|PM)$/i, '');
-            }
-            return formattedTime
-        }
-
-        function updateTimeField() {
-            if (playStatus !== "") {
-                clockIntervalIds.forEach(id => clearInterval(id));
-                clockIntervalIds = [];
-
-                function updateTime(animation) {
-                    if (animation && animation.isLoaded){
-                        Object.keys(clocks).forEach((key)=>{
-                            let time = getTime(key);
-                            if (animation && animation.renderer && animation.renderer.elements) {
-                                animation.renderer.elements.forEach((element, index) => {
-                                    if (element && element.data && element.data.nm && element.updateDocumentData) {
-                                        clocks[key].forEach((layer)=>{
-                                            if (element.data.nm === layer){
-                                                element.updateDocumentData({t: time})
-                                            }
-                                        })
-                                    }
-                                })
-                            };
-                        })
-
-                            if (lottieState === "idle") {
-                                let saveFrame = animation.currentFrame + currentSegmentFrames;
-                                if(animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0){
-                                    saveFrame = animation.currentFrame;
-                                }
-                                if (animation.renderer && typeof animation.renderer.renderFrame === "function") {
-                                    try {
-                                        animation.renderer.renderFrame(saveFrame + 1);
-                                        animation.renderer.renderFrame(saveFrame);
-                                    } catch (error) {
-                                        console.error("⚠️ Error while rendering Frame: ", error);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                const id = setInterval(()=>{
-                    updateTime(animation);
-                    updateTime(newAnimation)
-                    updateTime(updateAnimation)
-
-                }, 100);
-                clockIntervalIds.push(id);
-
-                updateTime(animation);
-                updateTime(newAnimation)
-                updateTime(updateAnimation)
-            }
-    </script>
 </head>
 
 <body>
 <div id="animation1"></div>
-<!--Animations-Script-->
-<script>
-    //Google Table integration
-    // SHEET_ID = "1Ta6xX9ZVGEQXY5K3uqpCSlqXr6r6Ixqpr91-WcAR1IA";
-    // SHEET_TITLE = "Tabellenblatt1";
-    //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_TITLE;
 
-    const googleTableCells = '${googleTableData}';
-
-    /*googleTableCells.push({
-        id:"id",
-        key: "_value1",
-        cell: "A1",
-        value:"default"
-    })*/
-
-    function delay(ms) {
-         return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    async function parseGoogleTable() {
-        return JSON.parse(googleTableCells);
-    }
-
-    async function fetchDataFromGoogle(url) {
-        try {
-            let response = await fetch(url);
-            if (!response.ok) {
-                console.warn(`Fehler beim Abrufen der Daten. Status: ${response.status}`);
-                return null;
-            }
-            let tsvText = await response.text();
-            return tsvText.split('\n').map(row => row.split('\t'));
-        } catch (error) {
-            console.error("Error collecting data from Google:", error);
-            return null;
-        }
-    }
-
-    function getCellData(cell, data) {
-        try {
-            const columnName = cell.match(/[A-Z]+/g)[0];
-            const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let rowIx = (parseInt(cell.match(/[0-9]+/g)[0])) - 1; // Row index (0-based)
-            let colIx = 0;
-
-            for (let i = 0; i < columnName.length; i++) {
-                colIx = colIx * 26 + base.indexOf(columnName[i]) + 1;
-            }
-            colIx = colIx - 1; // Column index (0-based)
-
-            let cellValue = data[rowIx] ? data[rowIx][colIx] : undefined;
-
-            if (cellValue && cellValue.startsWith('"') && cellValue.endsWith('"')) {
-                cellValue = cellValue.slice(1, -1);
-            }
-
-            if (cellValue) {
-                cellValue = cellValue.replace(/\r/g, '').replace(/\n/g, '');
-            }
-
-            return cellValue;
-        } catch (error) {
-            console.log("Error getCellData from GoogleSheet:", error);
-        }
-    }
-
-    async function updateGoogleTableData(data) {
-        try{
-            const tableData = await parseGoogleTable();
-            let sources = {};
-
-            for (const element of tableData) {
-                //const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/gviz/tq?tqx=out:csv&sheet=' + element.sheet;
-                const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/export?format=tsv&gid=' + element.sheet;
-                let tsvArray;
-
-                if (!sources[sheetURL]) {
-                    tsvArray = await fetchDataFromGoogle(sheetURL);
-                    sources[sheetURL] = tsvArray;
-                } else {
-                    tsvArray = sources[sheetURL];
-                }
-
-                if (tsvArray && tsvArray.length > 0) {
-                    const value = getCellData(element.cell, tsvArray);
-                    if (!data[element.key]){
-                        data[element.key] = value;
-                    }
-                }
-            }
-            return data;
-        } catch(error){
-            console.log(error)
-            return data
-        }
-    }
-
-
-</script>
 <script>
     "use strict"
     const lottieTemplate = ${jsonData};
@@ -253,7 +76,7 @@
         markers.push(name);
         marker.cm = name.toLowerCase();
 
-        if (name.includes("next")&& !name.includes("loop")) nextTotal++;
+        if (name.includes("next") && !name.includes("loop")) nextTotal++;
         if (name === "stop") stopExist = true;
         if (name === "update") updateExist = true;
     })
@@ -275,11 +98,11 @@
     const addFont = (fam, path) => {
         const newFont = document.createElement('style');
         newFont.appendChild(document.createTextNode(`\
-            @font-face {\
-                font-family: ${fam};\
-                src: url('${path}');\
-            }\
-            `));
+                @font-face {\
+                    font-family: ${fam};\
+                    src: url('${path}');\
+                }\
+                `));
         document.head.appendChild(newFont);
     }
 
@@ -299,7 +122,7 @@
             if (!lottieTemplate.fonts || !lottieTemplate.fonts.list || lottieTemplate.fonts.list.length === 0) {
                 if (showLogs) console.log("No fonts found");
                 resolve("No fonts found");
-            } else{
+            } else {
                 const fonts = lottieTemplate.fonts.list;
                 for (const font of fonts) {
                     if (font.fPath !== '') {
@@ -314,12 +137,12 @@
     }
 
     function decodeHtmlEntities(encodedString) {
-        const textArea = document.createElement("textarea"); // Create auxiliary element
-        textArea.innerHTML = encodedString; // Set HTML entities
-        return textArea.value; // Return decoded text
+        const textArea = document.createElement("textarea");
+        textArea.innerHTML = encodedString;
+        return textArea.value;
     }
 
-    function updateLayerText(layer,newText){
+    function updateLayerText(layer, newText) {
         layer.t.d.k[0].s.t = decodeHtmlEntities(newText);
     }
 
@@ -337,60 +160,60 @@
         return null;
     }
 
-    function getMarker(markerName){
+    function getMarker(markerName) {
         for (let marker of lottieTemplate.markers) {
             if (marker.cm === markerName) return marker;
         }
     }
 
-    function triggerPlayStack(){
-        setTimeout(()=>{
+    function triggerPlayStack() {
+        setTimeout(() => {
             if (showLogs) console.log(`LottieState: ${lottieState}`);
             if (currentSegment === "stop") {
                 //animation.destroy();
             }
-            if (playStack.length === 0 && currentSegment.includes("loop") ) playStack.push(currentSegment);
+            if (playStack.length === 0 && currentSegment.includes("loop")) playStack.push(currentSegment);
             if (playStack[0]) {
                 const nextSegment = playStack[0];
-                animation.goToAndPlay(nextSegment,true);
+                animation.goToAndPlay(nextSegment, true);
                 if (showLogs) console.log(`Template - Play   ${nextSegment} "Marker"`);
                 currentSegment = nextSegment;
                 playStack.shift();
             }
-        },0);
+        }, 0);
     }
 
-    function controlAnimation(animation, action, value, force=true){
-        if(typeof value == "number" && force === false) {
+    function controlAnimation(animation, action, value, force = true) {
+        if (typeof value == "number" && force === false) {
             console.log("Frames will be forced to play immediately and not be added to playStack!")
             force = true
         }
-        if (force){
-            if(action === "play"){
+        if (force) {
+            if (action === "play") {
                 animation.goToAndPlay(value, true)
-            } else if(action === "stop"){
-                animation.goToAndStop(value,true)
+            } else if (action === "stop") {
+                animation.goToAndStop(value, true)
             }
-            if(typeof value == "string"){
+            if (typeof value == "string") {
                 currentSegment = value
                 if (showLogs) console.log(`CurrentSegment: ${currentSegment}`)
-            } else if(typeof value == "number"){
-                lottieTemplate.markers.forEach((marker)=>{
-                    if(value >= marker.tm && value <marker.tm+marker.dr){
+            } else if (typeof value == "number") {
+                lottieTemplate.markers.forEach((marker) => {
+                    if (value >= marker.tm && value < marker.tm + marker.dr) {
                         currentSegment = marker.cm
                         if (showLogs) console.log(`CurrentSegment: ${currentSegment}`)
                     }
                 })
             }
-        } else if (typeof value == "string"){
+        } else if (typeof value == "string") {
             if (lottieState === "idle") {
-                if(action === "play"){
-                animation.goToAndPlay(value, true)
-                currentSegment = value
-            } else if(action === "stop"){
-                animation.goToAndStop(value,true)
-                currentSegment = value
-            }
+                if (action === "play") {
+                    animation.goToAndPlay(value, true)
+                    currentSegment = value
+                } else if (action === "stop") {
+                    animation.goToAndStop(value, true)
+                    currentSegment = value
+                }
             } else {
                 playStack.push(value);
                 if (markers.includes(value + "_loop")) playStack.push(value + "_loop");
@@ -401,7 +224,8 @@
     }
 
     let animationFrame;
-    function addEvents(animation){
+
+    function addEvents(animation) {
         animation.addEventListener("enterFrame", () => {
             currentSegmentFrames = getMarker(currentSegment).tm;
             /*
@@ -413,23 +237,23 @@
             */
             currentFrame = Math.round(animation.currentFrame) + currentSegmentFrames;
             animationFrame = Math.round(animation.currentFrame);
-            if(animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0){
+            if (animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0) {
                 currentFrame = animationFrame;
-                if (showLogs)console.log("animationFrame: " + animationFrame + " LottiePlayerDuration: " + animation.getDuration(1) + " TemplateCompleteLength: " + lottieTemplate.op + " CurrentSegmentStart: " + currentSegmentFrames);
+                if (showLogs) console.log("animationFrame: " + animationFrame + " LottiePlayerDuration: " + animation.getDuration(1) + " TemplateCompleteLength: " + lottieTemplate.op + " CurrentSegmentStart: " + currentSegmentFrames);
             } else {
                 if (showLogs) console.log("currentFrame: " + animationFrame + " LottiePlayerDuration: " + animation.getDuration(1) + " TemplateCompleteLength: " + lottieTemplate.op + " CurrentSegmentStart: " + currentSegmentFrames);
             }
         });
-        animation.addEventListener("_play",()=>{
-            lottieState="play";
+        animation.addEventListener("_play", () => {
+            lottieState = "play";
             if (showLogs) console.log(`LottieState: ${lottieState}`);
         });
-        animation.addEventListener("_pause",()=>{
-            lottieState="pause";
+        animation.addEventListener("_pause", () => {
+            lottieState = "pause";
             triggerPlayStack();
         });
-        animation.addEventListener("_idle", ()=>{
-            lottieState="idle";
+        animation.addEventListener("_idle", () => {
+            lottieState = "idle";
         });
     }
 
@@ -463,9 +287,10 @@
         }
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
+            console.log("google fetched: ", parsed);
         }
-        if (parsed){
-            for (let key of Object.keys(parsed)){
+        if (parsed) {
+            for (let key of Object.keys(parsed)) {
                 data[key] = parsed[key]
             }
         }
@@ -526,10 +351,9 @@
             ;
 
             await animReady;
-            controlAnimation(animation,"stop",0)
+            controlAnimation(animation, "stop", 0)
             playStatus = "loaded";
             animLoaded.resolve("Template - Animation is Ready");
-
         }
 
         //Update when tamplate is playing
@@ -577,7 +401,7 @@
                 updateAnimation.addEventListener("DOMLoaded", async function () {
                     addEvents(updateAnimation);
                     await delay(100)
-                    controlAnimation(updateAnimation,"play","update")
+                    controlAnimation(updateAnimation, "play", "update")
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = updateAnimation;
@@ -602,7 +426,7 @@
                         newAnimation.addEventListener("DOMLoaded", async function () {
                             if (showInfo) console.log("Template - updated Animation Ready");
                             addEvents(newAnimation);
-                            controlAnimation(newAnimation,"stop",updateStartFrame)
+                            controlAnimation(newAnimation, "stop", updateStartFrame)
                             currentSegment = "update" //important for right updateFrame!
                             await delay(100)
                             animation.destroy();
@@ -613,6 +437,7 @@
                     });
                 });
             }
+
             //only without update animation
             if (!updateExist) {
                 const newDiv = document.createElement("div");
@@ -631,7 +456,7 @@
                     if (showInfo) console.log("Template - updated Animation Ready");
                     addEvents(newAnimation);
                     await delay(100)
-                    controlAnimation(newAnimation,"stop",updateStartFrame)
+                    controlAnimation(newAnimation, "stop", updateStartFrame)
                     animation.destroy();
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
@@ -648,8 +473,8 @@
         await animLoaded.promise;
         await animReady;
         await loadFonts();
-        if(Object.keys(clocks).length!=0) updateTimeField()
-        controlAnimation(animation,"play","start")
+        if (Object.keys(clocks).length !== 0) updateTimeField()
+        controlAnimation(animation, "play", "start")
         playStatus = "play";
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
@@ -659,7 +484,7 @@
 
     function stop() {
         if (stopExist) {
-            controlAnimation(animation,"play","stop",false)
+            controlAnimation(animation, "play", "stop", false)
         } else {
             if (showLogs) console.log("Template - No 'stop' marker - destroy Animation");
             animation.destroy();
@@ -672,18 +497,15 @@
             stop();
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
         } else {
-            controlAnimation(animation,"play","next" + nextCount,false)
+            controlAnimation(animation, "play", "next" + nextCount, false)
             nextCount++;
         }
     }
 
-//function to invoke
-    function playMarker (name) {
-        controlAnimation(animation,"play",name,false)
+    //function to invoke
+    function playMarker(name) {
+        controlAnimation(animation, "play", name, false)
     }
-
-
-
 
 
     function info() {
@@ -711,19 +533,181 @@
         document.body.appendChild(br);
     }
 
-
-        // Uncomment the following lines to periodically update data
-        if (fetchInterval && fetchInterval !== 0) {
-        setTimeout(async function() {
+    if (fetchInterval && fetchInterval !== 0) {
+        setTimeout(async function () {
             setInterval(() => {
-               // await updateGoogleTableData()
+                // await updateGoogleTableData()
                 update(lastData)
             }, fetchInterval)
         }, 4000);
     }
-
-
 </script>
+
+<script>
+    //############################ Clocks ##################################
+    let clockIntervalIds = [];
+
+    function getTime(type, addSeconds = 0) {
+        let formats = {
+            clock1: {hour: "2-digit", minute: "2-digit", hour12: false},
+            clock2: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false},
+            clock3: {hour: "2-digit", minute: "2-digit", hour12: true},
+            clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
+            clock5: {hour: "2-digit", minute: "2-digit", hour12: true},
+            clock6: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
+        }
+
+        let now = new Date();
+        now.setSeconds(now.getSeconds() + addSeconds);
+
+        let formattedTime = new Intl.DateTimeFormat("en-GB", formats[type]).format(now);
+        if (type === "clock5" || type === "clock6") {
+            formattedTime = formattedTime.replace(/\s?(AM|PM)$/i, '');
+        }
+        return formattedTime
+    }
+
+    function updateTimeField() {
+        if (playStatus !== "") {
+            clockIntervalIds.forEach(id => clearInterval(id));
+            clockIntervalIds = [];
+
+            function updateTime(animation) {
+                if (animation && animation.isLoaded) {
+                    Object.keys(clocks).forEach((key) => {
+                        let time = getTime(key);
+                        if (animation && animation.renderer && animation.renderer.elements) {
+                            animation.renderer.elements.forEach((element, index) => {
+                                if (element && element.data && element.data.nm && element.updateDocumentData) {
+                                    clocks[key].forEach((layer) => {
+                                        if (element.data.nm === layer) {
+                                            element.updateDocumentData({t: time})
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                        ;
+                    })
+
+                    if (lottieState === "idle") {
+                        let saveFrame = animation.currentFrame + currentSegmentFrames;
+                        if (animation.getDuration(1) === lottieTemplate.op || currentSegmentFrames === 0) {
+                            saveFrame = animation.currentFrame;
+                        }
+                        if (animation.renderer && typeof animation.renderer.renderFrame === "function") {
+                            try {
+                                animation.renderer.renderFrame(saveFrame + 1);
+                                animation.renderer.renderFrame(saveFrame);
+                            } catch (error) {
+                                console.error("⚠️ Error while rendering Frame: ", error);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        const id = setInterval(() => {
+            updateTime(animation);
+            updateTime(newAnimation)
+            updateTime(updateAnimation)
+
+        }, 100);
+        clockIntervalIds.push(id);
+
+        updateTime(animation);
+        updateTime(newAnimation)
+        updateTime(updateAnimation)
+    }
+</script>
+
+<script>
+    //############################# Google Table integration ##########################################
+    const googleTableCells = '${googleTableData}';
+
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function parseGoogleTable() {
+        return JSON.parse(googleTableCells);
+    }
+
+    async function fetchDataFromGoogle(url) {
+        try {
+            let response = await fetch(url);
+            if (!response.ok) {
+                console.warn(`Fehler beim Abrufen der Daten. Status: ${response.status}`);
+                return null;
+            }
+            let tsvText = await response.text();
+            return tsvText.split('\n').map(row => row.split('\t'));
+        } catch (error) {
+            console.error("Error collecting data from Google:", error);
+            return null;
+        }
+    }
+
+    function getCellData(cell, data) {
+        try {
+            const columnName = cell.match(/[A-Z]+/g)[0];
+            const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let rowIx = (parseInt(cell.match(/[0-9]+/g)[0])) - 1;
+            let colIx = 0;
+
+            for (let i = 0; i < columnName.length; i++) {
+                colIx = colIx * 26 + base.indexOf(columnName[i]) + 1;
+            }
+            colIx = colIx - 1;
+
+            let cellValue = data[rowIx] ? data[rowIx][colIx] : undefined;
+
+            if (cellValue && cellValue.startsWith('"') && cellValue.endsWith('"')) {
+                cellValue = cellValue.slice(1, -1);
+            }
+
+            if (cellValue) {
+                cellValue = cellValue.replace(/\r/g, '').replace(/\n/g, '');
+            }
+
+            return cellValue;
+        } catch (error) {
+            console.log("Error getCellData from GoogleSheet:", error);
+        }
+    }
+
+    async function updateGoogleTableData(data) {
+        try {
+            const tableData = await parseGoogleTable();
+            let sources = {};
+
+            for (const element of tableData) {
+                const sheetURL = 'https://docs.google.com/spreadsheets/d/' + element.id + '/export?format=tsv&gid=' + element.sheet;
+                let tsvArray;
+
+                if (!sources[sheetURL]) {
+                    tsvArray = await fetchDataFromGoogle(sheetURL);
+                    sources[sheetURL] = tsvArray;
+                } else {
+                    tsvArray = sources[sheetURL];
+                }
+
+                if (tsvArray && tsvArray.length > 0) {
+                    const value = getCellData(element.cell, tsvArray);
+                    if (!data[element.key]) {
+                        data[element.key] = value;
+                    }
+                }
+            }
+            return data;
+        } catch (error) {
+            console.log(error)
+            return data
+        }
+    }
+</script>
+
 <!-- Lottie.js-->
 <script>
     ${lottieData}
