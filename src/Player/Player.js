@@ -4,7 +4,7 @@ import {GlobalStateContext} from "../Context/GlobalStateContext";
 import TemplatePlayer from "./PreviewPlayer";
 
 function Player() {
-    const {setIsPlaying, setCurrentFrame, fileName, markers} = useContext(GlobalStateContext);
+    const {jsonData, setIsPlaying, setCurrentFrame, fileName, markers} = useContext(GlobalStateContext);
     const [activeTab, setActiveTab] = useState('standard');
     const [key, setKey] = useState(0);
 
@@ -16,18 +16,24 @@ function Player() {
     };
 
     useEffect(() => {
-        setActiveTab("standard");
+        if(jsonData) {
+            setActiveTab("standard");
+        } else{
+            setActiveTab("template");
+        }
     }, [fileName]);
 
     return (
         <div id="previewWrapper">
             {markers && markers.length > 0 && (
                 <div className="mode-switch">
+                    {jsonData && (
                     <button className={`mode-button ${activeTab === 'standard' ? 'active' : ''}`}
                             onClick={() => handleTabChange('standard')}
                             title="check your animation frame by frame"
                     >Analyze
                     </button>
+                    )}
                     <button className={`mode-button ${activeTab === 'template' ? 'active' : ''}`}
                             onClick={() => handleTabChange('template')}
                             title="preview your HTML-Template">Preview

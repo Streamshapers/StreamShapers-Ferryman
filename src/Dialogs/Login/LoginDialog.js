@@ -55,7 +55,7 @@ function LoginDialog({onClose}) {
         e.preventDefault();
         setLoginMessage(null);
         try {
-            console.log('Sending Login-Data...');
+            //console.log('Sending Login-Data...');
             const response = await api.post('/auth/login', loginData, {
                 headers: {'Content-Type': 'application/json'},
                 withCredentials: true,
@@ -63,7 +63,7 @@ function LoginDialog({onClose}) {
 
             const {accessToken} = response.data;
             localStorage.setItem('accessToken', accessToken);
-            console.log('Login successful, token stored.');
+            //console.log('Login successful, token stored.');
 
             const userResponse = await api.get('/auth/me', {
                 headers: {Authorization: `Bearer ${accessToken}`},
@@ -71,7 +71,7 @@ function LoginDialog({onClose}) {
             });
 
             const user = userResponse.data.user;
-            console.log('User information retrieved:', user);
+            //console.log('User information retrieved:', user);
 
             login(user);
             onClose();

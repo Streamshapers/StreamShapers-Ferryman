@@ -4,15 +4,17 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRotateRight} from "@fortawesome/free-solid-svg-icons";
 
 function CasparCGTemplateDemo() {
-    const {htmlTemplate, textObjects, updateGoogle, setUpdateGoogle} = useContext(GlobalStateContext);
+    const {jsonData, htmlTemplate, textObjects, updateGoogle, setUpdateGoogle, importedHTML} = useContext(GlobalStateContext);
     const templateRef = useRef(null);
     const [clickedPlay, setClickedPlay] = useState(false);
     const [iframeKey, setIframeKey] = useState(0);
     const previewTemplate = useRef(htmlTemplate);
 
     useEffect(() => {
-
-    }, []);
+        if(!jsonData && importedHTML) {
+            previewTemplate.current = importedHTML;
+        }
+    }, [importedHTML]);
 
     const triggerAction = (action) => {
         const iframe = templateRef.current;
@@ -23,6 +25,7 @@ function CasparCGTemplateDemo() {
         switch (action) {
             case "play":
                 // erst Daten schicken, dann Play
+                console.log("template", importedHTML);
                 if(!clickedPlay) sendUpdateMessage();
                 iframe.contentWindow.postMessage({action: "play"}, "*");
                 setClickedPlay(true);

@@ -3,7 +3,6 @@ import AuthContext from "./AuthContext";
 import api from "../axiosInstance";
 import JSZip from "jszip";
 import isEqual from 'lodash/isEqual';
-import {replace} from "react-router-dom";
 
 export const GlobalStateContext = createContext();
 
@@ -52,7 +51,8 @@ export const GlobalStateProvider = ({children}) => {
     const clocks = useRef({});
     const [templateData, setTemplateData] = useState(null);
     const [remainingUploads, setRemainingUploads] = useState(null);
-
+    const [importedHTML, setImportedHTML] = useState(null);
+    const [performance, setPerformance] = useState(null);
     const googleCellSnapshot = useRef([]);
 
     useEffect(() => {
@@ -124,9 +124,9 @@ export const GlobalStateProvider = ({children}) => {
             reader.onload = (event) => {
                 const htmlContent = event.target.result;
 
-                const lottieMatch = htmlContent.match(/const lottieTemplate\s*=\s*(\{[\s\S]*?\});/);
-                const ferrymanMatch = htmlContent.match(/window\.ferrymanTemplateJSON\s*=\s*(\{[\s\S]*?\});/);
-                const spxMatch = htmlContent.match(/window\.SPXGCTemplateDefinition\s*=\s*(\{[\s\S]*?\});/);
+                const lottieMatch = htmlContent.match(/const lottieTemplate\s*=\s*(\{[\s\S]*?});/);
+                const ferrymanMatch = htmlContent.match(/window\.ferrymanTemplateJSON\s*=\s*(\{[\s\S]*?});/);
+                const spxMatch = htmlContent.match(/window\.SPXGCTemplateDefinition\s*=\s*(\{[\s\S]*?});/);
 
                 if (lottieMatch) {
                     try {
@@ -162,6 +162,9 @@ export const GlobalStateProvider = ({children}) => {
                     } catch (err) {
                         console.error("Error parsing spXGCTemplate:", err);
                     }
+                }
+                if(!lottieMatch) {
+                    setImportedHTML(htmlContent);
                 }
             };
             setFileName(file.name.replace(/\.html$/, ''));
@@ -1502,13 +1505,21 @@ export const GlobalStateProvider = ({children}) => {
             api.get('/templates/limit', {withCredentials: true})
                 .then(response => {
                     setRemainingUploads(response.data.remainingUploads);
-                    console.log(response.data);
+                    //console.log(response.data);
                 })
                 .catch(error => {
                     console.error('Error fetching template limit:', error);
                 });
         }
     }
+
+    const sendStatistic = (stat) => {
+        api.post('/statistics', stat, { withCredentials: true })
+            .catch(error => {
+                console.warn('Error sending statistics:', error);
+            });
+    };
+
 
     return (
         <GlobalStateContext.Provider value={{
@@ -1599,7 +1610,11 @@ export const GlobalStateProvider = ({children}) => {
             fetchSourcesPeriodically,
             setFetchSourcesPeriodically,
             sourcesFetchInterval,
-            setSourcesFetchInterval
+            setSourcesFetchInterval,
+            sendStatistic,
+            importedHTML,
+            performance,
+            setPerformance
         }}>
             {children}
         </GlobalStateContext.Provider>

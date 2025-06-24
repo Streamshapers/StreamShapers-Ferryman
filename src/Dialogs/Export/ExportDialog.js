@@ -25,7 +25,8 @@ function ExportDialog({ onClose }) {
         mimeType,
         generateFile,
         remainingUploads,
-        getTemplateLimit
+        getTemplateLimit,
+        sendStatistic
     } = useContext(GlobalStateContext);
 
     const [allFontsLoaded, setAllFontsLoaded] = useState(false);
@@ -142,6 +143,18 @@ function ExportDialog({ onClose }) {
                     showAlert("Download started!");
                 });
 
+                sendStatistic({
+                    client: 'ferryman',
+                    event: 'export',
+                    type: exportFormat,
+                    details: {
+                        template: fileName,
+                        user: user ? user.email : null,
+                        imageEmbed,
+                        projectId: selectedProjectId,
+                        refImagesCount: refImages.length
+                    }
+                });
                 return;
             }
         }
@@ -156,6 +169,18 @@ function ExportDialog({ onClose }) {
         document.body.removeChild(downloadLink);
         URL.revokeObjectURL(url);
         showAlert("Download started!");
+        sendStatistic({
+            client: 'ferryman',
+            event: 'export',
+            type: exportFormat,
+            details: {
+                template: fileName,
+                user: user ? user.email : null,
+                imageEmbed,
+                projectId: selectedProjectId,
+                refImagesCount: refImages.length
+            }
+        });
         onClose();
     };
 

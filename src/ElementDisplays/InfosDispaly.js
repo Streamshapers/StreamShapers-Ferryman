@@ -17,9 +17,11 @@ function InfosDisplay() {
     ));
 
     return (
-        <div className='accordionInfo'>
-            {infoElements}
-        </div>
+        <>
+            <div className='accordionInfo'>
+                {infoElements}
+            </div>
+        </>
     );
 }
 

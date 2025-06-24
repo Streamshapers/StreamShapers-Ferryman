@@ -294,16 +294,16 @@ function AnalyzePlayer() {
         return `${width / divisor} / ${height / divisor}`;
     };
 
+    if (!jsonData) {
+        return null;
+    }
+
     const aspectRatio = calculateAspectRatio(jsonData.w, jsonData.h);
 
     const style = {
         aspectRatio: aspectRatio,
         maxWidth: jsonData.w
     };
-
-    if (!jsonData) {
-        return null;
-    }
 
     return (
         <>

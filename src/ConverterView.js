@@ -3,6 +3,7 @@ import Splitter from "./Splitter";
 import {useContext} from "react";
 import {GlobalStateContext} from "./Context/GlobalStateContext";
 import Player from "./Player/Player";
+import TemplatePerformanceTester from "./TemplatePerformanceTester";
 
 function ConverterView() {
     const {jsonData} = useContext(GlobalStateContext);
@@ -13,6 +14,7 @@ function ConverterView() {
 
     return (
         <div className="container">
+            <TemplatePerformanceTester/>
             <div id="contentWrapper">
                 <div id="jsonElements"><JsonElementsDisplay/></div>
                 <Splitter/>
