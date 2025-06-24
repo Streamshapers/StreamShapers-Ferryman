@@ -277,9 +277,7 @@ function ExportDialog({onClose}) {
                         <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                         <input type="text" id="fileNameInput" value={String(fileName)}
                                onChange={handleFileNameChange}/>
-                        {exportFormat !== 'ograf' && (
-                            <span id="fileType">.{exportFormat}</span>
-                        )}
+                        <span id="fileType">{exportFormat === "ograf" ? ".zip" : `.${exportFormat}`}</span>
                     </div>
                     {refImages.length > 0 && exportFormat !== 'ograf' && (
                         <div id="image-export-options">
