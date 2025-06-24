@@ -292,7 +292,7 @@ function ExportDialog({onClose}) {
                     <div id="export-format">
                         <RadioButton value={exportFormat === 'html'} label="HTML-Template"
                                      onChange={handleExportFormat("html")}/>
-                        <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template"
+                        <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template (Beta)"
                                      onChange={handleExportFormat("ograf")}/>
                         <RadioButton value={exportFormat === 'json'} label="JSON"
                                      onChange={handleExportFormat('json')}/>
