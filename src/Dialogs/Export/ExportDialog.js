@@ -6,6 +6,7 @@ import GddExport from "./GddExport";
 import GeneralAlerts from "../../GeneralAlerts";
 import AuthContext from "../../Context/AuthContext";
 import api from "../../axiosInstance";
+import OgrafExport from "./OgrafExport";
 
 function ExportDialog({ onClose }) {
     const {user} = useContext(AuthContext);
@@ -17,7 +18,9 @@ function ExportDialog({ onClose }) {
         uploadedFonts,
         fonts,
         imagePath,
+        ografManifest,
         refImages,
+        generateJsonWithoutImages,
         imageEmbed,
         setImageEmbed,
         exportFormat,
@@ -99,47 +102,84 @@ function ExportDialog({ onClose }) {
         );
     };
 
+    const triggerDownload = (blob, downloadName) => {
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = downloadName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(url);
+    };
+
     const downloadFile = async () => {
         let fileContent;
-        const zip = new JSZip();
         const extension = "." + exportFormat;
+        const fileNameWithExt = `${fileName}${extension}`;
+        const zip = new JSZip();
 
         if (user && saveToAccount && remainingUploads > 0) {
             handleSaveTemplate();
         }
 
-        try {
-            fileContent = await generateFile(1);
-        } catch (error) {
-            console.log("Error generating File", error);
-        }
-
         if (exportFormat === 'html' || exportFormat === 'json') {
+            try {
+                fileContent = await generateFile(1);
+            } catch (error) {
+                console.log("Error generating File", error);
+                showAlert("File generation failed!");
+                return;
+            }
+
             if (imageEmbed === "extra") {
-                zip.file(`${fileName}${extension}`, fileContent, {type: mimeType});
-
-                let imageFolderName;
-                if (imagePath.endsWith("/")) {
-                    imageFolderName = imagePath.slice(0, -1);
-                } else {
-                    imageFolderName = imagePath;
-                }
-
+                const imageFolderName = imagePath.endsWith("/")
+                    ? imagePath.slice(0, -1)
+                    : imagePath;
                 const imgFolder = zip.folder(imageFolderName);
 
-                base64Images.forEach((file, index) => {
+                base64Images.forEach(file => {
                     imgFolder.file(file.name, file);
                 });
 
-                zip.generateAsync({type: "blob"}).then(function (content) {
-                    const url = URL.createObjectURL(content);
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = url;
-                    downloadLink.download = `${fileName}.zip`;
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
-                    URL.revokeObjectURL(url);
+                zip.file(fileNameWithExt, fileContent, {type: mimeType});
+
+                zip.generateAsync({type: "blob"}).then(blob => {
+                    triggerDownload(blob, `${fileName}.zip`);
+                    showAlert("Download started!");
+                });
+
+                return;
+            }
+        }
+
+        if (exportFormat === "ograf") {
+            try {
+                const graphicFile = await generateFile(1);
+                const lottieTemplateFile = JSON.stringify(generateJsonWithoutImages());
+                const lottiePlayerText = await (await fetch('/template/Ograf/lib/lottie-player.js')).text();
+                const manifestText = JSON.stringify(ografManifest);
+
+                const libFolder = zip.folder('lib');
+
+                const imageFolderName = imagePath.endsWith("/")
+                    ? imagePath.slice(0, -1)
+                    : imagePath;
+                const imgFolder = libFolder.folder(imageFolderName.toString());
+
+                base64Images.forEach(file => {
+                    imgFolder.file(file.name, file);
+                });
+
+                libFolder.file("lottie-player.js", lottiePlayerText);
+                libFolder.file("lottie-template.json", lottieTemplateFile);
+                zip.file("graphic.mjs", graphicFile, {type: mimeType});
+                zip.file("manifest.json", manifestText);
+
+                //zip.file(fileNameWithExt, fileContent, {type: mimeType});
+
+                zip.generateAsync({type: "blob"}).then(blob => {
+                    triggerDownload(blob, `${fileName}.zip`);
                     showAlert("Download started!");
                 });
 
@@ -156,31 +196,36 @@ function ExportDialog({ onClose }) {
                     }
                 });
                 return;
+            } catch (error) {
+                console.log("Error generating OGraf File", error);
+                showAlert("OGraf export failed!");
+                return;
             }
+            // return nicht vergessen, falls asynchron!
+            return;
         }
 
-        const blob = new Blob([fileContent], {type: mimeType});
-        const url = URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = url;
-        downloadLink.download = fileName + extension;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(url);
-        showAlert("Download started!");
-        sendStatistic({
-            client: 'ferryman',
-            event: 'export',
-            type: exportFormat,
-            details: {
-                template: fileName,
-                user: user ? user.email : null,
-                imageEmbed,
-                projectId: selectedProjectId,
-                refImagesCount: refImages.length
-            }
-        });
+        // Standard-Download (HTML, JSON)
+        try {
+            const blob = new Blob([fileContent], {type: mimeType});
+            triggerDownload(blob, fileNameWithExt);
+            showAlert("Download started!");
+            sendStatistic({
+                client: 'ferryman',
+                event: 'export',
+                type: exportFormat,
+                details: {
+                    template: fileName,
+                    user: user ? user.email : null,
+                    imageEmbed,
+                    projectId: selectedProjectId,
+                    refImagesCount: refImages.length
+                }
+            });
+        } catch (error) {
+            console.log("Error during download", error);
+            showAlert("Download failed!");
+        }
         onClose();
     };
 
@@ -206,7 +251,6 @@ function ExportDialog({ onClose }) {
         saveTemplate(fileName, selectedProjectId || null);
     };
 
-
     return (<>
             <h2>Export</h2>
             {message && (
@@ -218,6 +262,11 @@ function ExportDialog({ onClose }) {
                     <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
                             onClick={() => handleTabChange('default')}>General
                     </button>
+                    {exportFormat === 'ograf' &&(
+                        <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
+                                onClick={() => handleTabChange('ograf')}>Ograf
+                        </button>
+                    )}
                     <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`}
                             onClick={() => handleTabChange('spx')}>SPX
                     </button>
@@ -231,9 +280,11 @@ function ExportDialog({ onClose }) {
                             <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
                             <input type="text" id="fileNameInput" value={String(fileName)}
                                    onChange={handleFileNameChange}/>
-                            <span id="fileType">.{exportFormat}</span>
+                            {exportFormat !== 'ograf' && (
+                                <span id="fileType">.{exportFormat}</span>
+                            )}
                         </div>
-                        {refImages.length > 0 && (
+                        {refImages.length > 0 && exportFormat !== 'ograf' && (
                             <div id="image-export-options">
                                 <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
                                              onChange={handleImageExport("embed")}/>
@@ -244,6 +295,8 @@ function ExportDialog({ onClose }) {
                         <div id="export-format">
                             <RadioButton value={exportFormat === 'html'} label="HTML-Template"
                                          onChange={handleExportFormat("html")}/>
+                            <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template"
+                                         onChange={handleExportFormat("ograf")}/>
                             <RadioButton value={exportFormat === 'json'} label="JSON"
                                          onChange={handleExportFormat('json')}/>
                             {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
@@ -274,10 +327,12 @@ function ExportDialog({ onClose }) {
                                         </select>
                                     </div>
                                 )}
-
                             </div>
                         )}
                     </div>
+                )}
+                {activeTab === 'ograf' && (
+                    <OgrafExport/>
                 )}
                 {activeTab === 'spx' && (
                     <SpxExport/>

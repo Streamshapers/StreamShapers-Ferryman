@@ -51,6 +51,7 @@ export const GlobalStateProvider = ({children}) => {
     const clocks = useRef({});
     const [templateData, setTemplateData] = useState(null);
     const [remainingUploads, setRemainingUploads] = useState(null);
+    const [ografManifest, setOgrafManifest] = useState(null);
     const [importedHTML, setImportedHTML] = useState(null);
     const [performance, setPerformance] = useState(null);
     const googleCellSnapshot = useRef([]);
@@ -1240,12 +1241,30 @@ export const GlobalStateProvider = ({children}) => {
 
     /*############################# generate Template ########################################*/
 
+    const generateJsonWithoutImages = () => {
+        let jsonWithoutImages;
+        if (jsonData && jsonData.assets) {
+            if (imagePath != null && !imagePath.endsWith("/")) {
+                setImagePath(`${imagePath}/`);
+            }
+            jsonWithoutImages = JSON.parse(JSON.stringify(jsonData));
+
+            jsonWithoutImages.assets.forEach(asset => {
+                if (asset.p && asset.p.startsWith('data:image')) {
+                    asset.p = asset.id + ".png";
+                    asset.e = 0;
+                    asset.u = imagePath;
+                }
+            });
+            return jsonWithoutImages;
+        }
+    }
+
     const generateFile = async (production) => {
         let fileContent;
         let lottieScriptUrl = 'https://cdn.jsdelivr.net/npm/lottie-web/build/player/lottie.min.js';
         let lottiePlayerCode = '';
         let correctPath;
-        let jsonWithoutImages = "";
         let playerCode;
 
         if (production) {
@@ -1314,6 +1333,8 @@ export const GlobalStateProvider = ({children}) => {
             correctPath = imagePath;
         }
 
+        if (exportFormat === "ograf") correctPath = "lib/" + correctPath;
+
         try {
             const response = await fetch(lottieScriptUrl);
             if (!response.ok) throw new Error('CDN not answering');
@@ -1328,19 +1349,21 @@ export const GlobalStateProvider = ({children}) => {
             lottiePlayerCode = await localScriptResponse.text();
         }
 
-        if (jsonData && jsonData.assets) {
-            if (imagePath != null && !imagePath.endsWith("/")) {
-                setImagePath(`${imagePath}/`);
-            }
-            jsonWithoutImages = JSON.parse(JSON.stringify(jsonData));
+        let fontFacesString = '';
+        for (const font in fontFaces) {
+            fontFacesString += fontFaces[font];
+        }
 
-            jsonWithoutImages.assets.forEach(asset => {
-                if (asset.p && asset.p.startsWith('data:image')) {
-                    asset.p = asset.id + ".png";
-                    asset.e = 0;
-                    asset.u = imagePath;
-                }
-            });
+        const path = `"${correctPath}"`
+
+        let spxTag = " ";
+        if (spxExport) {
+            spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
+        }
+
+        let ferrymanJson = " ";
+        if (ferrymanTemplateJSON) {
+            ferrymanJson = "<script type=\"text/javascript\">window.ferrymanTemplateJSON = " + JSON.stringify(ferrymanTemplateJSON) + ";</script>";
         }
 
         let clockString = JSON.stringify(clocks.current);
@@ -1357,25 +1380,11 @@ export const GlobalStateProvider = ({children}) => {
                     }
                     const template = await response.text();
 
-                    let fontFacesString = '';
-                    for (const font in fontFaces) {
-                        fontFacesString += fontFaces[font];
-                    }
-
                     let jsonDataString
                     if (imageEmbed === "embed") {
                         jsonDataString = JSON.stringify(jsonData);
                     } else if (imageEmbed === "extra") {
-                        jsonDataString = JSON.stringify(jsonWithoutImages);
-                    }
-                    const path = `"${correctPath}"`
-                    let spxTag = " ";
-                    if (spxExport) {
-                        spxTag = "<script type=\"text/javascript\">window.SPXGCTemplateDefinition = " + JSON.stringify(SPXGCTemplateDefinition) + ";</script>";
-                    }
-                    let ferrymanJson = " ";
-                    if (ferrymanTemplateJSON) {
-                        ferrymanJson = "<script type=\"text/javascript\">window.ferrymanTemplateJSON = " + JSON.stringify(ferrymanTemplateJSON) + ";</script>";
+                        jsonDataString = JSON.stringify(generateJsonWithoutImages());
                     }
 
                     let fetchInterval = 'const fetchInterval = 0;';
@@ -1412,7 +1421,35 @@ export const GlobalStateProvider = ({children}) => {
                 if (imageEmbed === "embed") {
                     fileContent = JSON.stringify(jsonData);
                 } else if (imageEmbed === "extra") {
-                    fileContent = JSON.stringify(jsonWithoutImages);
+                    fileContent = JSON.stringify(generateJsonWithoutImages());
+                }
+                break;
+            case 'ograf':
+                setMimeType('text/javascript');
+                try {
+                    let response = null;
+                    response = await fetch('/template/Ograf/graphic.mjs');
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const template = await response.text();
+
+                    const dataBlock = `
+                        const replacements = {
+                          version: ${JSON.stringify(ferrymanVersion)},
+                          fontFaceStyles: ${JSON.stringify("<style>" + fontFacesString + "</style>")},
+                          imagePath: ${JSON.stringify(path)},
+                          spx: ${JSON.stringify(spxTag)},
+                          googleTableData: ${JSON.stringify(googleTableCells)},
+                          ferrymanJSON: ${JSON.stringify(ferrymanJson)}
+                        };
+                        `;
+
+                    fileContent = template.replace('let replacements;', dataBlock)
+                        .replace('${version}', ferrymanVersion);
+                } catch (e) {
+                    console.error(e);
                 }
                 break;
             default:
@@ -1420,8 +1457,10 @@ export const GlobalStateProvider = ({children}) => {
                 return;
         }
 
-        setHtmlTemplate(fileContent);
-        //console.log(jsonData);
+        if (exportFormat === "html") {
+            setHtmlTemplate(fileContent);
+        }
+
         return fileContent;
     };
 
@@ -1499,6 +1538,66 @@ export const GlobalStateProvider = ({children}) => {
         return response;
     };
 
+
+    //################################### Ograf ########################################################################
+
+    const generateOgrafManifest = () => {
+        if (!jsonData) return;
+        const updatedManifest = {...ografManifest};
+        const steps = markers ? markers.length - 1 : "";
+        const frameRate = jsonData ? jsonData.fr : null;
+
+        /*renderRequirements: [
+                { frameRate: Number(frameRate) }
+            ],*/
+
+        const rawManifest = {
+            $schema: "https://ograf.ebu.io/v1-draft-0/specification/json-schemas/graphics/schema.json",
+            name: `${fileName}`,
+            description: "HTML Graphic made with Ferryman, exported as Ograf.",
+            id: `${fileName}`,
+            version: "1.0.0",
+            main: "graphic.mjs",
+            author: {
+                name: "Streamshapers Ferryman",
+                email: "mail@streamshapers.com",
+                url: "https://streamshapers.com",
+            },
+            customActions: [],
+            supportsRealTime: true,
+            supportsNonRealTime: true,
+            schema: {
+                type: "object",
+                properties: {}
+            },
+            stepCount: steps ? Number(steps) : 1
+
+        };
+
+        if (ografManifest) {
+            const updatedProperties = {};
+            textObjects?.forEach(obj => {
+                if (obj.layername.startsWith("_")) {
+                    updatedProperties[obj.layername] = {
+                        type: obj.type === "text" ? "string" : "string",
+                        title: obj.layername.charAt(0).toUpperCase() + obj.layername.slice(1),
+                        default: obj.text || ""
+                    };
+                }
+            });
+            updatedManifest.schema.properties = updatedProperties;
+            setOgrafManifest(updatedManifest);
+            console.log(updatedManifest);
+        } else {
+            setOgrafManifest(rawManifest);
+        }
+    }
+
+    useEffect(() => {
+        generateOgrafManifest();
+    }, [textObjects, jsonData]);
+
+    //################################## StreamShapers Account #########################################################
 
     const getTemplateLimit = () => {
         if (user) {
@@ -1607,6 +1706,8 @@ export const GlobalStateProvider = ({children}) => {
             updateLottieLayername,
             clocks,
             deleteClock,
+            ografManifest,
+            generateJsonWithoutImages,
             fetchSourcesPeriodically,
             setFetchSourcesPeriodically,
             sourcesFetchInterval,

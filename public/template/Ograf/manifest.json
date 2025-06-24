@@ -1,0 +1,29 @@
+{
+  "$schema": "https://ograf.ebu.io/v1-draft-0/specification/json-schemas/graphics/schema.json",
+  "name": "Ferryman Template",
+  "description": "HTML Grafik erstellt mit Ferryman, exportiert als Ograf Template",
+  "id": "ferryman-template",
+  "version": "1.0.0",
+  "main": "graphic.mjs",
+  "author": {
+    "name": "Streamshapers Ferryman"
+  },
+  "customActions": [],
+  "supportsRealTime": true,
+  "supportsNonRealTime": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name",
+        "default": "John Doe"
+      },
+      "title": {
+        "type": "string",
+        "title": "Title",
+        "default": "Expert"
+      }
+    }
+  }
+}
