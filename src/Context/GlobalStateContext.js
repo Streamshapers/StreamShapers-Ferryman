@@ -1587,7 +1587,7 @@ export const GlobalStateProvider = ({children}) => {
             });
             updatedManifest.schema.properties = updatedProperties;
             setOgrafManifest(updatedManifest);
-            console.log(updatedManifest);
+            //console.log(updatedManifest);
         } else {
             setOgrafManifest(rawManifest);
         }

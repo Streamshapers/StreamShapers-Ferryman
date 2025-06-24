@@ -8,7 +8,7 @@ import AuthContext from "../../Context/AuthContext";
 import api from "../../axiosInstance";
 import OgrafExport from "./OgrafExport";
 
-function ExportDialog({ onClose }) {
+function ExportDialog({onClose}) {
     const {user} = useContext(AuthContext);
     const {
         jsonData,
@@ -201,8 +201,6 @@ function ExportDialog({ onClose }) {
                 showAlert("OGraf export failed!");
                 return;
             }
-            // return nicht vergessen, falls asynchron!
-            return;
         }
 
         // Standard-Download (HTML, JSON)
@@ -226,7 +224,7 @@ function ExportDialog({ onClose }) {
             console.log("Error during download", error);
             showAlert("Download failed!");
         }
-        onClose();
+        //onClose();
     };
 
     const handleExportFormat = (format) => () => {
@@ -258,91 +256,88 @@ function ExportDialog({ onClose }) {
                     <div className="success alert-success">{message}</div>
                 </div>
             )}
-                <div className="tab-navigation">
-                    <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('default')}>General
+            <div className="tab-navigation">
+                <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('default')}>General
+                </button>
+                {exportFormat === 'ograf' && 1 === 0 && (
+                    <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('ograf')}>Ograf
                     </button>
-                    {exportFormat === 'ograf' &&(
-                        <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
-                                onClick={() => handleTabChange('ograf')}>Ograf
-                        </button>
-                    )}
+                )}
+                {exportFormat !== 'ograf' && (
                     <button className={`tab-button ${activeTab === 'spx' ? 'active' : ''}`}
                             onClick={() => handleTabChange('spx')}>SPX
                     </button>
-                    {/*<button className={`tab-button ${activeTab === 'gdd' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('gdd')}>GDD
-                    </button>*/}
-                </div>
-                {activeTab === 'default' && (
-                    <div className="tab-content general">
-                        <div id="exportFileName">
-                            <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
-                            <input type="text" id="fileNameInput" value={String(fileName)}
-                                   onChange={handleFileNameChange}/>
-                            {exportFormat !== 'ograf' && (
-                                <span id="fileType">.{exportFormat}</span>
-                            )}
-                        </div>
-                        {refImages.length > 0 && exportFormat !== 'ograf' && (
-                            <div id="image-export-options">
-                                <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
-                                             onChange={handleImageExport("embed")}/>
-                                <RadioButton value={imageEmbed === 'extra'} label="Images separately"
-                                             onChange={handleImageExport('extra')}/>
-                            </div>
-                        )}
-                        <div id="export-format">
-                            <RadioButton value={exportFormat === 'html'} label="HTML-Template"
-                                         onChange={handleExportFormat("html")}/>
-                            <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template"
-                                         onChange={handleExportFormat("ograf")}/>
-                            <RadioButton value={exportFormat === 'json'} label="JSON"
-                                         onChange={handleExportFormat('json')}/>
-                            {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
-                        </div>
-                        {user && (
-                            <div id="save-in-account">
-                                <div className="row">
-                                    <input type="checkbox" id="save-in-account" name="save-in-account"
-                                           checked={saveToAccount}
-                                           disabled={remainingUploads <= 0} onChange={handleSaveToAccountCheckbox}/>
-                                    <label htmlFor="save-in-account">Save to StreamShapers Account on Export</label>
-                                    <span className="remaining-uploads"> ({remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.)</span>
-                                </div>
-                                {saveToAccount && (
-                                    <div className="row">
-                                        <span>Project</span>
-                                        <select
-                                            id="project-select"
-                                            value={selectedProjectId}
-                                            onChange={e => setSelectedProjectId(e.target.value)}
-                                        >
-                                            <option value="">No project</option>
-                                            {projects.map(project => (
-                                                <option key={project._id} value={project._id}>
-                                                    {project.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
+                )}
+            </div>
+            {activeTab === 'default' && (
+                <div className="tab-content general">
+                    <div id="exportFileName">
+                        <label htmlFor="fileNameInput" id="fileNameInputLabel">Filename:</label>
+                        <input type="text" id="fileNameInput" value={String(fileName)}
+                               onChange={handleFileNameChange}/>
+                        {exportFormat !== 'ograf' && (
+                            <span id="fileType">.{exportFormat}</span>
                         )}
                     </div>
-                )}
-                {activeTab === 'ograf' && (
-                    <OgrafExport/>
-                )}
-                {activeTab === 'spx' && (
-                    <SpxExport/>
-                )}
-                {/*activeTab === 'gdd' && (
-                    <GddExport/>
-                )*/}
-                <div className="popupButtonArea">
-                    <button id="downloadBtn" onClick={downloadFile}>Download File</button>
+                    {refImages.length > 0 && exportFormat !== 'ograf' && (
+                        <div id="image-export-options">
+                            <RadioButton value={imageEmbed === 'embed'} label="Images embeded"
+                                         onChange={handleImageExport("embed")}/>
+                            <RadioButton value={imageEmbed === 'extra'} label="Images separately"
+                                         onChange={handleImageExport('extra')}/>
+                        </div>
+                    )}
+                    <div id="export-format">
+                        <RadioButton value={exportFormat === 'html'} label="HTML-Template"
+                                     onChange={handleExportFormat("html")}/>
+                        <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template"
+                                     onChange={handleExportFormat("ograf")}/>
+                        <RadioButton value={exportFormat === 'json'} label="JSON"
+                                     onChange={handleExportFormat('json')}/>
+                        {/* <option value="separate">Separate HTML und JSON (Zip)</option> */}
+                    </div>
+                    {user && (
+                        <div id="save-in-account">
+                            <div className="row">
+                                <input type="checkbox" id="save-in-account" name="save-in-account"
+                                       checked={saveToAccount}
+                                       disabled={remainingUploads <= 0} onChange={handleSaveToAccountCheckbox}/>
+                                <label htmlFor="save-in-account">Save to StreamShapers Account on Export</label>
+                                <span
+                                    className="remaining-uploads"> ({remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.)</span>
+                            </div>
+                            {saveToAccount && (
+                                <div className="row">
+                                    <span>Project</span>
+                                    <select
+                                        id="project-select"
+                                        value={selectedProjectId}
+                                        onChange={e => setSelectedProjectId(e.target.value)}
+                                    >
+                                        <option value="">No project</option>
+                                        {projects.map(project => (
+                                            <option key={project._id} value={project._id}>
+                                                {project.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
+            )}
+            {activeTab === 'ograf' && (
+                <OgrafExport/>
+            )}
+            {activeTab === 'spx' && (
+                <SpxExport/>
+            )}
+            <div className="popupButtonArea">
+                <button id="downloadBtn" onClick={downloadFile}>Download File</button>
+            </div>
         </>
     )
         ;
