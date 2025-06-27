@@ -55,12 +55,13 @@
     let newAnimation;
     let updateAnimation;
     let stopExist = false;
-    let showLogs = false;
+    let showLogs = true;
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
     let updateExist = false;
     let lottieState = "idle";
+    let updateRunning = false
     let markers = [];
     let playStack = [];
     let breakFrame = undefined;
@@ -69,6 +70,7 @@
     let data = {};
     let clocks = ${clocks};
     const fetchInterval = 0;
+    
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -168,6 +170,7 @@
 
     function triggerPlayStack() {
         setTimeout(() => {
+            console.log("Playstack triggered")
             if (showLogs) console.log(`LottieState: ${lottieState}`);
             if (currentSegment === "stop") {
                 //animation.destroy();
@@ -206,7 +209,8 @@
                 })
             }
         } else if (typeof value == "string") {
-            if (lottieState === "idle") {
+            console.log("controlanimation: update läuft?! = " +updateRunning)
+            if (lottieState === "idle" && !updateRunning) {
                 if (action === "play") {
                     animation.goToAndPlay(value, true)
                     currentSegment = value
@@ -216,11 +220,11 @@
                 }
             } else {
                 playStack.push(value);
+                console.log(value +" wurde gepushed")
+                console.log(playStack)
                 if (markers.includes(value + "_loop")) playStack.push(value + "_loop");
             }
         }
-
-
     }
 
     let animationFrame;
@@ -250,7 +254,8 @@
         });
         animation.addEventListener("_pause", () => {
             lottieState = "pause";
-            triggerPlayStack();
+            if (showLogs) console.log(`LottieState: ${lottieState}`);
+            if(!updateRunning) triggerPlayStack();
         });
         animation.addEventListener("_idle", () => {
             lottieState = "idle";
@@ -357,6 +362,8 @@
 
         //Update when tamplate is playing
         if (playStatus === "play" && lottieState === "idle") {
+            updateRunning = true
+            console.log("anfang: update läuft?! = " +updateRunning)
             let updateData = JSON.parse(JSON.stringify(data))
             updateCounter++;
             const updateStartFrame = currentFrame;
@@ -432,6 +439,14 @@
                             document.getElementById("animation" + (updateCounter - 1)).remove();
                             animation = newAnimation;
                             newAnimation = null;
+
+                            updateRunning = false
+                            console.log(playStack)
+                            console.log("ende: update läuft?! = " +updateRunning)
+                            triggerPlayStack() 
+
+
+
                         });
                     });
                 });
@@ -460,11 +475,17 @@
                     document.getElementById("animation" + (updateCounter - 1)).remove();
                     animation = newAnimation;
                     newAnimation = null;
+                    updateRunning = false
+                    triggerPlayStack() 
+                    console.log("ende: update läuft?! = " +updateRunning)
                 });
             }
+
         }
         if (showInfo) info();
     }
+
+    //############################ Animation Control ##################################
 
 
     async function play() {
