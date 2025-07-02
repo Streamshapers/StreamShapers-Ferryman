@@ -67,6 +67,7 @@
     let breakFrame = undefined;
     let fetchSheet = true;
     let lastData;
+    let lastFetchedData
     let data = {};
     let clocks = ${clocks};
     const fetchInterval = 0;
@@ -264,7 +265,7 @@
 
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
-    async function update(rawData) {
+    async function update(rawData, isPeriodicUpdate) {
         if (rawData) lastData = rawData
         if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
         if (showLogs) console.log(`Update triggered: ${rawData}`);
@@ -292,6 +293,8 @@
         }
         if (fetchSheet && googleTableCells) {
             parsed = await updateGoogleTableData(parsed);
+
+            lastData = JSON.stringify(parsed)
         }
         if (parsed) {
             for (let key of Object.keys(parsed)) {
@@ -317,6 +320,10 @@
                 })
             }
         }
+        if(lastFetchedData === JSON.stringify(parsed) && isPeriodicUpdate) return
+        console.log("kein return")
+        lastFetchedData = JSON.stringify(parsed)
+
 
         //first Update and create Lottie for the first time
         if (playStatus === "") {
@@ -557,7 +564,8 @@
         setTimeout(async function () {
             setInterval(() => {
                 // await updateGoogleTableData();
-                update(lastData);
+                update(lastData,true);
+                console.log("Periodically update triggered")
             }, fetchInterval);
         }, 4000);
     }
