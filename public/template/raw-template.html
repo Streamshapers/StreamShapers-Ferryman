@@ -55,13 +55,14 @@
     let newAnimation;
     let updateAnimation;
     let stopExist = false;
-    let showLogs = true;
+    let showLogs = false;
     let imagesPathPrefix = ${imagePath};
     let updateCounter = 1;
     let currentFrame;
     let updateExist = false;
     let lottieState = "idle";
     let updateRunning = false
+    let updatingData = false
     let markers = [];
     let playStack = [];
     let breakFrame = undefined;
@@ -266,230 +267,238 @@
     let lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
 
     async function update(rawData, isPeriodicUpdate) {
-        if (rawData) lastData = rawData
-        if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
-        if (showLogs) console.log(`Update triggered: ${rawData}`);
+        if(!updateRunning && !updatingData){
+            updatingData = true
+            if (rawData) lastData = rawData
+            if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
+            if (showLogs) console.log(`Update triggered: ${rawData}`);
 
-        lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)); //copy the "old" updated template for the update Animation
-        lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
-        let parsed;
+            lottieTemplateUpdate = JSON.parse(JSON.stringify(lottieTemplateNew)); //copy the "old" updated template for the update Animation
+            lottieTemplateNew = JSON.parse(JSON.stringify(lottieTemplate));
+            let parsed;
 
-        if (rawData) {
-            if (rawData.startsWith("<templateData>")) {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(rawData, "text/xml");
-                const json = {};
-                const components = xmlDoc.getElementsByTagName("componentData");
+            if (rawData) {
+                if (rawData.startsWith("<templateData>")) {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(rawData, "text/xml");
+                    const json = {};
+                    const components = xmlDoc.getElementsByTagName("componentData");
 
-                for (let component of components) {
-                    const id = component.getAttribute("id");
-                    const dataElement = component.getElementsByTagName("data")[0];
-                    json[id] = dataElement.getAttribute("value");
-                }
-                parsed = json;
-            } else {
-                parsed = JSON.parse(rawData);
-            }
-        }
-        if (fetchSheet && googleTableCells) {
-            parsed = await updateGoogleTableData(parsed);
-
-            lastData = JSON.stringify(parsed)
-        }
-        if (parsed) {
-            for (let key of Object.keys(parsed)) {
-                data[key] = parsed[key]
-            }
-        }
-        if (data) {
-            for (let key of Object.keys(data)) {
-                if (key === "_templateInfo") showInfo = true;
-                if (key === "_debug") showLogs = true;
-                if (key === "epochID") imagesPathPrefix = "";
-                if (key === "_stopFetch") fetchSheet = false;
-            }
-            for (let key of Object.keys(data)) {
-                lottieTemplateNew.layers.forEach((layer) => {
-                    if (layer.nm === key) {
-                        if ('refId' in layer) {
-                            updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, data[key]);
-                        } else {
-                            updateLayerText(layer, data[key])
-                        }
+                    for (let component of components) {
+                        const id = component.getAttribute("id");
+                        const dataElement = component.getElementsByTagName("data")[0];
+                        json[id] = dataElement.getAttribute("value");
                     }
-                })
-            }
-        }
-        if(lastFetchedData === JSON.stringify(parsed) && isPeriodicUpdate) return
-        console.log("kein return")
-        lastFetchedData = JSON.stringify(parsed)
-
-
-        //first Update and create Lottie for the first time
-        if (playStatus === "") {
-            animation = bodymovin.loadAnimation({
-                container: document.getElementById("animation1"),
-                renderer: "svg",
-                loop: false,
-                autoplay: false,
-                animationData: lottieTemplateNew,
-            });
-
-            if (!animation.renderer.data.fonts || !animation.renderer.data.fonts.list || animation.renderer.data.fonts.list.length === 0) {
-                if (showLogs) console.log("No fonts found");
-            } else {
-                const fonts = animation.renderer.data.fonts.list;
-                if (fonts) {
-                    for (const font in fonts) {
-                        let family = fonts[font].fFamily;
-                        let fontPath = fonts[font].fPath;
-                        if (fontPath !== '') {
-                            addFont(family, fontPath);
-                        }
-                    }
+                    parsed = json;
+                } else {
+                    parsed = JSON.parse(rawData);
                 }
             }
+            if (fetchSheet && googleTableCells) {
+                parsed = await updateGoogleTableData(parsed);
 
-            animReady = new Promise((resolve, reject) => {
-                animation.addEventListener("DOMLoaded", function () {
-                    if (showLogs) console.log("Template - Ready");
-                    resolve("ready");
-                });
-            });
-
-            addEvents(animation);
-
-            ;
-
-            await animReady;
-            controlAnimation(animation, "stop", 0)
-            playStatus = "loaded";
-            animLoaded.resolve("Template - Animation is Ready");
-        }
-
-        //Update when tamplate is playing
-        if (playStatus === "play" && lottieState === "idle") {
-            updateRunning = true
-            console.log("anfang: update läuft?! = " +updateRunning)
-            let updateData = JSON.parse(JSON.stringify(data))
-            updateCounter++;
-            const updateStartFrame = currentFrame;
-
-            //Only for UpdateAnimations
-            if (updateExist && updateData) {
-                if (showLogs) console.log(`Update triggered at frame: ${updateStartFrame}`);
-
-                for (let key of Object.keys(updateData)) {
-                    lottieTemplateUpdate.layers.forEach((layer) => {
-                        if (layer.nm === `${key}_update`) {
-                            updateData[`${key}_update`] = updateData[key];
-                            delete updateData[key];
-                        }
-                    });
+                lastData = JSON.stringify(parsed)
+            }
+            if (parsed) {
+                for (let key of Object.keys(parsed)) {
+                    data[key] = parsed[key]
                 }
-                for (let key of Object.keys(updateData)) {
-                    lottieTemplateUpdate.layers.forEach((layer) => {
+            }
+            if (data) {
+                for (let key of Object.keys(data)) {
+                    if (key === "_templateInfo") showInfo = true;
+                    if (key === "_debug") showLogs = true;
+                    if (key === "epochID") imagesPathPrefix = "";
+                    if (key === "_stopFetch") fetchSheet = false;
+                }
+                console.log(data)
+                for (let key of Object.keys(data)) {
+                    lottieTemplateNew.layers.forEach((layer) => {
                         if (layer.nm === key) {
                             if ('refId' in layer) {
-                                updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, updateData[key]);
+                                updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, data[key]);
                             } else {
-                                updateLayerText(layer, updateData[key])
+                                updateLayerText(layer, data[key])
                             }
                         }
                     })
                 }
-
-                const newDiv = document.createElement("div");
-                newDiv.id = "animation" + updateCounter;
-                document.body.appendChild(newDiv);
-
-                updateAnimation = bodymovin.loadAnimation({
-                    container: document.getElementById("animation" + updateCounter),
-                    renderer: "svg",
-                    loop: false,
-                    autoplay: false,
-                    animationData: lottieTemplateUpdate,
-                });
-
-                updateAnimation.addEventListener("DOMLoaded", async function () {
-                    addEvents(updateAnimation);
-                    await delay(100)
-                    controlAnimation(updateAnimation, "play", "update")
-                    animation.destroy();
-                    document.getElementById("animation" + (updateCounter - 1)).remove();
-                    animation = updateAnimation;
-                    updateAnimation = null;
-                    animation.addEventListener("_idle", () => {
-                        lottieState = "idle";
-                        if (showInfo) console.log(`LottieState: "${lottieState}`);
-
-                        updateCounter++;
-                        const newDiv = document.createElement("div");
-                        newDiv.id = "animation" + updateCounter;
-                        document.body.appendChild(newDiv);
-
-                        newAnimation = bodymovin.loadAnimation({
-                            container: document.getElementById("animation" + updateCounter),
-                            renderer: "svg",
-                            loop: false,
-                            autoplay: false,
-                            animationData: lottieTemplateNew,
-                        });
-
-                        newAnimation.addEventListener("DOMLoaded", async function () {
-                            if (showInfo) console.log("Template - updated Animation Ready");
-                            addEvents(newAnimation);
-                            controlAnimation(newAnimation, "stop", updateStartFrame)
-                            currentSegment = "update" //important for right updateFrame!
-                            await delay(100)
-                            animation.destroy();
-                            document.getElementById("animation" + (updateCounter - 1)).remove();
-                            animation = newAnimation;
-                            newAnimation = null;
-
-                            updateRunning = false
-                            console.log(playStack)
-                            console.log("ende: update läuft?! = " +updateRunning)
-                            triggerPlayStack() 
-
-
-
-                        });
-                    });
-                });
             }
+            updatingData = false
+            if(lastFetchedData === JSON.stringify(parsed) && isPeriodicUpdate) {
+                updateRunning = false
+                triggerPlayStack() 
+                return
+            }
+            console.log("kein return")
+            lastFetchedData = JSON.stringify(parsed)
 
-            //only without update animation
-            if (!updateExist) {
-                const newDiv = document.createElement("div");
-                newDiv.id = "animation" + updateCounter;
-                document.body.appendChild(newDiv);
-
-                newAnimation = bodymovin.loadAnimation({
-                    container: document.getElementById("animation" + updateCounter),
+            //first Update and create Lottie for the first time
+            if (playStatus === "") {
+                animation = bodymovin.loadAnimation({
+                    container: document.getElementById("animation1"),
                     renderer: "svg",
                     loop: false,
                     autoplay: false,
                     animationData: lottieTemplateNew,
                 });
 
-                newAnimation.addEventListener("DOMLoaded", async function () {
-                    if (showInfo) console.log("Template - updated Animation Ready");
-                    addEvents(newAnimation);
-                    await delay(100)
-                    controlAnimation(newAnimation, "stop", updateStartFrame)
-                    animation.destroy();
-                    document.getElementById("animation" + (updateCounter - 1)).remove();
-                    animation = newAnimation;
-                    newAnimation = null;
-                    updateRunning = false
-                    triggerPlayStack() 
-                    console.log("ende: update läuft?! = " +updateRunning)
+                if (!animation.renderer.data.fonts || !animation.renderer.data.fonts.list || animation.renderer.data.fonts.list.length === 0) {
+                    if (showLogs) console.log("No fonts found");
+                } else {
+                    const fonts = animation.renderer.data.fonts.list;
+                    if (fonts) {
+                        for (const font in fonts) {
+                            let family = fonts[font].fFamily;
+                            let fontPath = fonts[font].fPath;
+                            if (fontPath !== '') {
+                                addFont(family, fontPath);
+                            }
+                        }
+                    }
+                }
+
+                animReady = new Promise((resolve, reject) => {
+                    animation.addEventListener("DOMLoaded", function () {
+                        if (showLogs) console.log("Template - Ready");
+                        resolve("ready");
+                    });
                 });
+
+                addEvents(animation);
+
+                ;
+
+                await animReady;
+                controlAnimation(animation, "stop", 0)
+                playStatus = "loaded";
+                animLoaded.resolve("Template - Animation is Ready");
             }
 
-        }
-        if (showInfo) info();
+            //Update when tamplate is playing
+            if (playStatus === "play" && lottieState === "idle") {
+                updateRunning = true
+                console.log("anfang: update läuft?! = " +updateRunning)
+                let updateData = JSON.parse(JSON.stringify(data))
+                updateCounter++;
+                const updateStartFrame = currentFrame;
+
+                //Only for UpdateAnimations
+                if (updateExist && updateData) {
+                    if (showLogs) console.log(`Update triggered at frame: ${updateStartFrame}`);
+
+                    for (let key of Object.keys(updateData)) {
+                        lottieTemplateUpdate.layers.forEach((layer) => {
+                            if (layer.nm === `${key}_update`) {
+                                updateData[`${key}_update`] = updateData[key];
+                                delete updateData[key];
+                            }
+                        });
+                    }
+                    for (let key of Object.keys(updateData)) {
+                        lottieTemplateUpdate.layers.forEach((layer) => {
+                            if (layer.nm === key) {
+                                if ('refId' in layer) {
+                                    updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, updateData[key]);
+                                } else {
+                                    updateLayerText(layer, updateData[key])
+                                }
+                            }
+                        })
+                    }
+
+                    const newDiv = document.createElement("div");
+                    newDiv.id = "animation" + updateCounter;
+                    document.body.appendChild(newDiv);
+
+                    updateAnimation = bodymovin.loadAnimation({
+                        container: document.getElementById("animation" + updateCounter),
+                        renderer: "svg",
+                        loop: false,
+                        autoplay: false,
+                        animationData: lottieTemplateUpdate,
+                    });
+
+                    updateAnimation.addEventListener("DOMLoaded", async function () {
+                        addEvents(updateAnimation);
+                        await delay(100)
+                        controlAnimation(updateAnimation, "play", "update")
+                        animation.destroy();
+                        document.getElementById("animation" + (updateCounter - 1)).remove();
+                        animation = updateAnimation;
+                        updateAnimation = null;
+                        animation.addEventListener("_idle", () => {
+                            lottieState = "idle";
+                            if (showInfo) console.log(`LottieState: "${lottieState}`);
+
+                            updateCounter++;
+                            const newDiv = document.createElement("div");
+                            newDiv.id = "animation" + updateCounter;
+                            document.body.appendChild(newDiv);
+
+                            newAnimation = bodymovin.loadAnimation({
+                                container: document.getElementById("animation" + updateCounter),
+                                renderer: "svg",
+                                loop: false,
+                                autoplay: false,
+                                animationData: lottieTemplateNew,
+                            });
+
+                            newAnimation.addEventListener("DOMLoaded", async function () {
+                                if (showInfo) console.log("Template - updated Animation Ready");
+                                addEvents(newAnimation);
+                                controlAnimation(newAnimation, "stop", updateStartFrame)
+                                currentSegment = "update" //important for right updateFrame!
+                                await delay(100)
+                                animation.destroy();
+                                document.getElementById("animation" + (updateCounter - 1)).remove();
+                                animation = newAnimation;
+                                newAnimation = null;
+
+                                updateRunning = false
+                                console.log(playStack)
+                                console.log("ende: update läuft?! = " +updateRunning)
+                                triggerPlayStack() 
+
+
+
+                            });
+                        });
+                    });
+                }
+
+                //only without update animation
+                if (!updateExist) {
+                    const newDiv = document.createElement("div");
+                    newDiv.id = "animation" + updateCounter;
+                    document.body.appendChild(newDiv);
+
+                    newAnimation = bodymovin.loadAnimation({
+                        container: document.getElementById("animation" + updateCounter),
+                        renderer: "svg",
+                        loop: false,
+                        autoplay: false,
+                        animationData: lottieTemplateNew,
+                    });
+
+                    newAnimation.addEventListener("DOMLoaded", async function () {
+                        if (showInfo) console.log("Template - updated Animation Ready");
+                        addEvents(newAnimation);
+                        await delay(100)
+                        controlAnimation(newAnimation, "stop", updateStartFrame)
+                        animation.destroy();
+                        document.getElementById("animation" + (updateCounter - 1)).remove();
+                        animation = newAnimation;
+                        newAnimation = null;
+                        updateRunning = false
+                        triggerPlayStack() 
+                        console.log("ende: update läuft?! = " +updateRunning)
+                    });
+                }
+
+            } 
+            if (showInfo) info();
+        } else {console.log("Updating is still running - new update was canceled")}
     }
 
     //############################ Animation Control ##################################
@@ -725,6 +734,7 @@
                     data[element.key] = value;
                 }
             }
+            console.log(data)
             return data;
         } catch (error) {
             console.log(error)
