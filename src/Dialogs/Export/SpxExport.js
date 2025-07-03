@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
@@ -14,12 +14,17 @@ function SpxExport() {
     const spxUiColors = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"]
     const templateDescription = SPXGCTemplateDefinition.description;
 
+    useEffect(() => {
+        setUiColor(spxUiColors[SPXGCTemplateDefinition.uicolor]);
+    }, []);
+
     /*function handleCheckboxChange(event) {
         setSpxExport(event.target.checked);
     }*/
 
     const handleUiColorChange = (color) => {
         setUiColor(color);
+        console.log(uiColor,color)
         const spxJson = {...SPXGCTemplateDefinition};
         spxJson.uicolor = spxUiColors.indexOf(color);
         setSPXGCTemplateDefinition(spxJson);

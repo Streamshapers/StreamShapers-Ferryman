@@ -850,7 +850,7 @@ export const GlobalStateProvider = ({children}) => {
         });
 
         spxExportJson.DataFields = spxExportJson.DataFields.filter(f =>
-            allExpectedFields.hasOwnProperty(f.field)
+            f.ftype === "instruction" || allExpectedFields.hasOwnProperty(f.field)
         );
 
         if (!isEqual(spxExportJson, SPXGCTemplateDefinition)) {
@@ -1715,7 +1715,7 @@ export const GlobalStateProvider = ({children}) => {
             sendStatistic,
             importedHTML,
             performance,
-            setPerformance
+            setPerformance,
         }}>
             {children}
         </GlobalStateContext.Provider>

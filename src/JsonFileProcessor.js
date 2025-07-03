@@ -26,7 +26,8 @@ function JsonFileProcessor() {
         setGoogleTableCells,
         setUpdateExternalSources,
         setUpdateGoogle,
-        clocks
+        clocks,
+        setFetchSourcesPeriodically
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -46,6 +47,9 @@ function JsonFileProcessor() {
         setUpdateExternalSources(0);
         setUpdateGoogle(false);
         clocks.current = {};
+        setFetchSourcesPeriodically(false);
+        setFileName(null);
+        setJsonFile(null);
     };
 
     const processJsonFile = (file) => {
@@ -100,7 +104,14 @@ function JsonFileProcessor() {
         setJsonFile(null);
         setJsonData(null);
         resetState();
+
+        if (window && window.history && window.location) {
+            const { protocol, host, pathname, hash } = window.location;
+            const newUrl = `${protocol}//${host}${pathname}${hash}`;
+            window.history.replaceState({}, '', newUrl);
+        }
     }
+
 
     return (
         <>
