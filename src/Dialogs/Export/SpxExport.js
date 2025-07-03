@@ -154,7 +154,7 @@ function SpxExport() {
                         <div id="spx-item-key"><p>Description</p></div>
                         <div className="spx-export-right">
                             <input type="text" placeholder="Title of your template..."
-                                   value={SPXGCTemplateDefinition.description}
+                                   value={SPXGCTemplateDefinition.description || ""}
                                    onChange={e => handleDescriptionChange(e)}>
                             </input>
                         </div>

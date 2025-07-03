@@ -189,7 +189,6 @@ function TextsDisplay() {
                 {filteredTexts.map((textObject, i) => {
                     const index = textObjects.indexOf(textObject);
                     const textTitle = "Original: " + textObject.original;
-                    let externalSourceSelect;
                     return (
                         <div key={i} className="jsonText">
                             {textObject.errors.length > 0 && (

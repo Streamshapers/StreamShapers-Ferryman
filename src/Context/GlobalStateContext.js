@@ -808,7 +808,7 @@ export const GlobalStateProvider = ({children}) => {
             }
             : {
                 ...SPXGCTemplateDefinition,
-                description : fileName || SPXGCTemplateDefinition.description,
+                description: SPXGCTemplateDefinition.description || fileName,
                 uicolor     : `${uiColor}`,
                 steps       : `${steps}`,
                 DataFields  : [...SPXGCTemplateDefinition.DataFields]
