@@ -675,7 +675,7 @@
         try {
             let response = await fetch(url);
             if (!response.ok) {
-                console.warn(`Fehler beim Abrufen der Daten. Status: ${response.status}`);
+                console.warn(`Error on fetching googlesheets data. Status: ${response.status}`);
                 return null;
             }
             let tsvText = await response.text();
