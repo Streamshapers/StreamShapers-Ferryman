@@ -102,7 +102,7 @@ function ConnectApiDialog() {
                     <div className="external-sources-header">
                         <div className="sources-placeholder"></div>
                         <h4>Sources</h4>
-                        <div className="div-button" title="refresh sources" onClick={() => handleSourceUpdate()}>
+                        <div className="div-button" title="fetch sources" onClick={() => handleSourceUpdate()}>
                             <FontAwesomeIcon icon={faRotateRight}/>
                         </div>
                     </div>

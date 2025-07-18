@@ -57,6 +57,10 @@ export const GlobalStateProvider = ({children}) => {
     const googleCellSnapshot = useRef([]);
 
     useEffect(() => {
+        console.log(fetchSourcesPeriodically);
+    }, [fetchSourcesPeriodically]);
+
+    useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
 
         const getQueryParameter = (param) => {
@@ -1472,7 +1476,7 @@ export const GlobalStateProvider = ({children}) => {
         }
 
         generateHTML().then();
-    }, [jsonData, textObjects]);
+    }, [jsonData, textObjects, fetchSourcesPeriodically, sourcesFetchInterval]);
 
     //################################## FerrymanTemplateJSON ##########################################################
     useEffect(() => {
