@@ -664,7 +664,7 @@ input[type="checkbox"] {
 }
 
 #previewWrapper {
-    max-height: 100%;
+    max-height: calc(100% + 20px);
     max-width: 100%;
     display: flex;
     flex-direction: column;
@@ -672,6 +672,7 @@ input[type="checkbox"] {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: 5px;
+    width: 100%;
 }
 
 .mode-switch {
@@ -710,17 +711,13 @@ input[type="checkbox"] {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    height: 100%;
+    height: calc(100% + 20px);
     padding: 20px;
     background-color: var(--foreground);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     border-radius: 5px;
     min-width: 500px;
     box-sizing: border-box;
-}
-
-#previewWrapper {
-    width: 100%;
 }
 
 .caspar-player iframe {
@@ -1824,7 +1821,6 @@ input.source-fetch-item{
     transition: all 0.3s ease-in-out;
 }
 
-/* Nur wenn .open hinzugefügt wird, wird das Dropdown sichtbar */
 .user-dropdown-content.open {
     opacity: 1;
     visibility: visible;
@@ -1844,12 +1840,10 @@ input.source-fetch-item{
     background-color: var(--secondary-light);
 }
 
-/* Zusätzliche Stile für Links */
 .user-dropdown-item a, .user-dropdown-item a:visited {
-    color: inherit; /* Verwende die gleiche Farbe wie die Dropdown-Elemente */
+    color: inherit;
     text-decoration: none;
 }
-
 
 .user-dropdown-item:not(:last-child) {
     border-bottom: 1px solid var(--border);
@@ -1859,6 +1853,14 @@ input.source-fetch-item{
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.dropdown-item a{
+    width: 50vw;
+}
+
+#downloadArea.dropdown-item {
+    width: 50vw;
 }
 
 .user-dropdown-item:hover {
@@ -2040,4 +2042,9 @@ textarea {
     display: flex;
     align-items: center;
     background: var(--foreground);
+}
+
+.upgrade-plan{
+    padding-left: 10px;
+    font-size: 1.2rem;
 }

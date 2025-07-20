@@ -304,7 +304,7 @@ function ExportDialog({onClose}) {
                                        disabled={remainingUploads <= 0} onChange={handleSaveToAccountCheckbox}/>
                                 <label htmlFor="save-in-account">Save to StreamShapers Account on Export</label>
                                 <span
-                                    className="remaining-uploads"> ({remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.)</span>
+                                    className="remaining-uploads"> ({remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left.<a href="https://streamshapers.com/plans"><span className="upgrade-plan">Upgrade Plan</span></a>)</span>
                             </div>
                             {saveToAccount && (
                                 <div className="row">

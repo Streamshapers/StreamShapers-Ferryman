@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useRef} from 'react';
 import {GlobalStateContext} from "../Context/GlobalStateContext";
 import lottie from 'lottie-web';
 import {

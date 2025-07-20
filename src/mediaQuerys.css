@@ -33,9 +33,11 @@
         display: none;
     }
 
-    #jsonElements {
+    #contentWrapper #jsonElements, #contentWrapper #jsonPreview {
         width: 100%;
         height: auto;
+        flex: 1;
+        min-width: 100px;
     }
 
     #animationPreview {
@@ -93,7 +95,7 @@
         min-width: 300px;
     }
 
-    #jsonPreview {
+    #contentWrapper #jsonPreview {
         padding: 5px;
         min-width: 300px;
     }
@@ -119,7 +121,6 @@
         font-size: 16px;
         width: 50px;
         padding: 1px 5px;
-        height: 26px;
     }
 
     .previewControlButton {
@@ -243,7 +244,7 @@
         width: 100%;
     }
 
-    .dropdown {
+    .headerSide .dropdown {
         display: flex;
         gap: 50px;
         background-color: var(--background);
@@ -255,6 +256,14 @@
         cursor: pointer;
     }
 
+    .headerSide .headerButton{
+        display: none;
+    }
+
+    .dropdown-content .headerButton {
+        display: block;
+    }
+
     .dropdown-content {
         display: none;
         position: absolute;
@@ -262,9 +271,18 @@
         box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
         z-index: 1;
         width: 50%;
+        top: 60px;
     }
 
     .dropdown:hover .dropdown-content {
         display: block;
+    }
+
+    .markers-wrapper .marker-inputs{
+        gap: 5px;
+    }
+
+    .marker-inputs label {
+        font-size: 0.6rem;
     }
 }
