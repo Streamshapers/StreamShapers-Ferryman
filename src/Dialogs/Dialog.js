@@ -72,8 +72,6 @@ function Dialog({isOpen, onClose, type}) {
                 </div>
                 <GeneralAlerts/>
                 {content}
-                <div className="popupButtonArea">
-                </div>
             </div>
         </>
     )

@@ -69,6 +69,10 @@
     #samples {
         flex-wrap: wrap;
     }
+    #startScreenContainer #startWrapper {
+        max-width: 100%;
+        width: 100%;
+    }
 }
 
 @media (width < 681px) {
@@ -228,8 +232,34 @@
 }
 
 @media (max-width: 680px) {
+    #content #startScreenContainer {
+        margin: 10px;
+    }
+
+    #startScreenContainer #startWrapper, #startWrapper #uploadWrapper, #startWrapper #sampleWrapper {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    #sampleWrapper #samples{
+        padding: 10px 0 0 0;
+    }
+
+    #samples .sample {
+        padding: 10px;
+    }
+
     .headerButton1 {
         display: none;
+    }
+
+    #login-button {
+        display: flex;
+        padding: 5px;
+    }
+
+    #login-button img{
+        margin-left: 0;
     }
 
     #header-title h1 {
@@ -252,7 +282,6 @@
         color: white;
         padding: 10px;
         text-align: center;
-        border: none;
         cursor: pointer;
     }
 
@@ -260,8 +289,12 @@
         display: none;
     }
 
+    .dropdown.headerButton{
+        display: flex;
+    }
+
     .dropdown-content .headerButton {
-        display: block;
+        display: flex;
     }
 
     .dropdown-content {
@@ -272,6 +305,7 @@
         z-index: 1;
         width: 50%;
         top: 60px;
+        left: 0;
     }
 
     .dropdown:hover .dropdown-content {
@@ -284,5 +318,152 @@
 
     .marker-inputs label {
         font-size: 0.6rem;
+    }
+
+    #content .dialog-window {
+        min-width: auto;
+        width: calc(100vw - 20px);
+        padding: 10px;
+    }
+
+    #content .dialog-window h2{
+        padding: 0 10px 10px 0;
+    }
+
+    .dialog-window .popupButtonArea {
+        padding-top: 10px;
+    }
+
+    .dialog-window .tab-content {
+        padding: 10px;
+    }
+
+    .dialog-window .mode-switch {
+        padding-bottom: 20px;
+    }
+
+    .tab-content .spx-settings{
+        margin-top: 10px;
+    }
+
+    .spx-settings #spx-item-key{
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+
+    .spx-settings .spx-setting-header{
+        gap: 10px;
+    }
+
+    .spx-description .spx-export-right{
+        flex: 0 1;
+        max-width: calc(100% - 110px);
+    }
+
+    .spx-description input{
+        max-width: 100%;
+    }
+
+    .spx-setting-header .spx-export-right{
+        max-width: calc(100% - 110px);
+    }
+
+    .spx-export-right label{
+        max-width: 100%;
+    }
+
+    .spx-instruction .spx-export-right textarea{
+        min-height: 100px;
+    }
+
+    .container #contentWrapper{
+        padding: 10px;
+    }
+
+    #contentWrapper #jsonElements{
+        padding: 10px;
+    }
+
+    .accordion-wrapper .accordion{
+        gap: 10px;
+    }
+
+    .font-item .font-item-text{
+        font-size: 0.8rem;
+        min-width: auto;
+        text-wrap: wrap;
+    }
+
+    #previewControls .previewControlButton.demo{
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+    }
+}
+
+@media (height <= 681px) {
+    #content .dialog-window {
+        min-height: auto;
+        height: 100vh;
+        padding: 10px;
+    }
+
+    #content .dialog-window h2{
+        padding: 0 10px 10px 0;
+    }
+
+    .dialog-window .popupButtonArea {
+        padding-top: 10px;
+    }
+
+    .dialog-window .tab-content {
+        padding: 10px;
+    }
+
+    .spx-settings #spx-item-key{
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+
+    .spx-settings .spx-setting-header{
+        gap: 10px;
+    }
+
+    .spx-description .spx-export-right{
+        flex: 0 1;
+        max-width: calc(100% - 110px);
+    }
+
+    .spx-description input{
+        max-width: 100%;
+    }
+
+    .spx-setting-header .spx-export-right{
+        max-width: calc(100% - 110px);
+    }
+
+    .spx-export-right label{
+        max-width: 100%;
+    }
+
+    .spx-instruction .spx-export-right textarea{
+        min-height: 100px;
+    }
+
+    .dialog-window .auth-form {
+        gap: 10px;
+    }
+
+    .dialog-window .auth-form p{
+        padding-bottom: 0;
+    }
+
+    .auth-form .auth-input input{
+        padding: 10px;
+        height: 40px;
+    }
+
+    .auth-form .auth-button{
+        padding: 5px;
     }
 }

@@ -62,7 +62,7 @@ function Header() {
             <Dialog isOpen={isSaveDialogOpen} onClose={closeSaveDialog} type="save" />
             <div id="headerContainer">
                 <div className="headerSide">
-                    <div className="dropdown">
+                    <div className="dropdown headerButton">
                         <FontAwesomeIcon icon={faNavicon}/>
                         <div className="dropdown-content">
                             <div className="dropdown-item">
@@ -90,12 +90,6 @@ function Header() {
                             <div id="info-button" className="headerButton dropdown-item" title="Info"
                                  onClick={openInfoDialog}>
                                 <FontAwesomeIcon icon={faCircleInfo}/>
-                            </div>
-                            <div id="login-button" className="headerButton dropdown-item" title="Login"
-                                 ref={dropdownRef}
-                                 onClick={openLoginDialog}>
-                                <FontAwesomeIcon icon={faUser}/>
-                                <span>Login</span>
                             </div>
                         </div>
                     </div>

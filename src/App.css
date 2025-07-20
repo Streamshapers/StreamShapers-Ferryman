@@ -371,6 +371,8 @@ input[type="checkbox"] {
 
 .dropdown {
     display: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
 }
 
 .headerButton:hover {
@@ -860,7 +862,6 @@ input[type="checkbox"] {
     border: 1px solid var(--border);
     border-left: 4px solid var(--secondary);
     transform: translateX(-4px);
-    z-index: 800;
 }
 
 .marker-duration {
@@ -1032,6 +1033,7 @@ input[type="checkbox"] {
     min-width: 500px;
     height: 60vh;
     min-height: 600px;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
 }
@@ -1046,7 +1048,8 @@ input[type="checkbox"] {
 
 .popupButtonArea {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 10px;
     padding: 20px 0 0 0;
 }
 
@@ -1295,7 +1298,7 @@ input[type="checkbox"] {
     align-items: center;
 }
 
-.spx-settings, .gdd-settings {
+.spx-settings{
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1363,6 +1366,8 @@ input[type="checkbox"] {
     gap: 10px;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
+    position: relative;
 }
 
 .header-profile-image {
@@ -1450,10 +1455,6 @@ button {
 
 #spx-logo {
     width: 50px;
-}
-
-.spx-description input {
-    flex-grow: 1;
 }
 
 .spx-instruction textarea {
@@ -2046,5 +2047,5 @@ textarea {
 
 .upgrade-plan{
     padding-left: 10px;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
