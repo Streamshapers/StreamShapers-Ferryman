@@ -3,6 +3,36 @@
 <!--######## HTML-Template by StreamShapers #######-->
 <!--########### visit streamshapers.com ###########-->
 <!--- made with StreamShapers Ferryman ${version} --->
+
+
+<!--- The included Lottie Player is published under MIT License: 
+
+MIT License
+
+Copyright (c) 2019 LottieFiles.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-->
+
+
+
 <head>
     <meta charset='utf-8'>
     <title>Lottie Template 01</title>
@@ -172,7 +202,6 @@
 
     function triggerPlayStack() {
         setTimeout(() => {
-            console.log("Playstack triggered")
             if (showLogs) console.log(`LottieState: ${lottieState}`);
             if (currentSegment === "stop") {
                 //animation.destroy();
@@ -190,7 +219,7 @@
 
     function controlAnimation(animation, action, value, force = true) {
         if (typeof value == "number" && force === false) {
-            console.log("Frames will be forced to play immediately and not be added to playStack!")
+            //console.log("Frames will be forced to play immediately and not be added to playStack!")
             force = true
         }
         if (force) {
@@ -211,7 +240,6 @@
                 })
             }
         } else if (typeof value == "string") {
-            console.log("controlanimation: update läuft?! = " +updateRunning)
             if (lottieState === "idle" && !updateRunning) {
                 if (action === "play") {
                     animation.goToAndPlay(value, true)
@@ -222,8 +250,6 @@
                 }
             } else {
                 playStack.push(value);
-                console.log(value +" wurde gepushed")
-                console.log(playStack)
                 if (markers.includes(value + "_loop")) playStack.push(value + "_loop");
             }
         }
@@ -311,7 +337,6 @@
                     if (key === "epochID") imagesPathPrefix = "";
                     if (key === "_stopFetch") fetchSheet = false;
                 }
-                console.log(data)
                 for (let key of Object.keys(data)) {
                     lottieTemplateNew.layers.forEach((layer) => {
                         if (layer.nm === key) {
@@ -330,7 +355,6 @@
                 triggerPlayStack() 
                 return
             }
-            console.log("kein return")
             lastFetchedData = JSON.stringify(parsed)
 
             //first Update and create Lottie for the first time
@@ -378,7 +402,6 @@
             //Update when tamplate is playing
             if (playStatus === "play" && lottieState === "idle") {
                 updateRunning = true
-                console.log("anfang: update läuft?! = " +updateRunning)
                 let updateData = JSON.parse(JSON.stringify(data))
                 updateCounter++;
                 const updateStartFrame = currentFrame;
@@ -456,8 +479,6 @@
                                 newAnimation = null;
 
                                 updateRunning = false
-                                console.log(playStack)
-                                console.log("ende: update läuft?! = " +updateRunning)
                                 triggerPlayStack() 
 
 
@@ -492,7 +513,6 @@
                         newAnimation = null;
                         updateRunning = false
                         triggerPlayStack() 
-                        console.log("ende: update läuft?! = " +updateRunning)
                     });
                 }
 
@@ -574,7 +594,7 @@
             setInterval(() => {
                 // await updateGoogleTableData();
                 update(lastData,true);
-                console.log("Periodically update triggered")
+                if(showInfo) console.log("Periodically update triggered")
             }, fetchInterval);
         }, 4000);
     }
@@ -734,7 +754,6 @@
                     data[element.key] = value;
                 }
             }
-            console.log(data)
             return data;
         } catch (error) {
             console.log(error)
