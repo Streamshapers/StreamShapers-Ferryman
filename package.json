@@ -5,6 +5,7 @@
   "license": "GNU",
   "private": true,
   "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@lottiefiles/react-lottie-player": "^3.5.4",

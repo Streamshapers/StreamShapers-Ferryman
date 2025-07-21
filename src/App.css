@@ -982,6 +982,28 @@ input[type="checkbox"] {
     justify-content: space-between;
 }
 
+.social-icons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+    flex: 1 1 auto;
+    font-size: 2rem;
+    padding-bottom: 20px;
+}
+
+.social-icons a {
+    color: var(--copy);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: var(--primary);
+}
+
+
 /*++++++++++++++++++Scrollbar+++++++++++++++++++++++++++++++*/
 
 ::-webkit-scrollbar {

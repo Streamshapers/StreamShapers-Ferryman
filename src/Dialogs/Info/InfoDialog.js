@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faDiscord, faGithub, faInstagram, faYoutube} from "@fortawesome/free-brands-svg-icons";
 
 function InfoDialog() {
     const {theme, ferrymanVersion} = useContext(GlobalStateContext);
@@ -53,7 +54,12 @@ function InfoDialog() {
                     </div>
                 </div>
 
-
+                                <div className="social-icons">
+                                    <a href="https://discord.gg/ksNhRkzrM6" rel="noopener noreferrer"><FontAwesomeIcon icon={faDiscord} title="Discord"/></a>
+                                    <a href="https://github.com/Streamshapers" rel="noopener noreferrer"><FontAwesomeIcon icon={faGithub} title="GitHub"/></a>
+                                    <a href="https://www.instagram.com/streamshapers/" rel="noopener noreferrer"><FontAwesomeIcon icon={faInstagram} title="Instagram"/></a>
+                                    <a href="https://www.youtube.com/@streamshapers" rel="noopener noreferrer"><FontAwesomeIcon icon={faYoutube} title="YouTube"/></a>
+                                </div>
             <div id="info-copyright">
                 <div>
                     © StreamShapers 2025
