@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDiscord, faGithub, faInstagram, faYoutube} from "@fortawesome/free-brands-svg-icons";
 
 function InfoDialog() {
-    const {theme, ferrymanVersion} = useContext(GlobalStateContext);
+    const {theme, ferrymanVersion, streamshapersUrl} = useContext(GlobalStateContext);
     const [isInfoOpen, setIsInfoOpen] = useState(false);
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [isLicenseOpen, setIsLicenseOpen] = useState(false);
@@ -27,7 +27,7 @@ function InfoDialog() {
                             </h3>
                             <div className={`accordion-body ${isInfoOpen ? 'open' : ''}`}>
                                 <p>StreamShapers Ferryman created by Jan-Philipp Peters, Nico Peters and Richard Weyer</p>
-                                <p> Read <a href="https://www.streamshapers.com/imprint">Imprint</a> and <a href="https://www.streamshapers.com/privacy-policy">Privacy Policy</a></p>
+                                <p> Read <a href={streamshapersUrl + "/imprint"}>Imprint</a> and <a href={streamshapersUrl + "/privacy-policy"}>Privacy Policy</a></p>
                             </div>
                         </div>
                         <div className="accordion-item License">

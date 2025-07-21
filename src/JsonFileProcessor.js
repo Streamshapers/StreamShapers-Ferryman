@@ -18,6 +18,7 @@ function JsonFileProcessor() {
         jsonFile,
         setJsonFile,
         importFerrymanJSON,
+        setImportFerrymanJSON,
         setUseExternalSources,
         setExternalSources,
         setGeneralAlerts,
@@ -27,7 +28,9 @@ function JsonFileProcessor() {
         setUpdateExternalSources,
         setUpdateGoogle,
         clocks,
-        setFetchSourcesPeriodically
+        setFetchSourcesPeriodically,
+        sourcesFetchInterval,
+        setSourcesFetchInterval
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -50,6 +53,8 @@ function JsonFileProcessor() {
         setFetchSourcesPeriodically(false);
         setFileName(null);
         setJsonFile(null);
+        setSourcesFetchInterval(5000);
+        setImportFerrymanJSON(null);
     };
 
     const processJsonFile = (file) => {
@@ -94,6 +99,9 @@ function JsonFileProcessor() {
                 if (importFerrymanJSON.textObjects) setTextObjects(importFerrymanJSON.textObjects);
                 if (importFerrymanJSON.useExternalSources) setUseExternalSources(importFerrymanJSON.useExternalSources);
                 if (importFerrymanJSON.externalSources) setExternalSources(importFerrymanJSON.externalSources);
+                if (importFerrymanJSON.fetchSourcesPeriodically) setFetchSourcesPeriodically(importFerrymanJSON.fetchSourcesPeriodically);
+                if (importFerrymanJSON.sourcesFetchInterval) setSourcesFetchInterval(importFerrymanJSON.sourcesFetchInterval);
+                if (importFerrymanJSON.clocks) clocks.current = importFerrymanJSON.clocks;
             }
         } catch (error) {
             setError(`Error reading the JSON file. Please make sure it is a valid JSON file. Error: ${error.message}`);

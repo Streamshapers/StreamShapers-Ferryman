@@ -57,10 +57,6 @@ export const GlobalStateProvider = ({children}) => {
     const googleCellSnapshot = useRef([]);
 
     useEffect(() => {
-        console.log(fetchSourcesPeriodically);
-    }, [fetchSourcesPeriodically]);
-
-    useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
 
         const getQueryParameter = (param) => {
@@ -120,6 +116,9 @@ export const GlobalStateProvider = ({children}) => {
                 if (parsedFile.data.ferrymanJson.textObjects) setTextObjects(parsedFile.data.ferrymanJson.textObjects);
                 if (parsedFile.data.ferrymanJson.externalSources) setExternalSources(parsedFile.data.ferrymanJson.externalSources);
                 if (parsedFile.data.ferrymanJson.useExternalSources) setUseExternalSources(parsedFile.data.ferrymanJson.useExternalSources);
+                if (parsedFile.data.ferrymanJson.sourcesFetchInterval) setSourcesFetchInterval(parsedFile.data.ferrymanJson.sourcesFetchInterval);
+                if (parsedFile.data.ferrymanJson.fetchSourcesPeriodically) setFetchSourcesPeriodically(parsedFile.data.ferrymanJson.fetchSourcesPeriodically);
+                if (parsedFile.data.ferrymanJson.clocks) clocks.current = parsedFile.data.ferrymanJson.clocks;
             } else {
                 setJsonFile(file);
                 setFileName(file.name.replace(/\.json$/, ''));
@@ -1155,7 +1154,7 @@ export const GlobalStateProvider = ({children}) => {
             return cellValue;
 
         } catch (error) {
-            //console.log("Error getCellData from GoogleSheet:", error); HIER FEHLERMELDUNG
+            //console.log("Error getCellData from GoogleSheet:", error)
             if (obj) {
                 setTextError(obj, {
                     type: "Cell Error",
@@ -1486,6 +1485,9 @@ export const GlobalStateProvider = ({children}) => {
         if (textObjects) temporaryJSON.textObjects = textObjects;
         if (useExternalSources) temporaryJSON.useExternalSources = useExternalSources;
         if (externalSources) temporaryJSON.externalSources = externalSources;
+        if (sourcesFetchInterval) temporaryJSON.sourcesFetchInterval = sourcesFetchInterval;
+        if (fetchSourcesPeriodically) temporaryJSON.fetchSourcesPeriodically = fetchSourcesPeriodically;
+        if (clocks) temporaryJSON.clocks = clocks.current;
 
         //console.log(JSON.stringify(temporaryJSON));
         setFerrymanTemplateJSON(temporaryJSON);
@@ -1515,7 +1517,7 @@ export const GlobalStateProvider = ({children}) => {
         }
 
         if (name && name !== '') templateName = name;
-        if (projectId !== undefined) templateProjectId = projectId; // Auch "" (kein Projekt) zulassen
+        if (projectId !== undefined) templateProjectId = projectId;
         if (description && description !== '') templateDescription = description;
         if (tags && tags !== '') templateTags = tags;
 

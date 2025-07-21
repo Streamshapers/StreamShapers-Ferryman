@@ -163,7 +163,7 @@ function ConnectApiDialog() {
                                         {api.key === "Digital Clock" && (
                                             <div className="external-source-clock">
                                                 <div>Format:</div>
-                                                <select onChange={e => handleChange(index, 'secret', e.target.value)}>
+                                                <select value={api.secret} onChange={e => handleChange(index, 'secret', e.target.value)}>
                                                     <option>24h hh:mm:ss</option>
                                                     <option>24h hh:mm</option>
                                                     <option>12h hh:mm:ss am/pm</option>

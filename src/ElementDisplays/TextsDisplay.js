@@ -111,11 +111,8 @@ function TextsDisplay() {
         const updatedTextObjects = [...textObjects];
         const textObject = updatedTextObjects.find(t => t === object);
 
-        if (value) {
-            textObject.cell = value.toUpperCase();
-        } else {
-            console.log("Error saving Google Table coordinates!")
-        }
+        textObject.cell = value.toUpperCase();
+
         setTextObjects(updatedTextObjects);
     }
 
@@ -243,7 +240,7 @@ function TextsDisplay() {
                                                     <input className="google-table-input"
                                                            type="text"
                                                            value={textObject.cell}
-                                                           pattern="[A-Za-z]+[0-9]+"
+                                                           pattern="|[A-Za-z]+[0-9]+"
                                                            onChange={(e) => handleGoogleCoordinates(textObject, e.target.value)}/>
                                                 </label>
                                                 {/*<label>Row:
