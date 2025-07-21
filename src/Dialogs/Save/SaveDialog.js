@@ -102,7 +102,7 @@ function SaveDialog({ onClose }) {
                 </div>
             )}
             {serverError && <p style={{ color: 'red', marginBottom: '1rem' }}>{serverError}</p>}
-            <p>{remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left. <a href="https://streamshapers.com/plans"><span className="upgrade-plan">Upgrade Plan</span></a></p>
+            <p>{remainingUploads} upload{remainingUploads > 1 ? 's' : ''} left. <a href="https://streamshapers.com/pricing"><span className="upgrade-plan">Upgrade Plan</span></a></p>
 
             <div id="save-in-account">
                 <div className="row">
