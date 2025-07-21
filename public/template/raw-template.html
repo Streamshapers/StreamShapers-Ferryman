@@ -589,7 +589,7 @@ SOFTWARE.
         document.body.appendChild(br);
     }
 
-    if (fetchInterval && fetchInterval !== 0) {
+    if (fetchInterval && fetchInterval !== 0 && googleTableCells != "null" ) {
         setTimeout(async function () {
             setInterval(() => {
                 // await updateGoogleTableData();
