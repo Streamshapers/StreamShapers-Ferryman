@@ -1024,7 +1024,7 @@ input[type="checkbox"] {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--foreground);
+    background: var(--background);
     border-radius: 5px;
     padding: 20px;
     z-index: 1001;
