@@ -320,7 +320,7 @@ SOFTWARE.
                     parsed = JSON.parse(rawData);
                 }
             }
-            if (fetchSheet && googleTableCells) {
+            if (googleTableCells != "null" && googleTableCells != "[]") {
                 parsed = await updateGoogleTableData(parsed);
 
                 lastData = JSON.stringify(parsed)
@@ -589,15 +589,6 @@ SOFTWARE.
         document.body.appendChild(br);
     }
 
-    if (fetchInterval && fetchInterval !== 0 && googleTableCells != "null" ) {
-        setTimeout(async function () {
-            setInterval(() => {
-                // await updateGoogleTableData();
-                update(lastData,true);
-                if(showInfo) console.log("Periodically update triggered")
-            }, fetchInterval);
-        }, 4000);
-    }
 </script>
 
 <script>
@@ -759,6 +750,17 @@ SOFTWARE.
             console.log(error)
             return data
         }
+    }
+
+    if (fetchInterval && fetchInterval !== 0 && googleTableCells != "null" && googleTableCells != "[]") {
+        console.log("Start Periodisch")
+        setTimeout(async function () {
+            setInterval(() => {
+                // await updateGoogleTableData();
+                update(lastData,true);
+                if(showInfo) console.log("Periodically update triggered")
+            }, fetchInterval);
+        }, 4000);
     }
 </script>
 
