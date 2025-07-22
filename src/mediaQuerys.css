@@ -60,6 +60,18 @@
 
     .template-grid {
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .template-grid .template-card{
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .last-uploaded-header {
+        flex-direction: column;
+        gap: 10px;
     }
 
     #startWrapper {

@@ -3,12 +3,12 @@ import {GlobalStateContext} from "../Context/GlobalStateContext";
 import AuthContext from "../Context/AuthContext";
 import {Player} from '@lottiefiles/react-lottie-player';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
+import {faChevronRight, faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import api from "../axiosInstance";
 
 function LastUploads() {
     const {user} = useContext(AuthContext);
-    const {loadNewFile, setTemplateData} = useContext(GlobalStateContext);
+    const {loadNewFile, setTemplateData, streamshapersUrl} = useContext(GlobalStateContext);
     const [loading, setLoading] = useState(true);
     const [templates, setTemplates] = useState([]);
     const [error, setError] = useState('');
@@ -113,46 +113,57 @@ function LastUploads() {
                         <p>{error}</p>
                     ) : templates.length !== 0 ? (
                         <>
-                            <h2>Your last edited Templates</h2>
-                            <div className="template-grid">
-                                {templates
-                                    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-                                    .slice(0, 3)
-                                    .map(template => (
-                                        <div
-                                            className="template-card"
-                                            key={template._id}
-                                            onMouseEnter={() => handleMouseEnter(template._id)}
-                                            onMouseLeave={() => handleMouseLeave(template._id)}
-                                        >
-                                            <div className="template-card-header">
-                                                <div></div>
-                                                <h3>{template.name}</h3>
-                                                <FontAwesomeIcon
-                                                    className="template-card-more"
-                                                    icon={faEllipsisVertical}
-                                                    onClick={() => handleDropdownToggle(template._id)}
-                                                />
-                                                {showDropdown === template._id && (
-                                                    <div className="template-card-dropdown-menu" ref={dropdownRef}>
-                                                        <button
-                                                            onClick={() => handleLoadInFerryman(template._id)}>Open
-                                                            in Ferryman
-                                                        </button>
+                            <div className="last-uploaded-header">
+                                <div className="last-uploaded-header-side"></div>
+                                <h2>Your last edited Templates</h2>
+                                <div className="last-uploaded-header-side right">
+                                    <div className="section-component-header-link">
+                                        <a href={streamshapersUrl + "/dashboard"}>Dashboard</a>
+                                        <FontAwesomeIcon icon={faChevronRight} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="last-uploaded-body">
+                                <div className="template-grid">
+                                    {templates
+                                        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                                        .slice(0, 3)
+                                        .map(template => (
+                                            <div
+                                                className="template-card"
+                                                key={template._id}
+                                                onMouseEnter={() => handleMouseEnter(template._id)}
+                                                onMouseLeave={() => handleMouseLeave(template._id)}
+                                            >
+                                                <div className="template-card-header">
+                                                    <div></div>
+                                                    <h3>{template.name}</h3>
+                                                    <FontAwesomeIcon
+                                                        className="template-card-more"
+                                                        icon={faEllipsisVertical}
+                                                        onClick={() => handleDropdownToggle(template._id)}
+                                                    />
+                                                    {showDropdown === template._id && (
+                                                        <div className="template-card-dropdown-menu" ref={dropdownRef}>
+                                                            <button
+                                                                onClick={() => handleLoadInFerryman(template._id)}>Open
+                                                                in Ferryman
+                                                            </button>
 
-                                                    </div>
-                                                )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="template-card-body">
+                                                    <Player
+                                                        ref={el => playerRefs.current[template._id] = el}
+                                                        src={template.data.templateJson}
+                                                        style={{height: 'auto', width: '100%'}}
+                                                        loop
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="template-card-body">
-                                                <Player
-                                                    ref={el => playerRefs.current[template._id] = el}
-                                                    src={template.data.templateJson}
-                                                    style={{height: 'auto', width: '100%'}}
-                                                    loop
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                </div>
                             </div>
                         </>
                     ) : (
