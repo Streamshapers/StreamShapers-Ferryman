@@ -58,34 +58,36 @@ export const GlobalStateProvider = ({children}) => {
 
     useEffect(() => {
         console.log('%c  StreamShapers Ferryman  ', 'border-radius: 5px; font-size: 1.1em; padding: 10px; background: #4ba1e2; color: #fff; font-family: OpenSans-Regular, arial;');
+    }, []);
 
-        const getQueryParameter = (param) => {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        };
 
-        const loadQueryTemplate = async (id) => {
-            try {
-                const res = await api.get('/templates/' + id, {
-                    withCredentials: true,
-                });
-
-                const blob = new Blob([JSON.stringify(res.data)], {type: 'application/json'});
-
-                await loadNewFile(blob);
-            } catch (error) {
-                console.error('Error loading file:', error);
-            }
-        };
-
+    useEffect(() => {
         const templateId = getQueryParameter('templateId');
-
         if (templateId) {
             loadQueryTemplate(templateId).then(() => {
                 console.log('Loaded template:', templateId);
             });
         }
-    }, []);
+    }, [window.location.search]);
+
+    const getQueryParameter = (param) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    };
+
+    const loadQueryTemplate = async (id) => {
+        try {
+            const res = await api.get('/templates/' + id, {
+                withCredentials: true,
+            });
+
+            const blob = new Blob([JSON.stringify(res.data)], {type: 'application/json'});
+
+            await loadNewFile(blob);
+        } catch (error) {
+            console.error('Error loading file:', error);
+        }
+    }
 
     async function parseBlobAsJson(blob) {
         try {
