@@ -174,7 +174,7 @@ function ExportDialog({onClose}) {
                 libFolder.file("lottie-player.js", lottiePlayerText);
                 libFolder.file("lottie-template.json", lottieTemplateFile);
                 zip.file("graphic.mjs", graphicFile, {type: mimeType});
-                zip.file("manifest.json", manifestText);
+                zip.file("manifest.ograf.json", manifestText);
 
                 //zip.file(fileNameWithExt, fileContent, {type: mimeType});
 
@@ -233,12 +233,12 @@ function ExportDialog({onClose}) {
 
     const handleImageExport = (option) => () => {
         setImageEmbed(option);
-        console.log(imageEmbed)
+        //console.log(imageEmbed)
     };
 
     const handleFileNameChange = (e) => {
         setFileName(e.target.value);
-        console.log(fileName)
+        //console.log(fileName)
     };
 
     const handleSaveToAccountCheckbox = (e) => {
@@ -262,7 +262,7 @@ function ExportDialog({onClose}) {
                 </button>
                 {exportFormat === 'ograf' && 1 === 0 && (
                     <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('ograf')}>Ograf
+                            onClick={() => handleTabChange('ograf')}>OGraf
                     </button>
                 )}
                 {exportFormat !== 'ograf' && (
@@ -290,7 +290,7 @@ function ExportDialog({onClose}) {
                     <div id="export-format">
                         <RadioButton value={exportFormat === 'html'} label="HTML-Template"
                                      onChange={handleExportFormat("html")}/>
-                        <RadioButton value={exportFormat === 'ograf'} label="Ograf-Template (Beta)"
+                        <RadioButton value={exportFormat === 'ograf'} label="OGraf-Template (Beta)"
                                      onChange={handleExportFormat("ograf")}/>
                         <RadioButton value={exportFormat === 'json'} label="JSON"
                                      onChange={handleExportFormat('json')}/>

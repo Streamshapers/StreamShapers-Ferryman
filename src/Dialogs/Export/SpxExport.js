@@ -24,7 +24,7 @@ function SpxExport() {
 
     const handleUiColorChange = (color) => {
         setUiColor(color);
-        console.log(uiColor,color)
+        //console.log(uiColor,color)
         const spxJson = {...SPXGCTemplateDefinition};
         spxJson.uicolor = spxUiColors.indexOf(color);
         setSPXGCTemplateDefinition(spxJson);

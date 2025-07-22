@@ -25,7 +25,7 @@ function CasparCGTemplateDemo() {
         switch (action) {
             case "play":
                 // erst Daten schicken, dann Play
-                console.log("template", importedHTML);
+                //console.log("template", importedHTML);
                 if(!clickedPlay) sendUpdateMessage();
                 iframe.contentWindow.postMessage({action: "play"}, "*");
                 setClickedPlay(true);
@@ -45,7 +45,7 @@ function CasparCGTemplateDemo() {
                 previewTemplate.current = htmlTemplate;
                 setClickedPlay(false);
                 setIframeKey(k => k + 1);
-                console.log("refresh")
+                //console.log("refresh")
                 break;
 
             default:

@@ -7,9 +7,9 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.0 beta");
+    const [ferrymanVersion] = useState("v2.0.0");
     const {user, serverUrl} = useContext(AuthContext);
-    const streamshapersUrl = "https://hosting.streamshapers.com";
+    const streamshapersUrl = "https://streamshapers.com";
 
     const [error, setError] = useState(null);
     const [jsonData, setJsonData] = useState(null);
@@ -1560,9 +1560,9 @@ export const GlobalStateProvider = ({children}) => {
             ],*/
 
         const rawManifest = {
-            $schema: "https://ograf.ebu.io/v1-draft-0/specification/json-schemas/graphics/schema.json",
+            $schema: "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
             name: `${fileName}`,
-            description: "HTML Graphic made with Ferryman, exported as Ograf.",
+            description: "HTML Graphic made with Ferryman, exported as OGraf.",
             id: `${fileName}`,
             version: "1.0.0",
             main: "graphic.mjs",

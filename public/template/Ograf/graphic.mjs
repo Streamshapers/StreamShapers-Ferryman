@@ -13,7 +13,7 @@
  */
 
 /**
- * @typedef { import("https://ograf.ebu.io/v1-draft-0/specification/javascript-types/index.d.ts").GraphicsAPI.Graphic } Graphic
+ * @typedef { import("https://ograf.ebu.io/v1/specification/javascript-types/index.d.ts").GraphicsAPI.Graphic } Graphic
  */
 
 let replacements;
