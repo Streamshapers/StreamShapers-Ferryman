@@ -1494,7 +1494,7 @@ export const GlobalStateProvider = ({children}) => {
         //console.log(JSON.stringify(temporaryJSON));
         setFerrymanTemplateJSON(temporaryJSON);
         //console.log(temporaryJSON);
-    }, [externalSources, ferrymanVersion, textObjects, useExternalSources]);
+    }, [externalSources, ferrymanVersion, textObjects, useExternalSources, sourcesFetchInterval, fetchSourcesPeriodically, clocks]);
 
     //#################################### Streamshapers JSON (streamshapers hosting) ##################################
 
