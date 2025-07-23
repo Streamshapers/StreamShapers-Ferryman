@@ -721,7 +721,10 @@ SOFTWARE.
 
     async function updateGoogleTableData(data) {
         try {
-            data = data ?? {};
+            if (data === null || data === undefined) {
+                data = {};
+            }
+
             const tableData = await parseGoogleTable();
             let sources = {};
 
