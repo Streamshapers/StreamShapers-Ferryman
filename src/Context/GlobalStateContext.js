@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.0");
+    const [ferrymanVersion] = useState("v2.0.1");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://streamshapers.com";
 
@@ -121,6 +121,7 @@ export const GlobalStateProvider = ({children}) => {
                 if (parsedFile.data.ferrymanJson.sourcesFetchInterval) setSourcesFetchInterval(parsedFile.data.ferrymanJson.sourcesFetchInterval);
                 if (parsedFile.data.ferrymanJson.fetchSourcesPeriodically) setFetchSourcesPeriodically(parsedFile.data.ferrymanJson.fetchSourcesPeriodically);
                 if (parsedFile.data.ferrymanJson.clocks) clocks.current = parsedFile.data.ferrymanJson.clocks;
+                if (parsedFile.data.ferrymanJson.googleTableCells) setGoogleTableCells(parsedFile.data.ferrymanJson.googleTableCells);
             } else {
                 setJsonFile(file);
                 setFileName(file.name.replace(/\.json$/, ''));
@@ -1490,11 +1491,12 @@ export const GlobalStateProvider = ({children}) => {
         if (sourcesFetchInterval) temporaryJSON.sourcesFetchInterval = sourcesFetchInterval;
         if (fetchSourcesPeriodically) temporaryJSON.fetchSourcesPeriodically = fetchSourcesPeriodically;
         if (clocks) temporaryJSON.clocks = clocks.current;
+        if (googleTableCells) temporaryJSON.googleTableCells = googleTableCells;
 
         //console.log(JSON.stringify(temporaryJSON));
         setFerrymanTemplateJSON(temporaryJSON);
         //console.log(temporaryJSON);
-    }, [externalSources, ferrymanVersion, textObjects, useExternalSources, sourcesFetchInterval, fetchSourcesPeriodically, clocks]);
+    }, [externalSources, ferrymanVersion, textObjects, useExternalSources, sourcesFetchInterval, fetchSourcesPeriodically, clocks, googleTableCells]);
 
     //#################################### Streamshapers JSON (streamshapers hosting) ##################################
 

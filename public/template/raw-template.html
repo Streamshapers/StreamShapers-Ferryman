@@ -5,7 +5,7 @@
 <!--- made with StreamShapers Ferryman ${version} --->
 
 
-<!--- The included Lottie Player is published under MIT License: 
+<!--- The included Lottie Player is published under MIT License:
 
 MIT License
 
@@ -91,18 +91,18 @@ SOFTWARE.
     let currentFrame;
     let updateExist = false;
     let lottieState = "idle";
-    let updateRunning = false
-    let updatingData = false
+    let updateRunning = false;
+    let updatingData = false;
     let markers = [];
     let playStack = [];
     let breakFrame = undefined;
     let fetchSheet = true;
     let lastData;
-    let lastFetchedData
+    let lastFetchedData;
     let data = {};
     let clocks = ${clocks};
     const fetchInterval = 0;
-    
+
 
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
@@ -220,33 +220,33 @@ SOFTWARE.
     function controlAnimation(animation, action, value, force = true) {
         if (typeof value == "number" && force === false) {
             //console.log("Frames will be forced to play immediately and not be added to playStack!")
-            force = true
+            force = true;
         }
         if (force) {
             if (action === "play") {
-                animation.goToAndPlay(value, true)
+                animation.goToAndPlay(value, true);
             } else if (action === "stop") {
-                animation.goToAndStop(value, true)
+                animation.goToAndStop(value, true);
             }
             if (typeof value == "string") {
-                currentSegment = value
-                if (showLogs) console.log(`CurrentSegment: ${currentSegment}`)
+                currentSegment = value;
+                if (showLogs) console.log(`CurrentSegment: ${currentSegment}`);
             } else if (typeof value == "number") {
                 lottieTemplate.markers.forEach((marker) => {
                     if (value >= marker.tm && value < marker.tm + marker.dr) {
-                        currentSegment = marker.cm
-                        if (showLogs) console.log(`CurrentSegment: ${currentSegment}`)
+                        currentSegment = marker.cm;
+                        if (showLogs) console.log(`CurrentSegment: ${currentSegment}`);
                     }
                 })
             }
         } else if (typeof value == "string") {
             if (lottieState === "idle" && !updateRunning) {
                 if (action === "play") {
-                    animation.goToAndPlay(value, true)
-                    currentSegment = value
+                    animation.goToAndPlay(value, true);
+                    currentSegment = value;
                 } else if (action === "stop") {
-                    animation.goToAndStop(value, true)
-                    currentSegment = value
+                    animation.goToAndStop(value, true);
+                    currentSegment = value;
                 }
             } else {
                 playStack.push(value);
@@ -294,8 +294,8 @@ SOFTWARE.
 
     async function update(rawData, isPeriodicUpdate) {
         if(!updateRunning && !updatingData){
-            updatingData = true
-            if (rawData) lastData = rawData
+            updatingData = true;
+            if (rawData) lastData = rawData;
             if (lottieState !== "idle") console.log("Updating is not possible while Playing ");
             if (showLogs) console.log(`Update triggered: ${rawData}`);
 
@@ -322,12 +322,11 @@ SOFTWARE.
             }
             if (googleTableCells != "null" && googleTableCells != "[]") {
                 parsed = await updateGoogleTableData(parsed);
-
-                lastData = JSON.stringify(parsed)
+                lastData = JSON.stringify(parsed);
             }
             if (parsed) {
                 for (let key of Object.keys(parsed)) {
-                    data[key] = parsed[key]
+                    data[key] = parsed[key];
                 }
             }
             if (data) {
@@ -343,19 +342,19 @@ SOFTWARE.
                             if ('refId' in layer) {
                                 updateAssetsByRefid(lottieTemplateNew.assets, layer.refId, data[key]);
                             } else {
-                                updateLayerText(layer, data[key])
+                                updateLayerText(layer, data[key]);
                             }
                         }
                     })
                 }
             }
-            updatingData = false
+            updatingData = false;
             if(lastFetchedData === JSON.stringify(parsed) && isPeriodicUpdate) {
-                updateRunning = false
-                triggerPlayStack() 
-                return
+                updateRunning = false;
+                triggerPlayStack();
+                return;
             }
-            lastFetchedData = JSON.stringify(parsed)
+            lastFetchedData = JSON.stringify(parsed);
 
             //first Update and create Lottie for the first time
             if (playStatus === "") {
@@ -401,8 +400,8 @@ SOFTWARE.
 
             //Update when tamplate is playing
             if (playStatus === "play" && lottieState === "idle") {
-                updateRunning = true
-                let updateData = JSON.parse(JSON.stringify(data))
+                updateRunning = true;
+                let updateData = JSON.parse(JSON.stringify(data));
                 updateCounter++;
                 const updateStartFrame = currentFrame;
 
@@ -424,7 +423,7 @@ SOFTWARE.
                                 if ('refId' in layer) {
                                     updateAssetsByRefid(lottieTemplateUpdate.assets, layer.refId, updateData[key]);
                                 } else {
-                                    updateLayerText(layer, updateData[key])
+                                    updateLayerText(layer, updateData[key]);
                                 }
                             }
                         })
@@ -444,8 +443,8 @@ SOFTWARE.
 
                     updateAnimation.addEventListener("DOMLoaded", async function () {
                         addEvents(updateAnimation);
-                        await delay(100)
-                        controlAnimation(updateAnimation, "play", "update")
+                        await delay(100);
+                        controlAnimation(updateAnimation, "play", "update");
                         animation.destroy();
                         document.getElementById("animation" + (updateCounter - 1)).remove();
                         animation = updateAnimation;
@@ -470,19 +469,16 @@ SOFTWARE.
                             newAnimation.addEventListener("DOMLoaded", async function () {
                                 if (showInfo) console.log("Template - updated Animation Ready");
                                 addEvents(newAnimation);
-                                controlAnimation(newAnimation, "stop", updateStartFrame)
-                                currentSegment = "update" //important for right updateFrame!
-                                await delay(100)
+                                controlAnimation(newAnimation, "stop", updateStartFrame);
+                                currentSegment = "update"; //important for correct updateFrame!
+                                await delay(100);
                                 animation.destroy();
                                 document.getElementById("animation" + (updateCounter - 1)).remove();
                                 animation = newAnimation;
                                 newAnimation = null;
 
-                                updateRunning = false
-                                triggerPlayStack() 
-
-
-
+                                updateRunning = false;
+                                triggerPlayStack();
                             });
                         });
                     });
@@ -505,18 +501,18 @@ SOFTWARE.
                     newAnimation.addEventListener("DOMLoaded", async function () {
                         if (showInfo) console.log("Template - updated Animation Ready");
                         addEvents(newAnimation);
-                        await delay(100)
-                        controlAnimation(newAnimation, "stop", updateStartFrame)
+                        await delay(100);
+                        controlAnimation(newAnimation, "stop", updateStartFrame);
                         animation.destroy();
                         document.getElementById("animation" + (updateCounter - 1)).remove();
                         animation = newAnimation;
                         newAnimation = null;
-                        updateRunning = false
-                        triggerPlayStack() 
+                        updateRunning = false;
+                        triggerPlayStack();
                     });
                 }
 
-            } 
+            }
             if (showInfo) info();
         } else {console.log("Updating is still running - new update was canceled")}
     }
@@ -525,12 +521,12 @@ SOFTWARE.
 
 
     async function play() {
-        nextCount = 1
+        nextCount = 1;
         await animLoaded.promise;
         await animReady;
         await loadFonts();
-        if (Object.keys(clocks).length !== 0) updateTimeField()
-        controlAnimation(animation, "play", "start")
+        if (Object.keys(clocks).length !== 0) updateTimeField();
+        controlAnimation(animation, "play", "start");
         playStatus = "play";
         currentSegment = "start";
         if (showLogs) console.log("Template - Play 'start' marker");
@@ -540,7 +536,7 @@ SOFTWARE.
 
     function stop() {
         if (stopExist) {
-            controlAnimation(animation, "play", "stop", false)
+            controlAnimation(animation, "play", "stop", false);
         } else {
             if (showLogs) console.log("Template - No 'stop' marker - destroy Animation");
             animation.destroy();
@@ -553,14 +549,14 @@ SOFTWARE.
             stop();
             if (showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
         } else {
-            controlAnimation(animation, "play", "next" + nextCount, false)
+            controlAnimation(animation, "play", "next" + nextCount, false);
             nextCount++;
         }
     }
 
     //function to invoke
     function playMarker(name) {
-        controlAnimation(animation, "play", name, false)
+        controlAnimation(animation, "play", name, false);
     }
 
 
@@ -603,7 +599,7 @@ SOFTWARE.
             clock4: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
             clock5: {hour: "2-digit", minute: "2-digit", hour12: true},
             clock6: {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true},
-        }
+        };
 
         let now = new Date();
         now.setSeconds(now.getSeconds() + addSeconds);
@@ -612,14 +608,14 @@ SOFTWARE.
         if (type === "clock5" || type === "clock6") {
             formattedTime = formattedTime.replace(/\s?(AM|PM)$/i, '');
         }
-        return formattedTime
+        return formattedTime;
     }
 
     function updateTimeField() {
         if (playStatus !== "") {
             clockIntervalIds.forEach(id => clearInterval(id));
             clockIntervalIds = [];
-
+        }
             function updateTime(animation) {
                 if (animation && animation.isLoaded) {
                     Object.keys(clocks).forEach((key) => {
@@ -629,7 +625,7 @@ SOFTWARE.
                                 if (element && element.data && element.data.nm && element.updateDocumentData) {
                                     clocks[key].forEach((layer) => {
                                         if (element.data.nm === layer) {
-                                            element.updateDocumentData({t: time})
+                                            element.updateDocumentData({t: time});
                                         }
                                     })
                                 }
@@ -654,19 +650,18 @@ SOFTWARE.
                     }
                 }
             }
-        }
 
         const id = setInterval(() => {
             updateTime(animation);
-            updateTime(newAnimation)
-            updateTime(updateAnimation)
+            updateTime(newAnimation);
+            updateTime(updateAnimation);
 
         }, 100);
         clockIntervalIds.push(id);
 
         updateTime(animation);
-        updateTime(newAnimation)
-        updateTime(updateAnimation)
+        updateTime(newAnimation);
+        updateTime(updateAnimation);
     }
 </script>
 
@@ -726,6 +721,7 @@ SOFTWARE.
 
     async function updateGoogleTableData(data) {
         try {
+            data = data ?? {};
             const tableData = await parseGoogleTable();
             let sources = {};
 
@@ -747,8 +743,8 @@ SOFTWARE.
             }
             return data;
         } catch (error) {
-            console.log(error)
-            return data
+            console.log(error);
+            return data;
         }
     }
 
@@ -757,7 +753,7 @@ SOFTWARE.
             setInterval(() => {
                 // await updateGoogleTableData();
                 update(lastData,true);
-                if(showInfo) console.log("Periodically update triggered")
+                if(showInfo) console.log("Periodically update triggered");
             }, fetchInterval);
         }, 4000);
     }
