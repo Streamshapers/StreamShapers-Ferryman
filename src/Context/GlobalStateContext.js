@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.1");
+    const [ferrymanVersion] = useState("v2.0.3");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://streamshapers.com";
 
@@ -520,17 +520,21 @@ export const GlobalStateProvider = ({children}) => {
             let tempTextObjects = [];
 
             if (typeof obj === "object" && obj !== null) {
-                if (obj.t && obj.t.d && obj.t.d.k && Array.isArray(obj.t.d.k) && obj.t.d.k.length > 0 && obj.t.d.k[0].s && obj.t.d.k[0].s.t) {
-                    tempTextObjects = [...tempTextObjects, {
-                        layername: obj.nm,
-                        text: obj.t.d.k[0].s.t,
-                        original: obj.t.d.k[0].s.t,
-                        type: 'text',
-                        source: 'none',
-                        sheet: "0",
-                        cell: "",
-                        errors: [],
-                    }];
+                if (obj.t && obj.t.d && obj.t.d.k &&
+                    Array.isArray(obj.t.d.k) &&
+                    obj.t.d.k.length > 0 &&
+                    obj.t.d.k[0].s &&
+                    obj.t.d.k[0].s.hasOwnProperty("t")) {
+                        tempTextObjects = [...tempTextObjects, {
+                            layername: obj.nm,
+                            text: obj.t.d.k[0].s.t,
+                            original: obj.t.d.k[0].s.t,
+                            type: 'text',
+                            source: 'none',
+                            sheet: "0",
+                            cell: "",
+                            errors: [],
+                        }];
                 }
 
                 Object.keys(obj).forEach(key => {

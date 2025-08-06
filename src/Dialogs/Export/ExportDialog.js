@@ -187,6 +187,7 @@ function ExportDialog({onClose}) {
                     client: 'ferryman',
                     event: 'export',
                     type: exportFormat,
+                    authenticated: !!user,
                     details: {
                         template: fileName,
                         user: user ? user.email : null,
@@ -212,6 +213,7 @@ function ExportDialog({onClose}) {
                 client: 'ferryman',
                 event: 'export',
                 type: exportFormat,
+                authenticated: !!user,
                 details: {
                     template: fileName,
                     user: user ? user.email : null,
