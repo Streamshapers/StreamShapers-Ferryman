@@ -1460,13 +1460,13 @@ button {
     flex-grow: 1;
 }
 
-.spx-header {
+.spx-header , .ograf-header{
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.spx-header h3 {
+.spx-header h3 , .ograf-header h3{
     margin: 0;
 }
 
@@ -1477,6 +1477,10 @@ button {
 
 #spx-logo {
     width: 50px;
+}
+
+.ograf-logo {
+    width: 100px;
 }
 
 .spx-instruction textarea {
@@ -1534,6 +1538,146 @@ label span.vio {
 
 label span.bla {
     background: #000000;
+}
+
+/* --- OGraf Export Styles --- */
+.ogf-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.ogf-label {
+    display: inline-block;
+    width: 160px;
+    font-weight: 600;
+}
+
+.ogf-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.ogf-hr {
+    margin: 16px 0;
+}
+
+.ogf-subtitle {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.ogf-subtitle--with-toolbar {
+    margin: 0;
+}
+
+.ogf-section-toolbar {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ogf-autosync {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Properties Grid */
+.ogf-props-grid {
+    display: grid;
+    grid-template-columns: 1fr 120px 1fr 120px 80px;
+    gap: 8px;
+}
+
+.ogf-props-header {
+    font-weight: 600;
+}
+
+.ogf-props-row {
+    align-items: center;
+    margin-top: 6px;
+}
+
+.ogf-prop-key {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ogf-remove-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.ogf-select {
+    width: 100%;
+}
+
+/* JSON Preview */
+.ogf-details summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.ogf-json-preview {
+    white-space: pre-wrap;
+    background: #111;
+    color: #eee;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    overflow: auto;
+}
+
+/* Optionale Feinheiten */
+.ogf-add-field.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* --- OGraf Export: reset buttons & wrappers --- */
+.ogf-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.ogf-reset-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+.ogf-reset-btn:focus-visible {
+    outline: 2px solid var(--primary, #66afe9);
+    outline-offset: 2px;
+}
+
+/* Add an "Include" column to the grid */
+.ogf-props-grid--with-include {
+    grid-template-columns: 40px 1fr 120px 1fr 120px 80px;
+}
+
+/* Grey out disabled rows but keep the include checkbox active */
+.ogf-props-row.is-disabled > *:not(:first-child) {
+    opacity: 0.5;
+    pointer-events: none; /* prevent editing while excluded */
+}
+.ogf-include-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .api-dialog-wrapper {

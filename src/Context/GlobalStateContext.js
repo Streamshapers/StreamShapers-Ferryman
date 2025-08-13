@@ -52,6 +52,7 @@ export const GlobalStateProvider = ({children}) => {
     const [templateData, setTemplateData] = useState(null);
     const [remainingUploads, setRemainingUploads] = useState(null);
     const [ografManifest, setOgrafManifest] = useState(null);
+    const [ografAutoSync, setOgrafAutoSync] = useState(true);
     const [importedHTML, setImportedHTML] = useState(null);
     const [performance, setPerformance] = useState(null);
     const googleCellSnapshot = useRef([]);
@@ -1555,61 +1556,99 @@ export const GlobalStateProvider = ({children}) => {
 
     //################################### Ograf ########################################################################
 
-    const generateOgrafManifest = () => {
-        if (!jsonData) return;
-        const updatedManifest = {...ografManifest};
-        const steps = markers ? markers.length - 1 : "";
-        const frameRate = jsonData ? jsonData.fr : null;
+    const slugify = (s) =>
+        (s || 'ferryman-graphic')
+            .toString()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g,'-')
+            .replace(/^-+|-+$/g,'');
 
-        /*renderRequirements: [
-                { frameRate: Number(frameRate) }
-            ],*/
+    const buildDefaultManifest = () => {
+        const steps = markers ? Math.max(1, Number(markers.length - 1) || 1) : 1;
+        const w = jsonData?.w, h = jsonData?.h, fr = jsonData?.fr;
+        const renderReq = [];
+        if (w && h) renderReq.push({ resolution: { width: { exact: w }, height: { exact: h } } });
+        if (fr)     renderReq.push({ frameRate: { exact: Number(fr) } });
 
-        const rawManifest = {
+        return {
             $schema: "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
-            name: `${fileName}`,
-            description: "HTML Graphic made with Ferryman, exported as OGraf.",
-            id: `${fileName}`,
+            id: slugify(fileName),
             version: "1.0.0",
+            name: fileName || "Untitled",
+            description: "HTML Graphic made with Ferryman, exported as OGraf.",
+            author: { name: "StreamShapers Ferryman", url: "https://streamshapers.com" },
             main: "graphic.mjs",
-            author: {
-                name: "Streamshapers Ferryman",
-                email: "mail@streamshapers.com",
-                url: "https://streamshapers.com",
-            },
-            customActions: [],
             supportsRealTime: true,
             supportsNonRealTime: true,
-            schema: {
-                type: "object",
-                properties: {}
-            },
-            stepCount: steps ? Number(steps) : 1
-
+            stepCount: steps,
+            schema: { type: "object", properties: {} },
+            ...(renderReq.length ? { renderRequirements: renderReq } : {})
         };
+    };
 
-        if (ografManifest) {
-            const updatedProperties = {};
-            textObjects?.forEach(obj => {
-                if (obj.layername.startsWith("_")) {
-                    updatedProperties[obj.layername] = {
-                        type: obj.type === "text" ? "string" : "string",
-                        title: obj.layername.charAt(0).toUpperCase() + obj.layername.slice(1),
-                        default: obj.text || ""
-                    };
-                }
-            });
-            updatedManifest.schema.properties = updatedProperties;
-            setOgrafManifest(updatedManifest);
-            //console.log(updatedManifest);
-        } else {
-            setOgrafManifest(rawManifest);
-        }
-    }
+    const mergeSchemaPropsFromProject = (manifest) => {
+        const next = { ...manifest, schema: manifest.schema || { type: "object", properties: {} } };
+        next.schema.properties = { ...(next.schema.properties || {}) };
+
+        // _Text-Layer -> string-Felder vorschlagen
+        textObjects?.forEach(obj => {
+            if (obj.layername?.startsWith('_') && !next.schema.properties[obj.layername]) {
+                next.schema.properties[obj.layername] = {
+                    type: "string",
+                    title: obj.layername.replace(/^_/, ''),
+                    default: obj.text || ""
+                };
+            }
+        });
+
+        // _Bild-Refs -> string-Felder vorschlagen
+        refImages?.forEach(img => {
+            if (img.nm?.startsWith('_') && !next.schema.properties[img.nm]) {
+                next.schema.properties[img.nm] = {
+                    type: "string",
+                    title: img.nm.replace(/^_/, ''),
+                    default: `/media/images/${img.refId}.png`
+                };
+            }
+        });
+
+        return next;
+    };
 
     useEffect(() => {
-        generateOgrafManifest();
-    }, [textObjects, jsonData]);
+        // Erstinitialisierung, wenn Projekt geladen wurde
+        if (!ografManifest && (jsonData && fileName)) {
+            let base = buildDefaultManifest();
+            if (ografAutoSync) base = mergeSchemaPropsFromProject(base);
+            setOgrafManifest(base);
+            return;
+        }
+
+        // Sanft aktualisieren ohne Nutzereingaben zu überschreiben
+        if (ografManifest) {
+            let updated = { ...ografManifest };
+
+            // stepCount aus Markern
+            const steps = markers ? Math.max(1, Number(markers.length - 1) || 1) : 1;
+            updated.stepCount = steps;
+
+            // renderRequirements aus Lottie
+            const w = jsonData?.w, h = jsonData?.h, fr = jsonData?.fr;
+            const req = [];
+            if (w && h) req.push({ resolution: { width: { exact: w }, height: { exact: h } } });
+            if (fr)     req.push({ frameRate: { exact: Number(fr) } });
+            updated.renderRequirements = req.length ? req : undefined;
+
+            if (ografAutoSync) updated = mergeSchemaPropsFromProject(updated);
+
+            if (JSON.stringify(updated) !== JSON.stringify(ografManifest)) {
+                setOgrafManifest(updated);
+            }
+
+            console.log(ografManifest);
+        }
+    }, [fileName, jsonData, markers, textObjects, refImages, ografAutoSync]);
+
 
     //################################## StreamShapers Account #########################################################
 
@@ -1720,7 +1759,6 @@ export const GlobalStateProvider = ({children}) => {
             updateLottieLayername,
             clocks,
             deleteClock,
-            ografManifest,
             generateJsonWithoutImages,
             fetchSourcesPeriodically,
             setFetchSourcesPeriodically,
@@ -1730,6 +1768,10 @@ export const GlobalStateProvider = ({children}) => {
             importedHTML,
             performance,
             setPerformance,
+            ografManifest,
+            setOgrafManifest,
+            ografAutoSync,
+            setOgrafAutoSync,
         }}>
             {children}
         </GlobalStateContext.Provider>

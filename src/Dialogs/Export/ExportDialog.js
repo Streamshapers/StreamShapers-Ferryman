@@ -262,7 +262,7 @@ function ExportDialog({onClose}) {
                 <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
                         onClick={() => handleTabChange('default')}>General
                 </button>
-                {exportFormat === 'ograf' && 1 === 0 && (
+                {exportFormat === 'ograf' && (
                     <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
                             onClick={() => handleTabChange('ograf')}>OGraf
                     </button>
