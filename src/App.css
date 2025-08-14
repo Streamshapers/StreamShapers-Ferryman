@@ -1051,16 +1051,14 @@ input[type="checkbox"] {
     padding: 20px;
     z-index: 1001;
     border: 1px solid var(--border);
-    min-width: 500px;
-    max-width: 2000px;
-    height: 80vh;
+    width: 1400px;
     min-height: 600px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
 }
 
-.dialog-window h2 {
+.dialog-window h1 {
     padding: 0 20px 20px 0;
 }
 
@@ -1466,7 +1464,7 @@ button {
     align-items: center;
 }
 
-.spx-header h3 , .ograf-header h3{
+.spx-header h3 {
     margin: 0;
 }
 
@@ -1541,6 +1539,10 @@ label span.bla {
 }
 
 /* --- OGraf Export Styles --- */
+.ograf-header{
+    margin-bottom: 10px;
+}
+
 .ogf-row {
     display: flex;
     align-items: center;
@@ -1564,8 +1566,8 @@ label span.bla {
 }
 
 .ogf-subtitle {
-    margin: 0 0 8px 0;
-    font-size: 1.1rem;
+    margin: 0 0 20px 0;
+    font-size: 1.4rem;
     font-weight: 700;
 }
 

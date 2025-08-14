@@ -232,14 +232,14 @@ function OgrafExport() {
         <div className="tab-content ograf-tab">
             {/* Header stays as-is */}
             <div className="export-checkbox ograf-header">
-                <h3>OGraf Export Settings</h3>
+                <h2>OGraf Export Settings</h2>
                 <a href="https://ograf.ebu.io/" target="_blank" rel="noreferrer">
                     <img className="ograf-logo" src="./ograf-logo-colour.png" alt="Ograf Logo" />
                 </a>
             </div>
 
             {/* Manifest basics */}
-            <Row>
+            {/*<Row>
                 <Label>$schema</Label>
                 <div className="ogf-input-wrap">
                     <Input value={m.$schema || ""} onChange={(e) => update("$schema", e.target.value)} />
@@ -253,7 +253,7 @@ function OgrafExport() {
                         <FontAwesomeIcon icon={faRotateRight} />
                     </button>
                 </div>
-            </Row>
+            </Row>*/}
 
             <Row>
                 <Label>id</Label>
@@ -325,7 +325,7 @@ function OgrafExport() {
                 </div>
             </Row>
 
-            <Row>
+            {/*<Row>
                 <Label>main</Label>
                 <div className="ogf-input-wrap">
                     <Input value={m.main || "graphic.mjs"} onChange={(e) => update("main", e.target.value)} />
@@ -333,7 +333,7 @@ function OgrafExport() {
                         <FontAwesomeIcon icon={faRotateRight} />
                     </button>
                 </div>
-            </Row>
+            </Row>*/}
 
             <Row>
                 <Label>supportsRealTime</Label>
@@ -355,7 +355,7 @@ function OgrafExport() {
                 </div>
             </Row>
 
-            <Row>
+            {/*<Row>
                 <Label>stepCount</Label>
                 <div className="ogf-input-wrap">
                     <Input
@@ -368,7 +368,7 @@ function OgrafExport() {
                         <FontAwesomeIcon icon={faRotateRight} />
                     </button>
                 </div>
-            </Row>
+            </Row>*/}
 
             <hr className="ogf-hr" />
             <h4 className="ogf-subtitle">Render Requirements</h4>
@@ -499,9 +499,7 @@ function OgrafExport() {
             </Row>
 
             <hr className="ogf-hr" />
-            <Row>
-                <h4 className="ogf-subtitle">Schema (Data Model)</h4>
-            </Row>
+            <h4 className="ogf-subtitle">Schema (Data Model)</h4>
 
             {/* Header with Include column */}
             <div className="ogf-props-grid ogf-props-header ogf-props-grid--with-include">

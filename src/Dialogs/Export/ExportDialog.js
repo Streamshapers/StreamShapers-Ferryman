@@ -252,7 +252,7 @@ function ExportDialog({onClose}) {
     };
 
     return (<>
-            <h2>Export</h2>
+            <h1>Export</h1>
             {message && (
                 <div className="success-wrapper">
                     <div className="success alert-success">{message}</div>
