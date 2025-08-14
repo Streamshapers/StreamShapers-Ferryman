@@ -1051,9 +1051,9 @@ input[type="checkbox"] {
     padding: 20px;
     z-index: 1001;
     border: 1px solid var(--border);
-    width: 50vw;
     min-width: 500px;
-    height: 60vh;
+    max-width: 2000px;
+    height: 80vh;
     min-height: 600px;
     max-height: 90vh;
     display: flex;
@@ -1636,7 +1636,6 @@ label span.bla {
     overflow: auto;
 }
 
-/* Optionale Feinheiten */
 .ogf-add-field.btn {
     display: inline-flex;
     align-items: center;
@@ -1666,7 +1665,7 @@ label span.bla {
 
 /* Add an "Include" column to the grid */
 .ogf-props-grid--with-include {
-    grid-template-columns: 40px 1fr 120px 1fr 120px 80px;
+    grid-template-columns: 40px minmax(0, 0.6fr) 120px minmax(0, 1fr) minmax(0, 1fr);
 }
 
 /* Grey out disabled rows but keep the include checkbox active */

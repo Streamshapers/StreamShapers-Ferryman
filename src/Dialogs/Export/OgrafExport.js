@@ -505,12 +505,11 @@ function OgrafExport() {
 
             {/* Header with Include column */}
             <div className="ogf-props-grid ogf-props-header ogf-props-grid--with-include">
-                <div>In manifest</div>
+                <div>Use</div>
                 <div>Key</div>
                 <div>Type</div>
                 <div>Title</div>
                 <div>Default</div>
-                <div>Req?</div>
             </div>
 
             {allPropKeys.map((k) => {
@@ -596,23 +595,6 @@ function OgrafExport() {
                                 className="ogf-reset-btn"
                                 title="Reset default"
                                 onClick={() => resetPropField("default", () => "")}
-                                disabled={!included}
-                            >
-                                <FontAwesomeIcon icon={faRotateRight} />
-                            </button>
-                        </div>
-
-                        {/* Required? → presence in JSON Schema `required` */}
-                        <div className="ogf-input-wrap">
-                            <Checkbox
-                                checked={isRequired(k)}
-                                onChange={(v) => toggleRequired(k, v)}
-                                disabled={!included}
-                            />
-                            <button
-                                className="ogf-reset-btn"
-                                title="Reset required"
-                                onClick={() => toggleRequired(k, baseReq)}
                                 disabled={!included}
                             >
                                 <FontAwesomeIcon icon={faRotateRight} />
