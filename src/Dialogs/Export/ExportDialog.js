@@ -156,7 +156,20 @@ function ExportDialog({onClose}) {
         if (exportFormat === "ograf") {
             try {
                 const graphicFile = await generateFile(1);
-                const lottieTemplateFile = JSON.stringify(generateJsonWithoutImages());
+                const lottieJSON = generateJsonWithoutImages();
+
+                if (Array.isArray(lottieJSON.assets)) {
+                    for (const a of lottieJSON.assets) {
+                        if (a.p && !String(a.p).startsWith('data:')) {
+                            a.p = a.p.split('/').pop();
+                            a.u = "lib/images/";
+                            a.e = 0;
+                        }
+                    }
+                }
+
+                const lottieTemplateFile = JSON.stringify(lottieJSON);
+
                 const lottiePlayerText = await (await fetch('/template/Ograf/lib/lottie-player.js')).text();
                 const manifestText = JSON.stringify(ografManifest);
 
@@ -252,7 +265,7 @@ function ExportDialog({onClose}) {
     };
 
     return (<>
-            <h2>Export</h2>
+            <h1>Export</h1>
             {message && (
                 <div className="success-wrapper">
                     <div className="success alert-success">{message}</div>
@@ -262,7 +275,7 @@ function ExportDialog({onClose}) {
                 <button className={`tab-button ${activeTab === 'default' ? 'active' : ''}`}
                         onClick={() => handleTabChange('default')}>General
                 </button>
-                {exportFormat === 'ograf' && 1 === 0 && (
+                {exportFormat === 'ograf' && (
                     <button className={`tab-button ${activeTab === 'ograf' ? 'active' : ''}`}
                             onClick={() => handleTabChange('ograf')}>OGraf
                     </button>
