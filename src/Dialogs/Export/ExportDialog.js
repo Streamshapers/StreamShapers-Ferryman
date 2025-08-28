@@ -156,7 +156,20 @@ function ExportDialog({onClose}) {
         if (exportFormat === "ograf") {
             try {
                 const graphicFile = await generateFile(1);
-                const lottieTemplateFile = JSON.stringify(generateJsonWithoutImages());
+                const lottieJSON = generateJsonWithoutImages();
+
+                if (Array.isArray(lottieJSON.assets)) {
+                    for (const a of lottieJSON.assets) {
+                        if (a.p && !String(a.p).startsWith('data:')) {
+                            a.p = a.p.split('/').pop();
+                            a.u = "lib/images/";
+                            a.e = 0;
+                        }
+                    }
+                }
+
+                const lottieTemplateFile = JSON.stringify(lottieJSON);
+
                 const lottiePlayerText = await (await fetch('/template/Ograf/lib/lottie-player.js')).text();
                 const manifestText = JSON.stringify(ografManifest);
 

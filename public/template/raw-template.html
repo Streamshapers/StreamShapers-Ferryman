@@ -107,13 +107,24 @@ SOFTWARE.
     //fix and check markers
     lottieTemplate.markers.forEach((marker) => {
         const name = marker.cm;
-        markers.push(name);
-        marker.cm = name.toLowerCase();
+        let finalName = name;
 
-        if (name.includes("next") && !name.includes("loop")) nextTotal++;
-        if (name === "stop") stopExist = true;
-        if (name === "update") updateExist = true;
-    })
+        if (
+            name.toLowerCase() === "start" ||
+            name.toLowerCase() === "stop" ||
+            name.toLowerCase() === "update" ||
+            /^next\d+$/i.test(name) // Regex: "next" + Number
+        ) {
+            finalName = name.toLowerCase();
+        }
+
+        markers.push(finalName);
+        marker.cm = finalName;
+
+        if (finalName.includes("next") && !finalName.includes("loop")) nextTotal++;
+        if (finalName === "stop") stopExist = true;
+        if (finalName === "update") updateExist = true;
+    });
 
     function createDeferredPromise() {
         let resolver, rejecter;

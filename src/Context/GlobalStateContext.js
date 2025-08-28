@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.5");
+    const [ferrymanVersion] = useState("v2.0.6");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://streamshapers.com";
 
@@ -1253,23 +1253,23 @@ export const GlobalStateProvider = ({children}) => {
     /*############################# generate Template ########################################*/
 
     const generateJsonWithoutImages = () => {
-        let jsonWithoutImages;
-        if (jsonData && jsonData.assets) {
-            if (imagePath != null && !imagePath.endsWith("/")) {
-                setImagePath(`${imagePath}/`);
-            }
-            jsonWithoutImages = JSON.parse(JSON.stringify(jsonData));
+        if (!jsonData?.assets) return;
 
-            jsonWithoutImages.assets.forEach(asset => {
-                if (asset.p && asset.p.startsWith('data:image')) {
-                    asset.p = asset.id + ".png";
-                    asset.e = 0;
-                    asset.u = imagePath;
-                }
-            });
-            return jsonWithoutImages;
-        }
+        const out = JSON.parse(JSON.stringify(jsonData));
+
+        out.assets.forEach(asset => {
+            if (asset.p && asset.p.startsWith('data:image')) {
+                const m = asset.p.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
+                const ext = (m ? m[1] : 'png').toLowerCase().replace('jpeg','jpg');
+                asset.p = asset.id + "." + ext;
+                asset.u = imagePath.endsWith("/") ? imagePath : (imagePath + "/");
+                asset.e = 0;
+            }
+        });
+
+        return out;
     }
+
 
     const generateFile = async (production) => {
         let fileContent;
@@ -1450,7 +1450,7 @@ export const GlobalStateProvider = ({children}) => {
                         const replacements = {
                           version: ${JSON.stringify(ferrymanVersion)},
                           fontFaceStyles: ${JSON.stringify("<style>" + fontFacesString + "</style>")},
-                          imagePath: ${JSON.stringify(path)},
+                          imagePath: "lib/images/",
                           spx: ${JSON.stringify(spxTag)},
                           googleTableData: ${JSON.stringify(googleTableCells)},
                           ferrymanJSON: ${JSON.stringify(ferrymanJson)}
@@ -1604,13 +1604,22 @@ export const GlobalStateProvider = ({children}) => {
         // _Bild-Refs -> string-Felder vorschlagen
         refImages?.forEach(img => {
             if (img.nm?.startsWith('_') && !next.schema.properties[img.nm]) {
+                const asset = jsonData?.assets?.find(a => a.id === img.refId);
+                let ext = "png"; // Fallback
+                if (asset && asset.p) {
+                    const match = asset.p.match(/\.(\w+)$/);
+                    if (match) {
+                        ext = match[1].toLowerCase();
+                    }
+                }
                 next.schema.properties[img.nm] = {
                     type: "string",
                     title: img.nm.replace(/^_/, ''),
-                    default: `/media/images/${img.refId}.png`
+                    default: `${img.refId}.${ext}`
                 };
             }
         });
+
 
         return next;
     };

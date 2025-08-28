@@ -457,18 +457,14 @@ class FerrymanGraphic extends HTMLElement {
         layer.t.d.k[0].s.t = this._decodeHtmlEntities(newText);
     }
 
-    _updateAssetsByRefid(array, searchValue, newValue) {
-        const foundObject = array.find(obj => obj['id'] === searchValue);
-
-        if (foundObject) {
-            foundObject['u'] = this.state.imagesPathPrefix;
-            foundObject['p'] = newValue;
-            foundObject['e'] = 0;
-            return foundObject;
-        }
-
-        return null;
+    _updateAssetsByRefid(assets, id, value) {
+        const a = assets.find(x => x.id === id);
+        if (!a) return;
+        a.p = String(value).split('/').pop();
+        a.u = this.state.imagesPathPrefix || "lib/images/";
+        a.e = 0;
     }
+
 
     _getMarker(markerName) {
         for (let marker of this.state.lottieTemplate.markers) {
