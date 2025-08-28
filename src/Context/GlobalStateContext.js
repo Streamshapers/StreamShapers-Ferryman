@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.3");
+    const [ferrymanVersion] = useState("v2.0.6");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://streamshapers.com";
 
