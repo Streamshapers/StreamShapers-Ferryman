@@ -151,23 +151,28 @@ class FerrymanGraphic extends HTMLElement {
     }
 
     async playAction() {
+        let stepJustPlayed;
+
         if (!this.state.startPlayed) {
             await this.state.animLoaded.promise;
-            console.log("AnimLoaded");
+            if (this.state.showLogs) console.log("AnimLoaded");
             await this.state.animReady;
-            console.log("animReady");
+            if (this.state.showLogs) console.log("animReady");
             await this._loadFonts();
-            console.log("fonts loaded");
+            if (this.state.showLogs) console.log("fonts loaded");
             this.state.animation.goToAndPlay("start", true);
             this.state.playStatus = "play";
             this.state.currentSegment = "start";
             if (this.state.showLogs) console.log("Template - Play 'start' marker");
             if (this.state.markers.includes("start_loop")) this.state.playStack.push("start_loop");
             this.state.startPlayed = true;
+
+            stepJustPlayed = 0;
         } else {
             if (this.state.nextCount > this.state.nextTotal && this.state.stopExist) {
                 stop();
                 if (this.state.showLogs) console.log("Template - No 'next' marker left - Play 'stop' Marker");
+                stepJustPlayed = (this.state.nextTotal > 0) ? this.state.nextTotal : 0;
             } else {
                 if (this.state.lottieState === "idle") {
                     this.state.animation.goToAndPlay("next" + this.state.nextCount, true);
@@ -178,12 +183,13 @@ class FerrymanGraphic extends HTMLElement {
                     this.state.playStack.push("next" + this.state.nextCount);
                     if (this.state.markers.includes("next" + this.state.nextCount + "_loop")) this.state.playStack.push("next" + this.state.nextCount + "_loop");
                 }
+                stepJustPlayed = this.state.nextCount;
                 this.state.nextCount++;
             }
         }
 
         //this._updateTimeField("animation" + updateCounter);
-        return {};
+        return { currentStep: stepJustPlayed };
 
     }
 
