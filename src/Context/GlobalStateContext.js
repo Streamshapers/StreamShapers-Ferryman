@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.7");
+    const [ferrymanVersion] = useState("v2.0.8");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://streamshapers.com";
 
@@ -45,6 +45,7 @@ export const GlobalStateProvider = ({children}) => {
     const updateTextRef = useRef(null);
     const [imageEmbed, setImageEmbed] = useState("embed");
     const [exportFormat, setExportFormat] = useState("html");
+    const [ografExportVendor, setOgrafExportVendor] = useState("spx");
     const [mimeType, setMimeType] = useState("text/html");
     const [htmlTemplate, setHtmlTemplate] = useState(null);
     const [generalAlerts, setGeneralAlerts] = useState([]);
@@ -1004,14 +1005,21 @@ export const GlobalStateProvider = ({children}) => {
         const updatedCellsString = JSON.stringify(updatedGoogleTableCells);
 
         if (currentSnapshotString !== updatedCellsString) {
-            //console.log("Zellen haben sich geändert");
             googleCellSnapshot.current = [...updatedGoogleTableCells];
             setGoogleTableCells(updatedGoogleTableCells);
             setUpdateGoogle(true);
         } else {
-            //console.log("Keine Änderung in den Zellen");
+
         }
     }, [textObjects, externalSources]);
+
+    useEffect(() => {
+        const hasGoogle = Array.isArray(externalSources) && externalSources.some(s => s.key === "Google Sheet");
+        if (!hasGoogle) {
+            setFetchSourcesPeriodically(false);
+            setSourcesFetchInterval(5000);
+        }
+    }, [externalSources]);
 
     function arraysAreEqual(arr1, arr2) {
         // Check if both arrays are null or undefined
@@ -1449,10 +1457,11 @@ export const GlobalStateProvider = ({children}) => {
                         const replacements = {
                           version: ${JSON.stringify(ferrymanVersion)},
                           fontFaceStyles: ${JSON.stringify("<style>" + fontFacesString + "</style>")},
-                          imagePath: "lib/images/",
                           spx: ${JSON.stringify(spxTag)},
                           googleTableData: ${JSON.stringify(googleTableCells)},
-                          ferrymanJSON: ${JSON.stringify(ferrymanJson)}
+                          ferrymanJSON: ${JSON.stringify(ferrymanJson)},
+                          fetchInterval: ${sourcesFetchInterval},
+                          clocks: ${JSON.stringify(clockString)},
                         };
                         `;
 
@@ -1717,6 +1726,7 @@ export const GlobalStateProvider = ({children}) => {
             theme,
             setTheme,
             refImages,
+            setRefImages,
             imagePath,
             setImagePath,
             SPXGCTemplateDefinition,
@@ -1780,6 +1790,8 @@ export const GlobalStateProvider = ({children}) => {
             setOgrafManifest,
             ografAutoSync,
             setOgrafAutoSync,
+            ografExportVendor,
+            setOgrafExportVendor
         }}>
             {children}
         </GlobalStateContext.Provider>

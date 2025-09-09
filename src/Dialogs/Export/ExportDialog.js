@@ -2,11 +2,10 @@ import React, {useContext, useEffect, useState} from "react";
 import {GlobalStateContext} from "../../Context/GlobalStateContext";
 import JSZip from 'jszip';
 import SpxExport from "./SpxExport";
-import GddExport from "./GddExport";
-import GeneralAlerts from "../../GeneralAlerts";
 import AuthContext from "../../Context/AuthContext";
 import api from "../../axiosInstance";
 import OgrafExport from "./OgrafExport";
+import { ensureSpxSchema } from "../../utils/ograf/ensureSpxSchema";
 
 function ExportDialog({onClose}) {
     const {user} = useContext(AuthContext);
@@ -19,6 +18,7 @@ function ExportDialog({onClose}) {
         fonts,
         imagePath,
         ografManifest,
+        ografExportVendor,
         refImages,
         generateJsonWithoutImages,
         imageEmbed,
@@ -171,7 +171,14 @@ function ExportDialog({onClose}) {
                 const lottieTemplateFile = JSON.stringify(lottieJSON);
 
                 const lottiePlayerText = await (await fetch('/template/Ograf/lib/lottie-player.js')).text();
-                const manifestText = JSON.stringify(ografManifest);
+
+                const fixId = (s) => s && s.match(/^[a-z][a-z0-9-]*-[a-z0-9-]*$/) ? s : "graphic-template";
+                const manifestOut = (ografExportVendor === "spx"
+                    ? ensureSpxSchema(ografManifest, refImages)
+                    : ografManifest);
+                manifestOut.id = fixId(manifestOut.id || "");
+
+                const manifestText = JSON.stringify(manifestOut, null, 2);
 
                 const libFolder = zip.folder('lib');
 

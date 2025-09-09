@@ -16,6 +16,7 @@ function ConnectApiDialog() {
         setSourcesFetchInterval
     } = useContext(GlobalStateContext);
     const [externalSourceIndex, setExternalSourceIndex] = useState(2)
+    const hasGoogleSource = Array.isArray(externalSources) && externalSources.some(s => s.key === "Google Sheet");
 
     const handleAddApi = () => {
         setExternalSources([...externalSources, {
@@ -30,7 +31,6 @@ function ConnectApiDialog() {
     const handleChange = (index, field, value) => {
         const newApis = externalSources.map((api, idx) => {
             if (idx === index) {
-                // Wenn der API-Typ geändert wird
                 if (field === "key") {
                     let newSecret = '';
                     if (value === "Digital Clock") {
@@ -44,7 +44,6 @@ function ConnectApiDialog() {
                     };
                 }
 
-                // Wenn das Secret für Google Sheet geändert wird
                 if (field === "secret" && api.key === "Google Sheet") {
                     const regex = /\/d\/([a-zA-Z0-9-_]+)/;
                     const match = value.match(regex);
@@ -53,12 +52,10 @@ function ConnectApiDialog() {
                     return {...api, secret: finalValue, errors: error};
                 }
 
-                // Wenn das Secret für Digital Clock geändert wird
                 if (field === "secret" && api.key === "Digital Clock") {
                     return {...api, secret: value};
                 }
 
-                // Default-Fall für alle anderen Änderungen
                 return {...api, [field]: value};
             }
 
@@ -66,15 +63,26 @@ function ConnectApiDialog() {
         });
 
         setExternalSources(newApis);
+
+        const stillHasGoogle = newApis.some(a => a.key === "Google Sheet");
+        if (!stillHasGoogle) {
+            setFetchSourcesPeriodically(false);
+            setSourcesFetchInterval(5000);
+        }
     }
 
 
     const handleRemoveApi = index => {
-        const source = externalSources[index].index;
-        setDeleteExternalSource(source);
         const newApis = externalSources.filter((_, idx) => idx !== index);
+        setDeleteExternalSource(externalSources[index].index);
         setExternalSources(newApis);
-    };
+
+        const stillHasGoogle = newApis.some(a => a.key === "Google Sheet");
+        if (!stillHasGoogle) {
+            setFetchSourcesPeriodically(false);
+            setSourcesFetchInterval(5000);
+        }
+    }
 
     const handleSourceUpdate = () => {
         setUpdateGoogle(true);
@@ -107,33 +115,35 @@ function ConnectApiDialog() {
                         </div>
                     </div>
 
-                    <div className="external-sources-fetch-control">
-                        <div className="source-fetch-item">
-                            <label htmlFor="api-dialog-fetch-p">Fetch Periodically</label>
-                            <input
-                                type="checkbox"
-                                title="Fetch Periodically"
-                                id="api-dialog-fetch-p"
-                                checked={fetchSourcesPeriodically}
-                                onChange={toggleFetchPeriodically}
-                            />
-                        </div>
-                        {fetchSourcesPeriodically && (
-                            <>
-                                <p>Fetch every</p>
+                    {hasGoogleSource && (
+                        <div className="external-sources-fetch-control">
+                            <div className="source-fetch-item">
+                                <label htmlFor="api-dialog-fetch-p">Fetch Periodically</label>
                                 <input
-                                    className="source-fetch-item"
-                                    type="number"
-                                    min="1"
-                                    step="1"
-                                    title="Fetch Interval"
-                                    value={sourcesFetchInterval / 1000}
-                                    onChange={e => setNewFetchInterval(e.target.value)}
+                                    type="checkbox"
+                                    title="Fetch Periodically"
+                                    id="api-dialog-fetch-p"
+                                    checked={fetchSourcesPeriodically}
+                                    onChange={toggleFetchPeriodically}
                                 />
-                                <p>seconds</p>
-                            </>
-                        )}
-                    </div>
+                            </div>
+                            {fetchSourcesPeriodically && (
+                                <>
+                                    <p>Fetch every</p>
+                                    <input
+                                        className="source-fetch-item"
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        title="Fetch Interval"
+                                        value={sourcesFetchInterval / 1000}
+                                        onChange={e => setNewFetchInterval(e.target.value)}
+                                    />
+                                    <p>seconds</p>
+                                </>
+                            )}
+                        </div>
+                    )}
 
                     {externalSources.map((api, index) => (
                         <div className="api-wrapper" key={api.index}>

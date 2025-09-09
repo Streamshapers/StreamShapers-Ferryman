@@ -30,7 +30,11 @@ function JsonFileProcessor() {
         clocks,
         setFetchSourcesPeriodically,
         sourcesFetchInterval,
-        setSourcesFetchInterval
+        setSourcesFetchInterval,
+        setOgrafManifest,
+        setOgrafExportVendor,
+        setOgrafAutoSync,
+        setRefImages
     } = useContext(GlobalStateContext);
 
     const resetState = () => {
@@ -55,6 +59,10 @@ function JsonFileProcessor() {
         setJsonFile(null);
         setSourcesFetchInterval(5000);
         setImportFerrymanJSON(null);
+        setOgrafManifest(null);
+        setOgrafExportVendor("spx");
+        setOgrafAutoSync(true);
+        setRefImages([]);
     };
 
     const processJsonFile = (file) => {
