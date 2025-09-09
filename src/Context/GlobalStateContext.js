@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({children}) => {
-    const [ferrymanVersion] = useState("v2.0.8");
+    const [ferrymanVersion] = useState("v2.0.10");
     const {user, serverUrl} = useContext(AuthContext);
     const streamshapersUrl = "https://streamshapers.com";
 
@@ -1595,42 +1595,56 @@ export const GlobalStateProvider = ({children}) => {
     };
 
     const mergeSchemaPropsFromProject = (manifest) => {
-        const next = { ...manifest, schema: manifest.schema || { type: "object", properties: {} } };
+        const next = {
+            ...manifest,
+            schema: manifest.schema || { type: "object", properties: {} }
+        };
         next.schema.properties = { ...(next.schema.properties || {}) };
 
-        // _Text-Layer -> string-Felder vorschlagen
+        const upsertTextProp = (key, value) => {
+            const cur = next.schema.properties[key] || {};
+            next.schema.properties[key] = {
+                ...cur,
+                type: "string",
+                title: cur.title || key.replace(/^_/, ""),
+                default: value ?? ""
+            };
+        };
+
+        // Helper: image-Property
+        const upsertImageProp = (img) => {
+            const cur = next.schema.properties[img.nm] || {};
+            const asset = jsonData?.assets?.find(a => a.id === img.refId);
+            let ext = "png";
+            if (asset?.p) {
+                const m = asset.p.match(/\.(\w+)$/);
+                if (m) ext = m[1].toLowerCase();
+            }
+            next.schema.properties[img.nm] = {
+                ...cur,
+                type: "string",
+                title: cur.title || img.nm.replace(/^_/, ""),
+                default: `${img.refId}.${ext}`
+            };
+        };
+
+        // Texts (_-Layer)
         textObjects?.forEach(obj => {
-            if (obj.layername?.startsWith('_') && !next.schema.properties[obj.layername]) {
-                next.schema.properties[obj.layername] = {
-                    type: "string",
-                    title: obj.layername.replace(/^_/, ''),
-                    default: obj.text || ""
-                };
+            if (obj.layername?.startsWith('_')) {
+                upsertTextProp(obj.layername, obj.text);
             }
         });
 
-        // _Bild-Refs -> string-Felder vorschlagen
+        // Images (_-Layer mit refId)
         refImages?.forEach(img => {
-            if (img.nm?.startsWith('_') && !next.schema.properties[img.nm]) {
-                const asset = jsonData?.assets?.find(a => a.id === img.refId);
-                let ext = "png"; // Fallback
-                if (asset && asset.p) {
-                    const match = asset.p.match(/\.(\w+)$/);
-                    if (match) {
-                        ext = match[1].toLowerCase();
-                    }
-                }
-                next.schema.properties[img.nm] = {
-                    type: "string",
-                    title: img.nm.replace(/^_/, ''),
-                    default: `${img.refId}.${ext}`
-                };
+            if (img.nm?.startsWith('_')) {
+                upsertImageProp(img);
             }
         });
-
 
         return next;
     };
+
 
     useEffect(() => {
         // Erstinitialisierung, wenn Projekt geladen wurde

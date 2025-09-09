@@ -28,6 +28,14 @@ function OgrafExport() {
         googleTableCells
     } = useContext(GlobalStateContext);
     const SPX_UI_COLORS = ["gra", "red", "ora", "gre", "blu", "pin", "vio", "bla"];
+    const lockedDisabledRef = useRef({});
+
+    // rgba(r,g,b,a) – a: 0..1 (inkl. 0.33 etc.)
+    const isRgbaCssColor = (val) =>
+        typeof val === "string" &&
+        /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(?:0(?:\.\d+)?|1(?:\.0+)?|0?\.\d+)\s*\)$/i.test(val);
+
+
     // Fallback if manifest is not yet set
     const m = useMemo(() => ografManifest || {
         $schema: "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
@@ -45,7 +53,6 @@ function OgrafExport() {
         if (ografExportVendor !== "spx") return m;
         return ensureSpxSchema(m, refImages); // z.B. ["logo","icon","theme"]
     }, [m, ografExportVendor, refImages]);
-
 
     const baselineRef = useRef(null);
     useEffect(() => {
@@ -235,6 +242,44 @@ function OgrafExport() {
             setRenderReq(next);
         }
     }, [textObjects, googleTableCells]);
+
+    useEffect(() => {
+        if (ografExportVendor !== "spx") return;
+        const props = m?.schema?.properties || {};
+        Object.entries(props).forEach(([key, def]) => {
+            if (def && isRgbaCssColor(def.default)) {
+                const hasColor = def?.v_spx?.ftype === "color";
+                if (!hasColor) {
+                    const nextVspx = { ...(def.v_spx || {}), ftype: "color" };
+                    setProp(key, "v_spx", nextVspx);
+                    if (def.type !== "string") setProp(key, "type", "string");
+                }
+            }
+        });
+    }, [ografExportVendor, m?.schema?.properties]);
+
+    const hasExternalSourceForKey = (key) =>
+        Array.isArray(textObjects) &&
+        textObjects.some(t => t?.layername === key && (t?.type === 'Google Sheet' || t?.type === 'Digital Clock'));
+
+    useEffect(() => {
+        const allKeys = Object.keys({
+            ...(m.schema?.properties || {}),
+            ...(hiddenPropsRef.current || {})
+        });
+
+        allKeys.forEach((k) => {
+            const locked = hasExternalSourceForKey(k);
+            if (locked) {
+                lockedDisabledRef.current[k] = true;
+                if (m.schema?.properties?.[k]) {
+                    includeToggle(k, false);
+                }
+            } else {
+                delete lockedDisabledRef.current[k];
+            }
+        });
+    }, [textObjects, m?.schema?.properties]);
 
     const isImageKey = (key) => Array.isArray(refImages) && refImages.some(img => img?.nm === key);
 
@@ -683,7 +728,8 @@ function OgrafExport() {
 
         {allPropKeys.map((k) => {
             const def = currentProps[k] || disabledProps[k] || {type: "string"};
-            const included = !!currentProps[k];
+            const isExternLocked = !!lockedDisabledRef.current[k];
+            const included = isExternLocked ? false : !!currentProps[k];
 
             const baseProp = baselineRef.current?.snapshot?.schema?.properties?.[k];
             const baseReq = Array.isArray(baselineRef.current?.snapshot?.required) ? baselineRef.current.snapshot.required.includes(k) : false;
@@ -696,13 +742,21 @@ function OgrafExport() {
                 }
             };
 
+            const isSpxColorField = ografExportVendor === "spx" && isRgbaCssColor(def.default);
+            const rowIsLocked = !!isSpxColorField;
+
             return (<div
                 key={k}
                 className={`ogf-props-grid ogf-props-row ogf-props-grid--with-include ${included ? "" : "is-disabled"}`}
             >
                 {/* Include toggle (always active) */}
                 <div className="ogf-include-cell">
-                    <Checkbox checked={included} onChange={(v) => includeToggle(k, v)}/>
+                    <Checkbox
+                        checked={included}
+                        onChange={(v) => { if (!isExternLocked) includeToggle(k, v); }}
+                        disabled={isExternLocked}
+                        title={isExternLocked ? "Disabled: value comes from external source" : ""}
+                    />
                 </div>
 
                 {/* Key */}
@@ -713,49 +767,69 @@ function OgrafExport() {
 
                 {/* Type */}
                 <div className="ogf-input-wrap">
-                    {ografExportVendor === "spx" && isImageKey(k) ? (
-                        <span className="ogf-badge ogf-badge--spx" title="Will show SPX file selector">
-                                    SPX file picker
-                                </span>) : (<>
-                        <select
-                            value={def.type || "string"}
-                            onChange={(e) => setProp(k, "type", e.target.value)}
-                            className="ogf-select"
-                            disabled={!included}
+                    {isExternLocked ? (
+                        <span
+                            className="ogf-badge ogf-badge--external"
+                            title="Value comes from an external source and cannot be edited here"
                         >
-                            <option>string</option>
-                            <option>number</option>
-                            <option>integer</option>
-                            <option>boolean</option>
-                        </select>
-                        <button
-                            className="ogf-reset-btn"
-                            title="Reset type"
-                            onClick={() => resetPropField("type", () => "string")}
-                            disabled={!included}
+                          External source
+                        </span>
+                    ) : (ografExportVendor === "spx" && isImageKey(k)) ? (
+                        <span
+                            className="ogf-badge ogf-badge--spx"
+                            title="Will show SPX file selector"
                         >
-                            <FontAwesomeIcon icon={faRotateRight}/>
-                        </button>
-                    </>)}
+                          SPX file picker
+                        </span>
+                    ) : (ografExportVendor === "spx" && isSpxColorField) ? (
+                        <span
+                            className="ogf-badge ogf-badge--spx"
+                            title="SPX color field (only default is locked)"
+                        >
+                          SPX color
+                        </span>
+                    ) : (
+                        <>
+                            <select
+                                value={def.type || "string"}
+                                onChange={(e) => setProp(k, "type", e.target.value)}
+                                className="ogf-select"
+                                disabled={!included}
+                            >
+                                <option>string</option>
+                                <option>number</option>
+                                <option>integer</option>
+                                <option>boolean</option>
+                            </select>
+                            <button
+                                className="ogf-reset-btn"
+                                title="Reset type"
+                                onClick={() => resetPropField("type", () => "string")}
+                                disabled={!included}
+                            >
+                                <FontAwesomeIcon icon={faRotateRight} />
+                            </button>
+                        </>
+                    )}
                 </div>
-
 
                 {/* Title */}
                 <div className="ogf-input-wrap">
                     <Input
                         value={def.title || ""}
                         onChange={(e) => setProp(k, "title", e.target.value)}
-                        disabled={!included || (ografExportVendor === "spx" && isImageKey(k))}
+                        disabled={!included}
                         title={ografExportVendor === "spx" && isImageKey(k) ? "Locked for SPX image fields" : undefined}
                     />
                     <button
                         className="ogf-reset-btn"
                         title="Reset title"
                         onClick={() => resetPropField("title", () => k.replace(/^_/, ""))}
-                        disabled={!included || (ografExportVendor === "spx" && isImageKey(k))}
+                        disabled={!included}
                     >
-                        <FontAwesomeIcon icon={faRotateRight}/>
+                        <FontAwesomeIcon icon={faRotateRight} />
                     </button>
+
                 </div>
 
                 {/* Default */}
@@ -763,23 +837,27 @@ function OgrafExport() {
                     <Input
                         value={def.default ?? ""}
                         onChange={(e) => setProp(k, "default", e.target.value)}
-                        disabled={!included}
+                        disabled={!included || rowIsLocked}
                         placeholder={isImageKey(k) ? "./lib/images/filename.png" : ""}
-                        title={isImageKey(k) ? "The file extension of the default value sets the SPX picker filter." : ""}
+                        title={
+                            isImageKey(k)
+                                ? "The file extension of the default value sets the SPX picker filter."
+                                : rowIsLocked
+                                    ? "Locked for SPX color fields"
+                                    : ""
+                        }
                     />
                     <button
                         className="ogf-reset-btn"
                         title="Reset default"
                         onClick={() => resetPropField("default", () => "")}
-                        disabled={!included}
+                        disabled={!included || rowIsLocked}
                     >
-                        <FontAwesomeIcon icon={faRotateRight}/>
+                        <FontAwesomeIcon icon={faRotateRight} />
                     </button>
                 </div>
-
             </div>);
         })}
-
 
         <hr className="ogf-hr"/>
         <details className="ogf-details">

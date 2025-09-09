@@ -36,7 +36,6 @@ function SpxExport() {
         setSPXGCTemplateDefinition(spxJson);
     }
 
-
     const handleInstructionChange = (event) => {
         const { value } = event.target;
         const newFields = [...SPXGCTemplateDefinition.DataFields];

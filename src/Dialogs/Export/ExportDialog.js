@@ -162,7 +162,7 @@ function ExportDialog({onClose}) {
                     for (const a of lottieJSON.assets) {
                         if (a.p && !String(a.p).startsWith('data:')) {
                             a.p = a.p.split('/').pop();
-                            a.u = "lib/images/";
+                            a.u = "images/";
                             a.e = 0;
                         }
                     }
