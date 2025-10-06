@@ -171,6 +171,7 @@ function ExportDialog({onClose}) {
                 const lottieTemplateFile = JSON.stringify(lottieJSON);
 
                 const lottiePlayerText = await (await fetch('/template/Ograf/lib/lottie-player.js')).text();
+                const lottieEsmComp = await (await fetch('/template/Ograf/lib/lottie-web.esm.mjs')).text();
 
                 const fixId = (s) => s && s.match(/^[a-z][a-z0-9-]*-[a-z0-9-]*$/) ? s : "graphic-template";
                 const manifestOut = (ografExportVendor === "spx"
@@ -191,7 +192,8 @@ function ExportDialog({onClose}) {
                     imgFolder.file(file.name, file);
                 });
 
-                libFolder.file("lottie-player.js", lottiePlayerText);
+                //libFolder.file("lottie-player.js", lottiePlayerText);
+                libFolder.file("lottie-web.esm.mjs", lottieEsmComp);
                 libFolder.file("lottie-template.json", lottieTemplateFile);
                 zip.file("graphic.mjs", graphicFile, {type: mimeType});
                 zip.file("manifest.ograf.json", manifestText);

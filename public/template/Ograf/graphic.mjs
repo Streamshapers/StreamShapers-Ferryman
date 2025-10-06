@@ -91,7 +91,8 @@ class FerrymanGraphic extends HTMLElement {
         const styleNode = temp.querySelector('style');
         if (styleNode) this.shadow.appendChild(styleNode);
 
-        const lottieModule = await import("https://esm.sh/lottie-web@5.12.2");
+        // Using local Lottie-Web (ESM) – equivalent to https://esm.sh/lottie-web@5.12.2
+        const lottieModule = await import(import.meta.resolve("./lib/lottie-web.esm.mjs"));
         this.lottie = lottieModule.default;
         if (this.state.showLogs) console.log("Load params: ",loadParams);
 
@@ -135,11 +136,6 @@ class FerrymanGraphic extends HTMLElement {
 
         //Clocks
         this.state.clocks = await this._parseClocks() || {};
-
-        const script = document.createElement('script');
-        //script.src = 'https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm';
-        script.src = import.meta.resolve("./lib/lottie-player.js")
-        this.shadow.appendChild(script);
 
         const animDiv = document.createElement('div');
         animDiv.id = 'animation1';
