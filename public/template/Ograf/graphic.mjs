@@ -1,7 +1,7 @@
 /**
  * ┌─────────────────────────────────────────────┐
  * │   This OGraf template was created using     │
- * │   StreamShapers Ferryman v${version}        │
+ * │   StreamShapers Ferryman ${version}        │
  * │   https://streamshapers.com                 │
  * └─────────────────────────────────────────────┘
  */
@@ -185,7 +185,7 @@ class FerrymanGraphic extends HTMLElement {
 
         //----
 
-        // Warte, bis der Player verfügbar ist
+        // Warte, bis der Player verfügbar ist //Noch zu Testen
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // Google
@@ -287,7 +287,6 @@ class FerrymanGraphic extends HTMLElement {
 
         return { currentStep: stepJustPlayed };
     }
-
 
     async stopAction(args = {}) {
         const { skipAnimation = false } = (args || {});
